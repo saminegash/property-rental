@@ -126,7 +126,7 @@ Allow car owners to create, edit, and manage car listings with itemized pricing 
 ## Task Group 3: Admin-Controlled Rental Request, Commission, and Rating Plan
 
 ### Goal
-Implement the full rental request lifecycle where renters submit requests, admins intermediate and control the process, and the platform calculates a 5% commission strictly on the base rental price. Document the rating system design for post-MVP implementation.
+Implement the full rental request lifecycle where renters submit requests, admins intermediate and control the process, and the platform calculates commission using a tiered model: flat fee (300–1,000 Birr) for short-term rentals based on daily price, or 8% for long-term rentals — strictly on the base rental price. Document the rating system design for post-MVP implementation.
 
 ### Tasks
 - [ ] Create `rental_requests` table migration:
@@ -136,9 +136,11 @@ Implement the full rental request lifecycle where renters submit requests, admin
   - `SELECT`: Renters can view only their own requests. Owners **cannot** see requests at all. Admins can view all requests.
   - `UPDATE`: Admins only.
   - `DELETE`: Not permitted for anyone (requests are status-managed, not deleted).
-- [ ] Create a Postgres function or trigger for commission calculation:
-  - On request status change to `confirmed`, compute `commission_amount = total_rental_price * 0.05`.
-  - Only the `base_rental_price` feeds into `total_rental_price`. Driver fee, delivery fee, security deposit are excluded.
+- [ ] Create a Postgres function or trigger for tiered commission calculation:
+  - Determine rental type: short-term (1–30 days) or long-term (31+ days).
+  - **Short-term:** Apply flat fee based on daily base rental price (≤ 2,000 Birr/day → 300 Birr; 2,001–5,000 → 600 Birr; > 5,000 → 1,000 Birr).
+  - **Long-term:** Compute `commission_amount = base_rental_price × rental_days × 0.08`.
+  - Only the `base_rental_price` feeds into the calculation. Driver fee, delivery fee, security deposit are excluded.
 - [ ] Build renter request submission flow:
   - Date picker on listing detail page to select rental period.
   - Server Action to compute `total_rental_price` (base price × number of days), validate dates, and insert the request with `pending` status.
@@ -150,7 +152,7 @@ Implement the full rental request lifecycle where renters submit requests, admin
   - Each request row shows: renter info, listing info, owner info, dates, pricing, and current status.
   - Status transition controls (dropdown or buttons) to move a request through the workflow: `pending` → `owner_contacted` → `confirmed` / `rejected`.
   - Admin notes field for internal remarks.
-  - Commission amount auto-populated and displayed when status moves to `confirmed`.
+  - Commission amount auto-populated and displayed when status moves to `confirmed`, showing the tier applied (flat fee or 8%).
 - [ ] Build admin request detail view:
   - Full breakdown of the request: listing details, renter contact info, owner contact info, itemized pricing, commission calculation, and status history.
 - [ ] Server Action for admin status updates:
@@ -168,7 +170,9 @@ Implement the full rental request lifecycle where renters submit requests, admin
 - [ ] A renter can select dates on a listing and submit a rental request. The request is created with `pending` status.
 - [ ] The submitted request is visible in the admin dashboard immediately. The car owner cannot see the request in any view.
 - [ ] An admin can transition a request through statuses: `pending` → `owner_contacted` → `confirmed` or `rejected`.
-- [ ] When a request is confirmed, the `commission_amount` is automatically calculated as exactly 5% of `total_rental_price` (which is derived solely from `base_rental_price` × days).
+- [ ] When a request is confirmed, the `commission_amount` is automatically calculated using the correct tier:
+  - Short-term (1–30 days): flat fee of 300, 600, or 1,000 Birr based on daily base rental price.
+  - Long-term (31+ days): exactly 8% of `total_rental_price` (derived solely from `base_rental_price × days`).
 - [ ] Driver fees, delivery fees, and security deposits are displayed but explicitly excluded from the commission calculation.
 - [ ] A renter can view their request history and see real-time status updates.
 - [ ] All admin status update actions use server-only logic; the service-role key is never sent to the client.
@@ -185,7 +189,9 @@ Implement the full rental request lifecycle where renters submit requests, admin
 
 ### Testing Notes
 - Submit a rental request as a renter and verify the admin sees it. Log in as the listing owner and confirm the request is not visible.
-- As an admin, transition a request to `confirmed` and verify the `commission_amount` column is populated correctly (e.g., a 10-day rental at $100/day base price should yield a $50 commission).
-- Create a listing with a $200/day base price, $50 driver fee, $30 delivery fee, and $500 deposit. Submit a 5-day rental request and confirm the commission is $50 (5% of $1000), not 5% of any sum that includes the other fees.
+- As an admin, transition a request to `confirmed` and verify the `commission_amount` column is populated correctly:
+  - Short-term example: a 5-day rental at 3,000 Birr/day should yield a 600 Birr flat commission (mid-tier).
+  - Long-term example: a 60-day rental at 1,000 Birr/day should yield 4,800 Birr commission (8% of 60,000).
+- Create a listing with a 4,000 Birr/day base price, 500 Birr driver fee, 300 Birr delivery fee, and 5,000 Birr deposit. Submit a 3-day rental request and confirm the commission is 600 Birr (mid-tier flat fee), not a percentage of any sum that includes the other fees.
 - Attempt to update a request status as a renter or owner via direct Supabase API call and confirm RLS blocks it.
 - Verify the admin notes field persists across status transitions and is not visible to renters.

@@ -1,7 +1,7 @@
 # Car Rental Marketplace MVP Specification
 
 ## Goal
-To build a rental-first marketplace where car owners can list their vehicles and renters can request them. The platform operates with a centralized, concierge-style model where administrators intercept and intermediate all rental requests before owners see them. The platform takes a strict 5% commission on the rental price only, exempting all other associated fees.
+To build a rental-first marketplace where car owners can list their vehicles and renters can request them. The platform operates with a centralized, concierge-style model where administrators intercept and intermediate all rental requests before owners see them. The platform uses a tiered commission model on the base rental price only: a flat fee (300–1,000 Birr) for short-term rentals (1–30 days) scaled by daily rental price, and 8% for long-term rentals (31+ days). All other associated fees are exempt from commission.
 
 ## Users
 1. **Car Owners:** Users who register on the platform and list their cars for rent.
@@ -15,7 +15,7 @@ To build a rental-first marketplace where car owners can list their vehicles and
 - Rental request submission system for renters.
 - Admin dashboard to receive, view, and manage all rental requests.
 - Admin workflow to update request statuses (e.g., Pending, Owner Contacted, Confirmed, Rejected).
-- Commission calculation engine (5% of the core rental price).
+- Tiered commission calculation engine (flat 300–1,000 Birr for short-term, 8% for long-term, on the base rental price only).
 - Basic database architecture designed with future extensibility in mind (to support future sales and property listings).
 
 ## Out of Scope
@@ -39,12 +39,16 @@ To build a rental-first marketplace where car owners can list their vehicles and
    - Admin negotiates or confirms details with the owner.
    - Admin updates the renter regarding the request status and finalized details.
 4. **Financial Calculation:**
-   - Platform automatically calculates the 5% commission based *only* on the base rental price for the requested period.
-   - Other fees are clearly separated and tracked without commission applied.
+   - Platform automatically determines the commission type based on rental duration:
+     - **Short-term (1–30 days):** Flat fee of 300–1,000 Birr, scaled by the listing's daily base rental price.
+     - **Long-term (31+ days):** 8% of `base_rental_price × rental days`.
+   - Only the base rental price is used. Other fees are clearly separated and tracked without commission applied.
 
 ## Business Rules
 - **Admin Intermediation:** All rental requests are strictly controlled by admins. Car owners do not receive direct requests or see renter details until the admin facilitates the connection.
-- **Commission Structure:** The platform commission is strictly 5% of the rental price.
+- **Commission Structure:** The platform uses a tiered commission model based on rental duration:
+  - **Short-term (1–30 days):** A flat fee between 300–1,000 Birr, determined by the listing's daily base rental price (higher price → higher flat fee).
+  - **Long-term (31+ days):** 8% of `base_rental_price × rental days`.
 - **Exempt Fees:** Driver fees, delivery fees, security deposits, penalties, and damage fees are 100% excluded from platform commission calculations.
 - **Future-Proofing:** The platform's foundational architecture (database schema, models) must be designed to eventually support car sales, property rentals, and property sales without requiring a complete rewrite.
 
@@ -53,5 +57,5 @@ To build a rental-first marketplace where car owners can list their vehicles and
 - [ ] A renter can browse listings, view details, and successfully submit a rental request for specific dates.
 - [ ] Upon request submission, the request is routed exclusively to the admin dashboard. The owner does not receive an automated direct request.
 - [ ] Admins can view a queue of all rental requests, see renter and owner details, and update the status of the request.
-- [ ] The system accurately calculates the platform fee as exactly 5% of the listed rental price, ignoring driver fees, delivery fees, and security deposits.
+- [ ] The system accurately calculates the platform fee using the tiered model: flat 300–1,000 Birr for short-term rentals (1–30 days) based on daily price, or 8% of base rental price for long-term rentals (31+ days), ignoring driver fees, delivery fees, and security deposits.
 - [ ] The underlying data models are structured generically enough (e.g., `Listing`, `ListingType`) to support future non-car rental categories.

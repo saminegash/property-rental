@@ -57,14 +57,19 @@ As per the core business rules, owners do not receive direct requests.
 - The renter is then notified of the update.
 
 ## Commission Strategy
-- Commission is strictly defined as 5% of the `base_rental_price`.
+- Commission uses a tiered model based on rental duration, calculated exclusively on the `base_rental_price`.
+- **Short-term (1–30 days):** Flat fee determined by the listing's daily base rental price:
+  - ≤ 2,000 Birr/day → **300 Birr**
+  - 2,001–5,000 Birr/day → **600 Birr**
+  - > 5,000 Birr/day → **1,000 Birr**
+- **Long-term (31+ days):** **8%** of `base_rental_price × rental days`.
 - Excluded fees: driver fee, delivery fee, security deposit, damage fees.
-- **Implementation:** The calculation will **never** be done on the client side. 
-- When an Admin confirms a request (or when the request is finalized), a Postgres Database Trigger or a secure Next.js Server Action will read the `base_rental_price` of the listing, calculate the 5%, and save it to the `commission_amount` column in the `rental_requests` table.
+- **Implementation:** The calculation will **never** be done on the client side.
+- When an Admin confirms a request (or when the request is finalized), a Postgres Database Trigger or a secure Next.js Server Action will determine the rental type (short/long-term), look up the appropriate commission tier or rate, calculate the amount, and save it to the `commission_amount` column in the `rental_requests` table.
 
 ## Future Expansion Strategy
 To ensure the platform can scale to property rentals and sales:
 1. **Generic Core Models:** The primary table is `listings`, not `cars`. The `type` column easily accommodates `property_rental` or `property_sale`.
 2. **Flexible Schemas:** Utilizing JSONB for listing `attributes` means we don't need expensive database migrations to add "square footage" or "number of bathrooms" when property support is added.
-3. **Decoupled Pricing:** By separating `base_price` from contextual fees, the 5% commission logic will continue to work flawlessly whether the base price refers to a weekly car rental or a monthly apartment lease.
+3. **Decoupled Pricing:** By separating `base_price` from contextual fees, the tiered commission logic will continue to work flawlessly whether the base price refers to a weekly car rental or a monthly apartment lease.
 4. **Extensible Frontend:** UI components like `ListingCard` will be polymorphic, capable of rendering different layouts based on the `listing.type`.

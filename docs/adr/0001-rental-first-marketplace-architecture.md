@@ -69,20 +69,28 @@ When volume justifies it, the `rental_requests` RLS policies can be relaxed to a
 
 ---
 
-## Decision 4: 5% Commission on Rental Price Only
+## Decision 4: Tiered Commission on Rental Price Only
 
 ### Decision
-The platform charges a 5% commission calculated exclusively on the `base_rental_price × rental days`. Driver fees, delivery fees, security deposits, penalties, and damage fees are fully excluded from the commission calculation.
+The platform uses a tiered commission model calculated exclusively on the `base_rental_price`. Driver fees, delivery fees, security deposits, penalties, and damage fees are fully excluded.
+
+- **Short-term rentals (1–30 days):** A flat fee between 300–1,000 Birr, determined by the listing's daily base rental price:
+  - ≤ 2,000 Birr/day → **300 Birr**
+  - 2,001–5,000 Birr/day → **600 Birr**
+  - > 5,000 Birr/day → **1,000 Birr**
+- **Long-term rentals (31+ days):** **8%** of `base_rental_price × rental days`.
 
 ### Why
 - **Transparent and fair pricing.** Owners and renters can clearly understand what the platform earns. Charging commission on deposits or damage fees would feel punitive and erode trust.
-- **Competitive rate.** 5% is significantly lower than established rental marketplaces (Turo charges 15–40%, Getaround charges 40%). This attracts early supply (owners) who are price-sensitive about platform fees.
+- **Competitive rates.** Both the flat fees and the 8% rate are significantly lower than established rental marketplaces (Turo charges 15–40%, Getaround charges 40%). This attracts early supply (owners) who are price-sensitive about platform fees.
+- **Tiered model rewards volume.** Short-term rentals are low-value, high-frequency — a flat fee is predictable for owners and avoids collecting negligible percentages. Long-term rentals are high-value — a percentage ensures the platform earns proportionally as deal sizes grow.
+- **Incentivizes negotiation quality.** For short-term rentals, the flat fee is tied to the daily price tier. When the admin negotiates a higher rental price for the owner, the platform also moves into a higher commission tier. This aligns platform and owner incentives.
 - **Encourages accurate fee reporting.** If commission applied to all fees, owners would be incentivized to inflate the "base price" and minimize other fees, distorting the pricing structure. By exempting ancillary fees, owners have no reason to game the breakdown.
 - **Clean separation of concerns.** Security deposits are held temporarily and returned. Damage fees are contingent and unpredictable. Applying commission to these creates accounting complexity and potential disputes. Excluding them keeps the financial model simple.
-- **Server-side enforcement.** The commission formula runs exclusively in Postgres (trigger) or a secure Server Action, never on the client. This prevents tampering and ensures consistency.
+- **Server-side enforcement.** The commission logic runs exclusively in Postgres (trigger) or a secure Server Action, never on the client. This prevents tampering and ensures consistency.
 
 ### Tradeoffs
-- 5% may be too low to sustain operations at small scale. The rate can be adjusted later as the platform proves its value.
+- Flat fees for short-term rentals mean the platform earns a fixed amount regardless of rental duration within the 1–30 day window. A 1-day rental and a 30-day rental at the same daily price produce the same commission.
 - Excluding ancillary fees means the platform earns nothing from high-value add-on services (premium drivers, long-distance delivery). This can be revisited when those services are formalized.
 
 ---
