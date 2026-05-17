@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { ensureProfileExists } from "@/lib/auth/profile";
 import { redirect } from "next/navigation";
 import { logout } from "../(auth)/actions";
 import Link from "next/link";
@@ -14,10 +15,12 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   // Defense-in-depth: redirect if not authenticated
-  // (proxy.ts also handles this)
   if (!user) {
     redirect("/login");
   }
+
+  // Ensure profile exists (fallback for DB trigger)
+  await ensureProfileExists(user);
 
   return (
     <div className="dashboard-layout">
