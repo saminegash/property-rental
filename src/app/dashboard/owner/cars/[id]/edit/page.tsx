@@ -4,6 +4,7 @@ import VehicleDetailsForm from "./vehicle-details-form";
 import DriverOptionsForm from "./driver-options-form";
 import PickupDeliveryForm from "./pickup-delivery-form";
 import ImageUploadForm from "./image-upload-form";
+import SubmitReviewPanel from "./submit-review-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -22,10 +23,10 @@ export default async function EditCarPage({
 
   if (!user) redirect("/login");
 
-  // Fetch the listing (RLS ensures only the owner can see their own listings)
+  // Fetch the listing with status (RLS ensures only the owner can see their own)
   const { data: listing, error: listingError } = await supabase
     .from("listings")
-    .select("id, title, owner_id")
+    .select("id, title, owner_id, status")
     .eq("id", id)
     .single();
 
@@ -112,6 +113,14 @@ export default async function EditCarPage({
       <ImageUploadForm
         listingId={listing.id}
         existingImages={listingImages || []}
+      />
+
+      <SubmitReviewPanel
+        listingId={listing.id}
+        listingStatus={listing.status}
+        hasVehicleDetails={!!vehicleDetails}
+        hasRentalTerms={!!rentalTerms}
+        imageCount={(listingImages || []).length}
       />
     </>
   );

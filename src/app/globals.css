@@ -409,6 +409,47 @@ body {
 }
 
 /* ============================================================
+   Status Badge
+   ============================================================ */
+
+.status-badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}
+
+.status-badge--draft {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+.status-badge--pending {
+  background-color: #422006;
+  color: #fbbf24;
+  border-color: #78350f;
+}
+
+.status-badge--published {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+  border-color: var(--color-success-border);
+}
+
+.status-badge--rejected {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+  border-color: var(--color-error-border);
+}
+
+/* ============================================================
    Role Selection
    ============================================================ */
 

@@ -538,3 +538,104 @@ export async function deleteImage(params: {
   revalidatePath(`/dashboard/owner/cars/${params.listingId}/edit`);
   return { success: true };
 }
+
+// ─── Submit for Review ──────────────────────────────────────────
+
+export async function submitForReview(listingId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Fetch listing with status
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("id, owner_id, status, title, location")
+    .eq("id", listingId)
+    .single();
+
+  if (listingError || !listing) {
+    return { error: "Listing not found or you don't have permission" };
+  }
+
+  if (listing.owner_id !== user.id) {
+    return { error: "You can only submit your own listings" };
+  }
+
+  if (listing.status !== "draft") {
+    return { error: "Only draft listings can be submitted for review" };
+  }
+
+  // ── Completeness checks ──
+
+  const missing: string[] = [];
+
+  // 1. Basic info
+  if (!listing.title || listing.title.trim().length < 3) {
+    missing.push("Listing title (at least 3 characters)");
+  }
+  if (!listing.location || listing.location.trim().length === 0) {
+    missing.push("Pickup location");
+  }
+
+  // 2. Vehicle details
+  const { data: vehicleDetails } = await supabase
+    .from("vehicle_details")
+    .select("id")
+    .eq("listing_id", listingId)
+    .single();
+
+  if (!vehicleDetails) {
+    missing.push("Vehicle details (make, model, year, etc.)");
+  }
+
+  // 3. Rental terms
+  const { data: rentalTerms } = await supabase
+    .from("rental_terms")
+    .select("id, available_with_driver, available_without_driver")
+    .eq("listing_id", listingId)
+    .single();
+
+  if (!rentalTerms) {
+    missing.push("Driver options (with or without driver)");
+  } else if (!rentalTerms.available_with_driver && !rentalTerms.available_without_driver) {
+    missing.push("At least one driver option must be selected");
+  }
+
+  // 4. At least one image
+  const { count } = await supabase
+    .from("listing_images")
+    .select("id", { count: "exact", head: true })
+    .eq("listing_id", listingId);
+
+  if (!count || count === 0) {
+    missing.push("At least one listing photo");
+  }
+
+  if (missing.length > 0) {
+    return {
+      error: "Your listing is not ready for review. Please complete the following:",
+      missing,
+    };
+  }
+
+  // ── Update status ──
+
+  const { error: updateError } = await supabase
+    .from("listings")
+    .update({ status: "pending_review" })
+    .eq("id", listingId);
+
+  if (updateError) {
+    return { error: "Failed to submit listing: " + updateError.message };
+  }
+
+  revalidatePath(`/dashboard/owner/cars/${listingId}/edit`);
+  revalidatePath("/dashboard/owner");
+  return { success: true };
+}
+
