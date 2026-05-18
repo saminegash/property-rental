@@ -270,6 +270,145 @@ body {
 }
 
 /* ============================================================
+   Image Upload
+   ============================================================ */
+
+.image-upload-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  margin-bottom: 1.5rem;
+}
+
+.image-upload-zone:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(99, 102, 241, 0.04);
+}
+
+.image-upload-zone[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.image-upload-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.image-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  text-align: center;
+}
+
+.image-upload-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.image-upload-text {
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.image-upload-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   Image Grid
+   ============================================================ */
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.image-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+.image-card__preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: var(--color-surface-hover);
+}
+
+.image-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-card__badge {
+  position: absolute;
+  top: 0.375rem;
+  left: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.image-card__actions {
+  display: flex;
+  gap: 0;
+}
+
+.image-card__btn {
+  flex: 1;
+  padding: 0.375rem 0.25rem;
+  font-size: 0.6875rem;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.image-card__btn:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.image-card__btn--delete:hover {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+.image-card__btn + .image-card__btn {
+  border-left: 1px solid var(--color-border);
+}
+
+/* ============================================================
    Role Selection
    ============================================================ */
 

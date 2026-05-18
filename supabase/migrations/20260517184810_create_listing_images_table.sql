@@ -67,8 +67,7 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('listing-images', 'listing-images', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Turn on RLS for storage.objects if not already on
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Note: RLS on storage.objects is already enabled by Supabase.
 
 -- Storage Policy: Anyone can view objects in the listing-images bucket
 CREATE POLICY "Public can view listing images"

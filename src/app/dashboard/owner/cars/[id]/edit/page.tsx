@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import VehicleDetailsForm from "./vehicle-details-form";
 import DriverOptionsForm from "./driver-options-form";
 import PickupDeliveryForm from "./pickup-delivery-form";
+import ImageUploadForm from "./image-upload-form";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,13 @@ export default async function EditCarPage({
     .eq("listing_id", id)
     .single();
 
+  // Fetch existing listing images
+  const { data: listingImages } = await supabase
+    .from("listing_images")
+    .select("id, image_url, storage_path, is_primary, sort_order")
+    .eq("listing_id", id)
+    .order("sort_order", { ascending: true });
+
   return (
     <>
       <VehicleDetailsForm
@@ -99,6 +107,11 @@ export default async function EditCarPage({
               }
             : null
         }
+      />
+
+      <ImageUploadForm
+        listingId={listing.id}
+        existingImages={listingImages || []}
       />
     </>
   );
