@@ -104,6 +104,18 @@ export default async function CarDetailPage({
     .single();
 
   const isVerified = ownerProfile?.verification_status === "verified";
+
+  // Fetch owner reviews
+  const { data: reviews } = await supabase
+    .from("rental_reviews")
+    .select("overall_rating")
+    .eq("reviewee_id", listing.owner_id)
+    .eq("reviewee_role", "owner");
+
+  const ownerRating = reviews && reviews.length > 0 
+    ? (reviews.reduce((acc, r) => acc + r.overall_rating, 0) / reviews.length).toFixed(1) 
+    : "New";
+  const ownerReviewCount = reviews?.length || 0;
   const vehicleTypeRaw = vd?.vehicle_types as unknown;
   const vehicleTypeName = Array.isArray(vehicleTypeRaw)
     ? (vehicleTypeRaw[0] as { name: string } | undefined)?.name
@@ -194,6 +206,13 @@ export default async function CarDetailPage({
               )}
 
               <div className="detail-badges">
+                <span className="detail-badge" style={{ backgroundColor: "var(--color-surface-hover)", color: "var(--color-text-heading)", border: "1px solid var(--color-border)" }}>
+                  ⭐ {ownerRating} Owner Score {ownerReviewCount > 0 ? `(${ownerReviewCount})` : ""}
+                </span>
+                <span className="detail-badge" style={{ backgroundColor: "var(--color-surface-hover)", color: "var(--color-text-muted)", border: "1px dashed var(--color-border)" }}>
+                  🚗 Car Rating: Coming Soon
+                </span>
+
                 {isVerified && (
                   <span className="detail-badge detail-badge--verified">
                     ✓ Verified Owner
