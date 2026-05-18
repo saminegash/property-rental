@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import RentalRequestForm from "./RentalRequestForm";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -396,23 +397,12 @@ export default async function CarDetailPage({
                 </div>
               )}
 
-              {/* CTA */}
-              <Link
-                href="/login"
-                className="auth-button"
-                style={{
-                  display: "block",
-                  textDecoration: "none",
-                  textAlign: "center",
-                  width: "100%",
-                  marginTop: "1rem",
-                }}
-              >
-                Request Rental
-              </Link>
-              <p style={{ fontSize: "0.6875rem", color: "var(--color-text-muted)", textAlign: "center", marginTop: "0.5rem" }}>
-                You&apos;ll need to sign in to request a rental.
-              </p>
+              {/* CTA Form */}
+              <RentalRequestForm
+                listingId={listing.id}
+                availableWithDriver={!!rt?.available_with_driver}
+                deliveryAvailable={!!rt?.delivery_available}
+              />
             </div>
           </aside>
         </div>
