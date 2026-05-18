@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateRequestStatus, updateRequestAdminNotes } from "./actions";
+import { updateRequestStatus, updateRequestAdminNotes, updateRequestOwnerNotes } from "./actions";
 
 type RequestProfile = {
   full_name: string | null;
@@ -29,6 +29,7 @@ type EnrichedRequest = {
   message: string | null;
   status: string;
   admin_notes: string | null;
+  owner_response_notes: string | null;
   created_at: string;
   listing: RequestListing;
   owner: RequestProfile | null;
@@ -61,16 +62,22 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
+  const [ownerNotes, setOwnerNotes] = useState(request.owner_response_notes || "");
 
-  async function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  async function handleStatusChange(newStatus: string) {
     setIsUpdating(true);
-    await updateRequestStatus(request.id, e.target.value);
+    await updateRequestStatus(request.id, newStatus);
     setIsUpdating(false);
   }
 
   async function handleNotesSave() {
     setIsUpdating(true);
-    await updateRequestAdminNotes(request.id, adminNotes);
+    if (adminNotes !== (request.admin_notes || "")) {
+      await updateRequestAdminNotes(request.id, adminNotes);
+    }
+    if (ownerNotes !== (request.owner_response_notes || "")) {
+      await updateRequestOwnerNotes(request.id, ownerNotes);
+    }
     setIsUpdating(false);
   }
 
@@ -181,11 +188,48 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
               <h4 style={{ fontSize: "0.875rem", marginTop: "1.5rem", marginBottom: "0.5rem", color: "var(--color-text-heading)" }}>
                 Admin Controls
               </h4>
+              
+              {/* Quick Status Flow Buttons */}
+              <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                <button 
+                  onClick={() => handleStatusChange("admin_reviewing")}
+                  disabled={isUpdating || request.status === "admin_reviewing"}
+                  className="auth-button auth-button--secondary"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", flex: 1 }}
+                >
+                  Reviewing
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("owner_contacted")}
+                  disabled={isUpdating || request.status === "owner_contacted"}
+                  className="auth-button auth-button--secondary"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", flex: 1 }}
+                >
+                  Owner Contacted
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("owner_available")}
+                  disabled={isUpdating || request.status === "owner_available"}
+                  className="auth-button"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", backgroundColor: "var(--color-success)", flex: 1 }}
+                >
+                  Available
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("owner_unavailable")}
+                  disabled={isUpdating || request.status === "owner_unavailable"}
+                  className="auth-button"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", backgroundColor: "var(--color-error)", flex: 1 }}
+                >
+                  Unavailable
+                </button>
+              </div>
+
               <div className="auth-field" style={{ marginBottom: "1rem" }}>
-                <label className="auth-label">Status Update</label>
+                <label className="auth-label">All Statuses</label>
                 <select
                   value={request.status}
-                  onChange={handleStatusChange}
+                  onChange={(e) => handleStatusChange(e.target.value)}
                   disabled={isUpdating}
                   className="auth-input"
                   style={{ padding: "0.5rem" }}
@@ -198,18 +242,29 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                 </select>
               </div>
 
+              <div className="auth-field" style={{ marginBottom: "1rem" }}>
+                <label className="auth-label">Owner Response Notes</label>
+                <textarea
+                  value={ownerNotes}
+                  onChange={(e) => setOwnerNotes(e.target.value)}
+                  className="auth-input"
+                  rows={2}
+                  placeholder="Record owner availability context..."
+                />
+              </div>
+
               <div className="auth-field">
                 <label className="auth-label">Internal Admin Notes</label>
                 <textarea
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   className="auth-input"
-                  rows={3}
+                  rows={2}
                   placeholder="Only visible to admins..."
                 />
                 <button
                   onClick={handleNotesSave}
-                  disabled={isUpdating || adminNotes === (request.admin_notes || "")}
+                  disabled={isUpdating || (adminNotes === (request.admin_notes || "") && ownerNotes === (request.owner_response_notes || ""))}
                   className="auth-button"
                   style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", marginTop: "0.5rem" }}
                 >

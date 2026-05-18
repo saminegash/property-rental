@@ -56,3 +56,21 @@ export async function updateRequestAdminNotes(requestId: string, notes: string) 
   revalidatePath("/admin/requests");
   return { success: true };
 }
+
+export async function updateRequestOwnerNotes(requestId: string, notes: string) {
+  await ensureAdmin();
+
+  const adminClient = createAdminClient();
+
+  const { error } = await adminClient
+    .from("rental_requests")
+    .update({ owner_response_notes: notes })
+    .eq("id", requestId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin/requests");
+  return { success: true };
+}
