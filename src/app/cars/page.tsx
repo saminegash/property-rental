@@ -241,6 +241,9 @@ export default async function BrowseCarsPage() {
       {/* Footer */}
       <footer className="browse-footer">
         <p>© {new Date().getFullYear()} CarMarket. All rights reserved.</p>
+        <div style={{ marginTop: "1rem", display: "flex", gap: "1.5rem", justifyContent: "center" }}>
+          <Link href="/safety" style={{ color: "var(--color-primary)", textDecoration: "none" }}>Safety & Rules</Link>
+        </div>
       </footer>
     </div>
   );

@@ -31,6 +31,11 @@ export default function Home() {
             </Link>
           </div>
         </div>
+        <div style={{ textAlign: "center", marginTop: "2rem" }}>
+          <Link href="/safety" style={{ color: "var(--color-primary)", textDecoration: "none", fontSize: "0.875rem" }}>
+            Safety & Marketplace Rules
+          </Link>
+        </div>
       </div>
     </div>
   );
