@@ -36,7 +36,19 @@ export default async function OwnerLayout({
         >
           My Cars
         </Link>
-        {/* Placeholder for future links like "Bookings", "Earnings" */}
+        <Link 
+          href="/dashboard/owner/requests" 
+          style={{ 
+            color: "var(--color-primary)", 
+            textDecoration: "none", 
+            fontWeight: 600,
+            padding: "0.5rem 1rem",
+            backgroundColor: "rgba(99, 102, 241, 0.1)",
+            borderRadius: "var(--radius-md)"
+          }}
+        >
+          Rental Requests
+        </Link>
       </div>
       {children}
     </div>
