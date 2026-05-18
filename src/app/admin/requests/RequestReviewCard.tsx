@@ -189,7 +189,10 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                 Admin Controls
               </h4>
               
-              {/* Quick Status Flow Buttons */}
+              {/* Quick Status Flow Buttons - Owner */}
+              <div style={{ marginBottom: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", fontWeight: "bold", textTransform: "uppercase", color: "var(--color-text-muted)" }}>Owner Flow</span>
+              </div>
               <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                 <button 
                   onClick={() => handleStatusChange("admin_reviewing")}
@@ -205,7 +208,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                   className="auth-button auth-button--secondary"
                   style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", flex: 1 }}
                 >
-                  Owner Contacted
+                  Contacted
                 </button>
                 <button 
                   onClick={() => handleStatusChange("owner_available")}
@@ -222,6 +225,53 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                   style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", backgroundColor: "var(--color-error)", flex: 1 }}
                 >
                   Unavailable
+                </button>
+              </div>
+
+              {/* Quick Status Flow Buttons - Renter/Resolution */}
+              <div style={{ marginBottom: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", fontWeight: "bold", textTransform: "uppercase", color: "var(--color-text-muted)" }}>Renter & Resolution Flow</span>
+              </div>
+              <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                <button 
+                  onClick={() => handleStatusChange("renter_contacted")}
+                  disabled={isUpdating || request.status === "renter_contacted"}
+                  className="auth-button auth-button--secondary"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", flex: 1 }}
+                >
+                  Contacted
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("awaiting_payment")}
+                  disabled={isUpdating || request.status === "awaiting_payment"}
+                  className="auth-button auth-button--secondary"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", flex: 1 }}
+                >
+                  Awaiting Pay
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("confirmed")}
+                  disabled={isUpdating || request.status === "confirmed"}
+                  className="auth-button"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", backgroundColor: "var(--color-primary)", flex: 1 }}
+                >
+                  Confirm
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("cancelled")}
+                  disabled={isUpdating || request.status === "cancelled"}
+                  className="auth-button"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", backgroundColor: "var(--color-error)", flex: 1 }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => handleStatusChange("rejected")}
+                  disabled={isUpdating || request.status === "rejected"}
+                  className="auth-button"
+                  style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", backgroundColor: "var(--color-error)", flex: 1 }}
+                >
+                  Reject
                 </button>
               </div>
 
