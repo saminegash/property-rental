@@ -20,7 +20,10 @@ export default function Home() {
             Find a car to rent or list yours on the platform.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            <Link href="/signup" className="auth-button" style={{ textDecoration: "none", textAlign: "center" }}>
+            <Link href="/cars" className="auth-button" style={{ textDecoration: "none", textAlign: "center" }}>
+              Browse Cars
+            </Link>
+            <Link href="/signup" className="auth-button auth-button--secondary" style={{ textDecoration: "none", textAlign: "center" }}>
               Create an account
             </Link>
             <Link href="/login" className="auth-button auth-button--secondary" style={{ textDecoration: "none", textAlign: "center" }}>
