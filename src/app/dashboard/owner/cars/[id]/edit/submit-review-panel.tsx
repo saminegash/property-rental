@@ -175,15 +175,15 @@ export default function SubmitReviewPanel({
 
       {success && (
         <div className="form-success" role="status" style={{ marginBottom: "1rem" }}>
-          🎉 Your listing has been submitted for admin review! You'll be
-          notified once it's approved.
+          🎉 Your listing has been submitted for admin review! You&apos;ll be
+          notified once it&apos;s approved.
         </div>
       )}
 
       {!isDraft && !success && (
         <p className="dashboard-hint" style={{ marginBottom: "1.5rem" }}>
           {status === "pending_review"
-            ? "Your listing is currently being reviewed by an admin. You'll be notified once it's approved."
+            ? "Your listing is currently being reviewed by an admin. You&apos;ll be notified once it&apos;s approved."
             : status === "published"
               ? "Your listing is live and visible to renters."
               : status === "rejected"

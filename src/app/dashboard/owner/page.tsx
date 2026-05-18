@@ -51,7 +51,7 @@ export default async function OwnerMyCarsPage() {
       {!listings || listings.length === 0 ? (
         <div className="dashboard-card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
           <h2 style={{ fontSize: "1.25rem", color: "var(--color-text-heading)", marginBottom: "0.5rem" }}>
-            You haven't listed any cars yet
+            You haven&apos;t listed any cars yet
           </h2>
           <p className="dashboard-hint" style={{ marginBottom: "1.5rem" }}>
             Start earning by listing your first vehicle on CarMarket.
