@@ -50,6 +50,27 @@ export default function AdminPage() {
             Review and approve car listings submitted by owners.
           </p>
         </Link>
+
+        <Link 
+          href="/admin/requests" 
+          style={{ 
+            display: "block", 
+            padding: "1.5rem", 
+            border: "1px solid var(--color-border)", 
+            borderRadius: "var(--radius-md)",
+            textDecoration: "none",
+            backgroundColor: "var(--color-bg)",
+            textAlign: "left",
+            transition: "border-color 0.15s ease"
+          }}
+        >
+          <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
+            Rental Requests
+          </h2>
+          <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+            Review new bookings, update request statuses, and manage platform flow.
+          </p>
+        </Link>
       </div>
     </div>
   );
