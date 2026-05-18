@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { updateRequestStatus, updateRequestAdminNotes, updateRequestOwnerNotes } from "./actions";
+import { 
+  updateRequestStatus, 
+  updateRequestAdminNotes, 
+  updateRequestOwnerNotes,
+  generateCommission,
+  updateCommissionStatus 
+} from "./actions";
 
 type RequestProfile = {
   full_name: string | null;
@@ -12,6 +18,13 @@ type RequestProfile = {
 type RequestListing = {
   title: string;
   owner_id: string;
+};
+
+type RequestCommission = {
+  id: string;
+  commission_base_amount: number;
+  commission_amount: number;
+  commission_status: string;
 };
 
 type EnrichedRequest = {
@@ -34,6 +47,7 @@ type EnrichedRequest = {
   listing: RequestListing;
   owner: RequestProfile | null;
   renterProfile: RequestProfile | null;
+  commission: RequestCommission | null;
 };
 
 const STATUS_OPTIONS = [
@@ -141,6 +155,65 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                       &quot;{request.message}&quot;
                     </span>
                   </div>
+                )}
+              </div>
+
+              <h4 style={{ fontSize: "0.875rem", marginTop: "1.5rem", marginBottom: "0.5rem", color: "var(--color-text-heading)" }}>
+                Financials & Commission
+              </h4>
+              <div className="review-grid" style={{ gridTemplateColumns: "1fr", backgroundColor: "var(--color-surface-hover)", padding: "1rem", borderRadius: "var(--radius-md)" }}>
+                {!request.commission ? (
+                  <div>
+                    <p style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", marginBottom: "0.75rem" }}>
+                      Commission has not been generated for this request yet.
+                    </p>
+                    <button
+                      onClick={async () => {
+                        setIsUpdating(true);
+                        await generateCommission(request.id);
+                        setIsUpdating(false);
+                      }}
+                      disabled={isUpdating}
+                      className="auth-button auth-button--secondary"
+                      style={{ padding: "0.5rem 1rem", fontSize: "0.8125rem" }}
+                    >
+                      {isUpdating ? "Calculating..." : "Calculate Commission (5%)"}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                      <span className="review-label">Rental Base (excl. fees)</span>
+                      <span className="review-value" style={{ fontWeight: 500 }}>
+                        {request.commission.commission_base_amount.toLocaleString()} Birr
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem", paddingBottom: "0.75rem", borderBottom: "1px solid var(--color-border)" }}>
+                      <span className="review-label" style={{ color: "var(--color-primary)" }}>Platform Commission (5%)</span>
+                      <span className="review-value" style={{ fontWeight: 600, color: "var(--color-primary)" }}>
+                        {request.commission.commission_amount.toLocaleString()} Birr
+                      </span>
+                    </div>
+                    <div>
+                      <span className="review-label" style={{ display: "block", marginBottom: "0.25rem" }}>Commission Status</span>
+                      <select
+                        value={request.commission.commission_status}
+                        onChange={async (e) => {
+                          setIsUpdating(true);
+                          await updateCommissionStatus(request.commission!.id, e.target.value);
+                          setIsUpdating(false);
+                        }}
+                        disabled={isUpdating}
+                        className="auth-input"
+                        style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem" }}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="collected">Collected</option>
+                        <option value="waived">Waived</option>
+                        <option value="refunded">Refunded</option>
+                      </select>
+                    </div>
+                  </>
                 )}
               </div>
 

@@ -60,6 +60,13 @@ export default async function AdminRequestsPage() {
     .select("user_id, full_name, email, phone")
     .in("user_id", Array.from(userIds));
 
+  // Batch fetch commissions
+  const requestIds = requests.map((r) => r.id);
+  const { data: commissions } = await adminClient
+    .from("commissions")
+    .select("id, rental_request_id, commission_base_amount, commission_amount, commission_status")
+    .in("rental_request_id", requestIds);
+
   // Build enriched request objects
   const enrichedRequests = requests.map((request) => {
     const listing = listings?.find((l) => l.id === request.listing_id) || {
@@ -72,11 +79,14 @@ export default async function AdminRequestsPage() {
       ? profiles?.find((p) => p.user_id === request.renter_id) || null
       : null;
 
+    const commission = commissions?.find((c) => c.rental_request_id === request.id) || null;
+
     return {
       ...request,
       listing,
       owner: ownerProfile,
       renterProfile,
+      commission,
     };
   });
 
