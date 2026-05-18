@@ -250,3 +250,130 @@ export async function saveDriverOptions(formData: FormData) {
   revalidatePath("/dashboard/owner");
   return { success: true };
 }
+
+// ─── Pickup & Delivery ──────────────────────────────────────────
+
+const pickupDeliverySchema = z.object({
+  listing_id: z.string().uuid("Invalid listing ID"),
+  pickup_available: z.boolean(),
+  delivery_available: z.boolean(),
+  delivery_fee: z.coerce
+    .number()
+    .int()
+    .min(0, "Delivery fee must be 0 or more")
+    .nullable(),
+  estimated_delivery_time: z
+    .enum(["within_3_hours", "same_day", "next_day", "custom", ""], {
+      message: "Invalid delivery time option",
+    })
+    .transform((v) => (v === "" ? null : v))
+    .nullable(),
+  rental_notes: z.string().optional(),
+});
+
+export async function savePickupDelivery(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const listingId = formData.get("listing_id");
+
+  // Verify listing ownership (RLS + defense-in-depth)
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("id, owner_id")
+    .eq("id", listingId)
+    .single();
+
+  if (listingError || !listing) {
+    return {
+      error: "Listing not found or you don't have permission to edit it",
+    };
+  }
+
+  if (listing.owner_id !== user.id) {
+    return {
+      error: "You can only update pickup & delivery for your own listings",
+    };
+  }
+
+  const rawDeliveryFee = formData.get("delivery_fee");
+
+  const parseResult = pickupDeliverySchema.safeParse({
+    listing_id: listingId,
+    pickup_available: formData.get("pickup_available") === "true",
+    delivery_available: formData.get("delivery_available") === "true",
+    delivery_fee:
+      rawDeliveryFee === "" || rawDeliveryFee === null
+        ? null
+        : rawDeliveryFee,
+    estimated_delivery_time: formData.get("estimated_delivery_time") || null,
+    rental_notes: formData.get("rental_notes") || undefined,
+  });
+
+  if (!parseResult.success) {
+    return { error: parseResult.error.issues[0].message };
+  }
+
+  const data = parseResult.data;
+
+  // Clear delivery-specific fields if delivery is not available
+  const deliveryFields = data.delivery_available
+    ? {
+        delivery_fee: data.delivery_fee,
+        estimated_delivery_time: data.estimated_delivery_time,
+      }
+    : {
+        delivery_fee: null,
+        estimated_delivery_time: null,
+      };
+
+  // Check if rental_terms already exist for this listing (upsert)
+  const { data: existing } = await supabase
+    .from("rental_terms")
+    .select("id")
+    .eq("listing_id", data.listing_id)
+    .single();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("rental_terms")
+      .update({
+        pickup_available: data.pickup_available,
+        delivery_available: data.delivery_available,
+        ...deliveryFields,
+        rental_notes: data.rental_notes || null,
+      })
+      .eq("listing_id", data.listing_id);
+
+    if (error) {
+      return {
+        error: "Failed to update pickup & delivery options: " + error.message,
+      };
+    }
+  } else {
+    const { error } = await supabase.from("rental_terms").insert({
+      listing_id: data.listing_id,
+      pickup_available: data.pickup_available,
+      delivery_available: data.delivery_available,
+      ...deliveryFields,
+      rental_notes: data.rental_notes || null,
+    });
+
+    if (error) {
+      return {
+        error: "Failed to save pickup & delivery options: " + error.message,
+      };
+    }
+  }
+
+  revalidatePath(`/dashboard/owner/cars/${data.listing_id}/edit`);
+  revalidatePath("/dashboard/owner");
+  return { success: true };
+}
+
