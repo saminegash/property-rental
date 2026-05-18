@@ -1,0 +1,169 @@
+import { createAdminClient } from "@/lib/supabase/admin";
+import ListingReviewCard from "./ListingReviewCard";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminListingsPage() {
+  const adminClient = createAdminClient();
+
+  // Fetch all pending_review listings with owner_id
+  const { data: listings, error: listingsError } = await adminClient
+    .from("listings")
+    .select("id, title, description, location, status, owner_id, created_at")
+    .eq("status", "pending_review")
+    .order("created_at", { ascending: true });
+
+  if (listingsError || !listings) {
+    return (
+      <div className="dashboard-card">
+        <h1 className="dashboard-title">Pending Listings</h1>
+        <div className="auth-error">
+          Error loading listings: {listingsError?.message}
+        </div>
+      </div>
+    );
+  }
+
+  if (listings.length === 0) {
+    return (
+      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          <h1 className="dashboard-title" style={{ marginBottom: 0 }}>
+            Pending Listings
+          </h1>
+        </div>
+        <div className="dashboard-card">
+          <p className="dashboard-hint">
+            🎉 No listings pending review. All caught up!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Collect all owner_ids to batch-fetch their profiles
+  const ownerIds = [...new Set(listings.map((l) => l.owner_id))];
+
+  const { data: profiles } = await adminClient
+    .from("profiles")
+    .select("user_id, full_name, email, phone, city")
+    .in("user_id", ownerIds);
+
+  // Fetch vehicle details for all listings
+  const listingIds = listings.map((l) => l.id);
+
+  const { data: vehicleDetails } = await adminClient
+    .from("vehicle_details")
+    .select(
+      "listing_id, make, model, year, transmission, fuel_type, seats, mileage, color, condition, vehicle_type_id, vehicle_types(name)"
+    )
+    .in("listing_id", listingIds);
+
+  // Fetch rental terms for all listings
+  const { data: rentalTerms } = await adminClient
+    .from("rental_terms")
+    .select(
+      "listing_id, available_with_driver, available_without_driver, daily_driver_fee, weekly_driver_fee, monthly_driver_fee, pickup_available, delivery_available, delivery_fee"
+    )
+    .in("listing_id", listingIds);
+
+  // Fetch images for all listings
+  const { data: images } = await adminClient
+    .from("listing_images")
+    .select("id, listing_id, image_url, is_primary, sort_order")
+    .in("listing_id", listingIds)
+    .order("sort_order", { ascending: true });
+
+  // Build enriched listing objects
+  const enrichedListings = listings.map((listing) => {
+    const profile = profiles?.find((p) => p.user_id === listing.owner_id) || {
+      full_name: "Unknown",
+      email: "Unknown",
+      phone: null,
+      city: null,
+    };
+
+    const vd = vehicleDetails?.find(
+      (v) => v.listing_id === listing.id
+    );
+
+    const rt = rentalTerms?.find((r) => r.listing_id === listing.id);
+
+    const listingImages = (images || []).filter(
+      (img) => img.listing_id === listing.id
+    );
+
+    return {
+      id: listing.id,
+      title: listing.title,
+      description: listing.description,
+      location: listing.location,
+      created_at: listing.created_at,
+      owner: profile,
+      vehicle_details: vd
+        ? {
+            make: vd.make,
+            model: vd.model,
+            year: vd.year,
+            transmission: vd.transmission,
+            fuel_type: vd.fuel_type,
+            seats: vd.seats,
+            mileage: vd.mileage,
+            color: vd.color,
+            condition: vd.condition,
+            vehicle_type: Array.isArray(vd.vehicle_types)
+              ? (vd.vehicle_types[0] as { name: string } | undefined) ?? null
+              : (vd.vehicle_types as { name: string } | null),
+          }
+        : null,
+      rental_terms: rt
+        ? {
+            available_with_driver: rt.available_with_driver,
+            available_without_driver: rt.available_without_driver,
+            daily_driver_fee: rt.daily_driver_fee,
+            weekly_driver_fee: rt.weekly_driver_fee,
+            monthly_driver_fee: rt.monthly_driver_fee,
+            pickup_available: rt.pickup_available,
+            delivery_available: rt.delivery_available,
+            delivery_fee: rt.delivery_fee,
+          }
+        : null,
+      images: listingImages.map((img) => ({
+        id: img.id,
+        image_url: img.image_url,
+        is_primary: img.is_primary,
+      })),
+    };
+  });
+
+  return (
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "2rem",
+        }}
+      >
+        <h1 className="dashboard-title" style={{ marginBottom: 0 }}>
+          Pending Listings
+        </h1>
+        <span className="status-badge status-badge--pending">
+          {listings.length} pending
+        </span>
+      </div>
+
+      {enrichedListings.map((listing) => (
+        <ListingReviewCard key={listing.id} listing={listing} />
+      ))}
+    </div>
+  );
+}

@@ -29,6 +29,27 @@ export default function AdminPage() {
             Review, approve, or suspend car owner profiles.
           </p>
         </Link>
+
+        <Link 
+          href="/admin/listings" 
+          style={{ 
+            display: "block", 
+            padding: "1.5rem", 
+            border: "1px solid var(--color-border)", 
+            borderRadius: "var(--radius-md)",
+            textDecoration: "none",
+            backgroundColor: "var(--color-bg)",
+            textAlign: "left",
+            transition: "border-color 0.15s ease"
+          }}
+        >
+          <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
+            Pending Listings
+          </h2>
+          <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+            Review and approve car listings submitted by owners.
+          </p>
+        </Link>
       </div>
     </div>
   );
