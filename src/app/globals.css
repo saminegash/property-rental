@@ -198,6 +198,78 @@ body {
 }
 
 /* ============================================================
+   Checkbox
+   ============================================================ */
+
+.form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.form-checkbox__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.form-checkbox__box {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  position: relative;
+  margin-top: 0.125rem;
+}
+
+.form-checkbox__input:checked + .form-checkbox__box {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+.form-checkbox__input:checked + .form-checkbox__box::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.form-checkbox__input:focus-visible + .form-checkbox__box {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.form-checkbox:hover .form-checkbox__box {
+  border-color: var(--color-text-muted);
+}
+
+.form-checkbox__label {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Nested Form Section
+   ============================================================ */
+
+.form-section-nested {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+/* ============================================================
    Role Selection
    ============================================================ */
 

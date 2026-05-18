@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import VehicleDetailsForm from "./vehicle-details-form";
+import DriverOptionsForm from "./driver-options-form";
 
 export const dynamic = "force-dynamic";
 
@@ -51,12 +52,28 @@ export default async function EditCarPage({
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  // Fetch existing driver options from rental_terms (may be null)
+  const { data: rentalTerms } = await supabase
+    .from("rental_terms")
+    .select(
+      "available_with_driver, available_without_driver, daily_driver_fee, weekly_driver_fee, monthly_driver_fee"
+    )
+    .eq("listing_id", id)
+    .single();
+
   return (
-    <VehicleDetailsForm
-      listingId={listing.id}
-      listingTitle={listing.title}
-      vehicleTypes={vehicleTypes || []}
-      existingDetails={vehicleDetails || null}
-    />
+    <>
+      <VehicleDetailsForm
+        listingId={listing.id}
+        listingTitle={listing.title}
+        vehicleTypes={vehicleTypes || []}
+        existingDetails={vehicleDetails || null}
+      />
+
+      <DriverOptionsForm
+        listingId={listing.id}
+        existingOptions={rentalTerms || null}
+      />
+    </>
   );
 }

@@ -132,3 +132,121 @@ export async function saveVehicleDetails(formData: FormData) {
   revalidatePath("/dashboard/owner");
   return { success: true };
 }
+
+// ─── Driver Options ──────────────────────────────────────────────
+
+const driverOptionsSchema = z
+  .object({
+    listing_id: z.string().uuid("Invalid listing ID"),
+    available_with_driver: z.boolean(),
+    available_without_driver: z.boolean(),
+    daily_driver_fee: z.coerce.number().int().min(0, "Daily driver fee must be 0 or more").nullable(),
+    weekly_driver_fee: z.coerce.number().int().min(0, "Weekly driver fee must be 0 or more").nullable(),
+    monthly_driver_fee: z.coerce.number().int().min(0, "Monthly driver fee must be 0 or more").nullable(),
+  })
+  .refine(
+    (d) => d.available_with_driver || d.available_without_driver,
+    { message: "At least one option must be selected: with driver or without driver" }
+  )
+  .refine(
+    (d) => !d.available_with_driver || (d.daily_driver_fee !== null && d.daily_driver_fee > 0),
+    { message: "Daily driver fee is required when available with driver" }
+  );
+
+export async function saveDriverOptions(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const listingId = formData.get("listing_id");
+
+  // Verify listing ownership (RLS + defense-in-depth)
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("id, owner_id")
+    .eq("id", listingId)
+    .single();
+
+  if (listingError || !listing) {
+    return { error: "Listing not found or you don't have permission to edit it" };
+  }
+
+  if (listing.owner_id !== user.id) {
+    return { error: "You can only update driver options for your own listings" };
+  }
+
+  // Parse checkbox values (unchecked checkboxes are absent from FormData)
+  const rawDailyFee = formData.get("daily_driver_fee");
+  const rawWeeklyFee = formData.get("weekly_driver_fee");
+  const rawMonthlyFee = formData.get("monthly_driver_fee");
+
+  const parseResult = driverOptionsSchema.safeParse({
+    listing_id: listingId,
+    available_with_driver: formData.get("available_with_driver") === "true",
+    available_without_driver: formData.get("available_without_driver") === "true",
+    daily_driver_fee: rawDailyFee === "" || rawDailyFee === null ? null : rawDailyFee,
+    weekly_driver_fee: rawWeeklyFee === "" || rawWeeklyFee === null ? null : rawWeeklyFee,
+    monthly_driver_fee: rawMonthlyFee === "" || rawMonthlyFee === null ? null : rawMonthlyFee,
+  });
+
+  if (!parseResult.success) {
+    return { error: parseResult.error.issues[0].message };
+  }
+
+  const data = parseResult.data;
+
+  // Clear driver fees if not available with driver
+  const driverFees = data.available_with_driver
+    ? {
+        daily_driver_fee: data.daily_driver_fee,
+        weekly_driver_fee: data.weekly_driver_fee,
+        monthly_driver_fee: data.monthly_driver_fee,
+      }
+    : {
+        daily_driver_fee: null,
+        weekly_driver_fee: null,
+        monthly_driver_fee: null,
+      };
+
+  // Check if rental_terms already exist for this listing (upsert)
+  const { data: existing } = await supabase
+    .from("rental_terms")
+    .select("id")
+    .eq("listing_id", data.listing_id)
+    .single();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("rental_terms")
+      .update({
+        available_with_driver: data.available_with_driver,
+        available_without_driver: data.available_without_driver,
+        ...driverFees,
+      })
+      .eq("listing_id", data.listing_id);
+
+    if (error) {
+      return { error: "Failed to update driver options: " + error.message };
+    }
+  } else {
+    const { error } = await supabase.from("rental_terms").insert({
+      listing_id: data.listing_id,
+      available_with_driver: data.available_with_driver,
+      available_without_driver: data.available_without_driver,
+      ...driverFees,
+    });
+
+    if (error) {
+      return { error: "Failed to save driver options: " + error.message };
+    }
+  }
+
+  revalidatePath(`/dashboard/owner/cars/${data.listing_id}/edit`);
+  revalidatePath("/dashboard/owner");
+  return { success: true };
+}
