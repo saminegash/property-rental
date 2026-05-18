@@ -1014,3 +1014,301 @@ body {
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
+
+/* ============================================================
+   Detail Page Layout
+   ============================================================ */
+
+.detail-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+/* ============================================================
+   Detail Gallery
+   ============================================================ */
+
+.detail-gallery {
+  margin-bottom: 2rem;
+}
+
+.detail-gallery__hero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--color-surface-hover);
+}
+
+.detail-gallery__hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-gallery__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-gallery__thumbs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.detail-gallery__thumb {
+  width: 80px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  opacity: 0.6;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.detail-gallery__thumb:hover {
+  opacity: 0.9;
+}
+
+.detail-gallery__thumb--active {
+  opacity: 1;
+  border-color: var(--color-primary);
+}
+
+.detail-gallery__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ============================================================
+   Detail Content (2-column)
+   ============================================================ */
+
+.detail-content {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .detail-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Detail Main (left column)
+   ============================================================ */
+
+.detail-main {
+  min-width: 0;
+}
+
+.detail-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.detail-subtitle {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.detail-location {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: 0.375rem;
+}
+
+.detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.875rem;
+}
+
+.detail-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+}
+
+.detail-badge--verified {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+  border: 1px solid var(--color-success-border);
+}
+
+.detail-badge--company {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.detail-badge--driver {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.detail-badge--self {
+  background-color: rgba(5, 150, 105, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+/* ============================================================
+   Detail Sections
+   ============================================================ */
+
+.detail-section {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.detail-section__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin-bottom: 1rem;
+}
+
+.detail-section__text {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.detail-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 540px) {
+  .detail-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.detail-spec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.detail-spec__label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: var(--color-text-muted);
+}
+
+.detail-spec__value {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.detail-notes {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   Detail Sidebar (pricing card)
+   ============================================================ */
+
+.detail-sidebar {
+  position: sticky;
+  top: 5rem;
+}
+
+.detail-price-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  background-color: var(--color-surface);
+}
+
+.detail-price-hero {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+}
+
+.detail-price-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.detail-price-currency {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.detail-price-unit {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.detail-price-alt {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.detail-price-alt__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-price-alt__row:last-child {
+  border-bottom: none;
+}
+
+.detail-fee-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.detail-fee-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  margin-bottom: 0.25rem;
+}
+
+.detail-fee-note {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
