@@ -6,7 +6,9 @@ import {
   updateRequestAdminNotes, 
   updateRequestOwnerNotes,
   generateCommission,
-  updateCommissionStatus 
+  updateCommissionStatus,
+  generateSecurityDeposit,
+  updateSecurityDeposit
 } from "./actions";
 
 type RequestProfile = {
@@ -25,6 +27,19 @@ type RequestCommission = {
   commission_base_amount: number;
   commission_amount: number;
   commission_status: string;
+};
+
+type RequestRentalTerm = {
+  listing_id: string;
+  security_deposit_amount: number;
+};
+
+type RequestSecurityDeposit = {
+  id: string;
+  deposit_amount: number;
+  deposit_status: string;
+  payment_method: string | null;
+  admin_notes: string | null;
 };
 
 type EnrichedRequest = {
@@ -48,6 +63,8 @@ type EnrichedRequest = {
   owner: RequestProfile | null;
   renterProfile: RequestProfile | null;
   commission: RequestCommission | null;
+  rentalTerm: RequestRentalTerm | null;
+  securityDeposit: RequestSecurityDeposit | null;
 };
 
 const STATUS_OPTIONS = [
@@ -77,6 +94,9 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
   const [isUpdating, setIsUpdating] = useState(false);
   const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
   const [ownerNotes, setOwnerNotes] = useState(request.owner_response_notes || "");
+  
+  const [depositPaymentMethod, setDepositPaymentMethod] = useState(request.securityDeposit?.payment_method || "");
+  const [depositNotes, setDepositNotes] = useState(request.securityDeposit?.admin_notes || "");
 
   async function handleStatusChange(newStatus: string) {
     setIsUpdating(true);
@@ -213,6 +233,105 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                         <option value="refunded">Refunded</option>
                       </select>
                     </div>
+                  </>
+                )}
+              </div>
+
+              <h4 style={{ fontSize: "0.875rem", marginTop: "1.5rem", marginBottom: "0.5rem", color: "var(--color-text-heading)" }}>
+                Security Deposit Tracking
+              </h4>
+              <div className="review-grid" style={{ gridTemplateColumns: "1fr", backgroundColor: "var(--color-surface-hover)", padding: "1rem", borderRadius: "var(--radius-md)" }}>
+                {!request.securityDeposit ? (
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+                      <span className="review-label">Required Deposit</span>
+                      <span className="review-value" style={{ fontWeight: 500 }}>
+                        {request.rentalTerm?.security_deposit_amount?.toLocaleString() || "0"} Birr
+                      </span>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setIsUpdating(true);
+                        await generateSecurityDeposit(request.id);
+                        setIsUpdating(false);
+                      }}
+                      disabled={isUpdating}
+                      className="auth-button auth-button--secondary"
+                      style={{ padding: "0.5rem 1rem", fontSize: "0.8125rem" }}
+                    >
+                      {isUpdating ? "Initializing..." : "Initialize Deposit Tracking"}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem", paddingBottom: "0.75rem", borderBottom: "1px solid var(--color-border)" }}>
+                      <span className="review-label">Required Deposit</span>
+                      <span className="review-value" style={{ fontWeight: 500 }}>
+                        {request.securityDeposit.deposit_amount.toLocaleString()} Birr
+                      </span>
+                    </div>
+                    
+                    <div style={{ marginBottom: "0.75rem" }}>
+                      <span className="review-label" style={{ display: "block", marginBottom: "0.25rem" }}>Deposit Status</span>
+                      <select
+                        value={request.securityDeposit.deposit_status}
+                        onChange={async (e) => {
+                          setIsUpdating(true);
+                          await updateSecurityDeposit(request.securityDeposit!.id, { deposit_status: e.target.value });
+                          setIsUpdating(false);
+                        }}
+                        disabled={isUpdating}
+                        className="auth-input"
+                        style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem" }}
+                      >
+                        <option value="not_required">Not Required</option>
+                        <option value="pending">Pending</option>
+                        <option value="collected">Collected</option>
+                        <option value="refunded">Refunded</option>
+                        <option value="partially_refunded">Partially Refunded</option>
+                        <option value="withheld">Withheld</option>
+                      </select>
+                    </div>
+
+                    <div style={{ marginBottom: "0.75rem" }}>
+                      <span className="review-label" style={{ display: "block", marginBottom: "0.25rem" }}>Payment Method</span>
+                      <input
+                        type="text"
+                        value={depositPaymentMethod}
+                        onChange={(e) => setDepositPaymentMethod(e.target.value)}
+                        placeholder="e.g. Bank Transfer, Cash..."
+                        className="auth-input"
+                        style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem" }}
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: "0.75rem" }}>
+                      <span className="review-label" style={{ display: "block", marginBottom: "0.25rem" }}>Deposit Notes</span>
+                      <textarea
+                        value={depositNotes}
+                        onChange={(e) => setDepositNotes(e.target.value)}
+                        placeholder="Internal notes about this deposit..."
+                        className="auth-input"
+                        rows={2}
+                        style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem" }}
+                      />
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        setIsUpdating(true);
+                        await updateSecurityDeposit(request.securityDeposit!.id, { 
+                          payment_method: depositPaymentMethod,
+                          admin_notes: depositNotes 
+                        });
+                        setIsUpdating(false);
+                      }}
+                      disabled={isUpdating || (depositPaymentMethod === (request.securityDeposit.payment_method || "") && depositNotes === (request.securityDeposit.admin_notes || ""))}
+                      className="auth-button"
+                      style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem" }}
+                    >
+                      {isUpdating ? "Saving..." : "Save Deposit Details"}
+                    </button>
                   </>
                 )}
               </div>

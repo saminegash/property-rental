@@ -67,6 +67,18 @@ export default async function AdminRequestsPage() {
     .select("id, rental_request_id, commission_base_amount, commission_amount, commission_status")
     .in("rental_request_id", requestIds);
 
+  // Batch fetch rental terms
+  const { data: rentalTerms } = await adminClient
+    .from("rental_terms")
+    .select("listing_id, security_deposit_amount")
+    .in("listing_id", listingIds);
+
+  // Batch fetch security deposits
+  const { data: securityDeposits } = await adminClient
+    .from("security_deposits")
+    .select("id, rental_request_id, deposit_amount, deposit_status, payment_method, admin_notes")
+    .in("rental_request_id", requestIds);
+
   // Build enriched request objects
   const enrichedRequests = requests.map((request) => {
     const listing = listings?.find((l) => l.id === request.listing_id) || {
@@ -80,6 +92,8 @@ export default async function AdminRequestsPage() {
       : null;
 
     const commission = commissions?.find((c) => c.rental_request_id === request.id) || null;
+    const rentalTerm = rentalTerms?.find((t) => t.listing_id === request.listing_id) || null;
+    const securityDeposit = securityDeposits?.find((d) => d.rental_request_id === request.id) || null;
 
     return {
       ...request,
@@ -87,6 +101,8 @@ export default async function AdminRequestsPage() {
       owner: ownerProfile,
       renterProfile,
       commission,
+      rentalTerm,
+      securityDeposit,
     };
   });
 

@@ -160,3 +160,65 @@ export async function updateCommissionStatus(commissionId: string, status: strin
   revalidatePath("/admin/requests");
   return { success: true };
 }
+
+export async function generateSecurityDeposit(requestId: string) {
+  await ensureAdmin();
+  const adminClient = createAdminClient();
+
+  // 1. Fetch request to get listing ID
+  const { data: request, error: requestError } = await adminClient
+    .from("rental_requests")
+    .select("listing_id")
+    .eq("id", requestId)
+    .single();
+
+  if (requestError || !request) {
+    return { error: "Failed to fetch rental request" };
+  }
+
+  // 2. Fetch rental terms to get required deposit amount
+  const { data: terms, error: termsError } = await adminClient
+    .from("rental_terms")
+    .select("security_deposit_amount")
+    .eq("listing_id", request.listing_id)
+    .single();
+
+  if (termsError || !terms) {
+    return { error: "Failed to fetch rental terms" };
+  }
+
+  // 3. Insert into security_deposits table
+  const depositStatus = terms.security_deposit_amount > 0 ? "pending" : "not_required";
+
+  const { error: insertError } = await adminClient
+    .from("security_deposits")
+    .insert({
+      rental_request_id: requestId,
+      deposit_amount: terms.security_deposit_amount,
+      deposit_status: depositStatus
+    });
+
+  if (insertError) {
+    return { error: insertError.message };
+  }
+
+  revalidatePath("/admin/requests");
+  return { success: true };
+}
+
+export async function updateSecurityDeposit(depositId: string, updates: { deposit_status?: string, payment_method?: string, admin_notes?: string }) {
+  await ensureAdmin();
+  const adminClient = createAdminClient();
+
+  const { error } = await adminClient
+    .from("security_deposits")
+    .update(updates)
+    .eq("id", depositId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin/requests");
+  return { success: true };
+}
