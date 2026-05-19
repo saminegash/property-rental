@@ -193,35 +193,35 @@ export default async function HomePage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="mp-trust" id="trust-badges">
-        <div className="mp-trust__inner">
-          <div className="mp-trust__card">
-            <div className="mp-trust__icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A6DFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <section className="py-12 lg:py-16 bg-white border-b border-(--color-border-light)" id="trust-badges">
+        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <h3 className="mp-trust__title">Verified Owners</h3>
-            <p className="mp-trust__desc">All owners are verified for your safety</p>
+            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Verified Owners</h3>
+            <p className="text-[0.875rem] text-(--color-text-muted)">All owners are verified for your safety.</p>
           </div>
-          <div className="mp-trust__card">
-            <div className="mp-trust__icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A6DFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <h3 className="mp-trust__title">Admin Reviewed</h3>
-            <p className="mp-trust__desc">Every listing is checked by our admin team</p>
+            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Admin Reviewed</h3>
+            <p className="text-[0.875rem] text-(--color-text-muted)">Every listing is checked by our admin team.</p>
           </div>
-          <div className="mp-trust__card">
-            <div className="mp-trust__icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A6DFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             </div>
-            <h3 className="mp-trust__title">With or Without Driver</h3>
-            <p className="mp-trust__desc">Choose the option that fits your trip</p>
+            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">With or Without Driver</h3>
+            <p className="text-[0.875rem] text-(--color-text-muted)">Choose the option that fits your trip.</p>
           </div>
-          <div className="mp-trust__card">
-            <div className="mp-trust__icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A6DFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
             </div>
-            <h3 className="mp-trust__title">Transparent Pricing</h3>
-            <p className="mp-trust__desc">Clear price breakdown &amp; low commission</p>
+            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Transparent Pricing</h3>
+            <p className="text-[0.875rem] text-(--color-text-muted)">Clear price breakdown &amp; low commission.</p>
           </div>
         </div>
       </section>
@@ -352,29 +352,39 @@ export default async function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="mp-steps" id="how-it-works">
-        <div className="mp-steps__inner">
-          <h2 className="mp-section-title">How It Works</h2>
-          <div className="mp-steps__grid">
-            <div className="mp-steps__step">
-              <span className="mp-steps__number">1</span>
-              <h3 className="mp-steps__label">Choose a car</h3>
-              <p className="mp-steps__desc">Browse available cars and select the one you like.</p>
+      <section className="py-16 lg:py-24 bg-(--color-surface-alt)" id="how-it-works">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-4">How It Works</h2>
+            <p className="text-(--color-text-muted) max-w-2xl mx-auto">Rent your dream car in four simple steps with complete peace of mind.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+            {/* Connecting Line for Desktop */}
+            <div className="hidden lg:block absolute top-8 left-[12%] right-[12%] h-[2px] bg-linear-to-r from-blue-100 via-blue-300 to-blue-100 z-0"></div>
+
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">1</div>
+              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Choose a car</h3>
+              <p className="text-[0.875rem] text-(--color-text-muted)">Browse available cars and select the one you like.</p>
             </div>
-            <div className="mp-steps__step">
-              <span className="mp-steps__number">2</span>
-              <h3 className="mp-steps__label">Send rental request</h3>
-              <p className="mp-steps__desc">Submit your request with dates, driver option and details.</p>
+
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">2</div>
+              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Send rental request</h3>
+              <p className="text-[0.875rem] text-(--color-text-muted)">Submit your request with dates, driver option and details.</p>
             </div>
-            <div className="mp-steps__step">
-              <span className="mp-steps__number">3</span>
-              <h3 className="mp-steps__label">Admin confirms with owner</h3>
-              <p className="mp-steps__desc">Our admin team verifies and confirms availability with the owner.</p>
+
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">3</div>
+              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Admin confirms with owner</h3>
+              <p className="text-[0.875rem] text-(--color-text-muted)">Our admin team securely verifies and confirms availability.</p>
             </div>
-            <div className="mp-steps__step">
-              <span className="mp-steps__number">4</span>
-              <h3 className="mp-steps__label">Receive the car</h3>
-              <p className="mp-steps__desc">Pick up or get delivery and enjoy your trip.</p>
+
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">4</div>
+              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Receive the car</h3>
+              <p className="text-[0.875rem] text-(--color-text-muted)">Pick up or get delivery and enjoy your trip safely.</p>
             </div>
           </div>
         </div>
