@@ -35,7 +35,7 @@ export function CarListingCard({
 }: CarListingCardProps) {
   return (
     <div className="snap-start flex-none w-[280px] sm:w-[320px] lg:w-auto bg-white rounded-2xl shadow-(--shadow-card) border border-(--color-border) overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-300">
-      <div className="relative aspect-4/3">
+      <div className="relative aspect-[4/3] bg-slate-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={image} alt={title} className="w-full h-full object-cover" />
         

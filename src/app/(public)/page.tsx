@@ -71,7 +71,7 @@ export default async function HomePage() {
     <>
       {/* Hero Section */}
       <section className="bg-(--color-primary-surface) py-12 lg:py-20" id="hero">
-        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left Column */}
           <div className="flex flex-col gap-8">
             <div>
@@ -144,7 +144,7 @@ export default async function HomePage() {
             </div>
             
             <div className="bg-white rounded-2xl shadow-(--shadow-card) overflow-hidden border border-(--color-border) relative">
-              <div className="relative aspect-4/3">
+              <div className="relative aspect-[4/3] bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={img} alt={featured.title} className="w-full h-full object-cover" />
                 <button className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-(--color-text-muted) hover:text-(--color-error) transition-colors shadow-sm">
@@ -201,7 +201,7 @@ export default async function HomePage() {
 
       {/* Trust Badges */}
       <section className="py-8 lg:py-12 bg-white border-b border-(--color-border-light)" id="trust-badges">
-        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
           
           <div className="flex items-center gap-4 p-4 lg:p-5 bg-white rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm)">
             <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -248,7 +248,7 @@ export default async function HomePage() {
 
       {/* Featured Cars Section */}
       <section className="py-16 lg:py-24 bg-(--color-surface-alt) border-b border-(--color-border-light)">
-        <div className="max-w-[1280px] mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end mb-8 lg:mb-10">
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-2">Featured Cars</h2>
@@ -296,7 +296,7 @@ export default async function HomePage() {
 
       {/* Browse by Category */}
       <section className="py-16 lg:py-24 bg-white border-b border-(--color-border-light)">
-        <div className="max-w-[1280px] mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end mb-8 lg:mb-10">
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-2">Browse by Category</h2>
@@ -310,7 +310,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
             {/* Economy Cars */}
             <Link href="/cars?category=economy" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-4 group-hover:scale-110 transition-transform">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="10" rx="2" ry="2"></rect><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="19" y1="8" x2="15" y2="3"></line><line x1="5" y1="8" x2="9" y2="3"></line><line x1="9" y1="3" x2="15" y2="3"></line></svg>
               </div>
               <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Economy Cars</h3>
@@ -319,7 +319,7 @@ export default async function HomePage() {
             
             {/* SUVs */}
             <Link href="/cars?category=suv" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4 group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4 group-hover:scale-110 transition-transform">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="10" width="18" height="8" rx="2" ry="2"></rect><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle><path d="M5 10l3-5h8l3 5"></path><line x1="12" y1="5" x2="12" y2="10"></line></svg>
               </div>
               <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">SUVs</h3>
@@ -328,7 +328,7 @@ export default async function HomePage() {
 
             {/* Luxury Cars */}
             <Link href="/cars?category=luxury" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 mb-4 group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 mb-4 group-hover:scale-110 transition-transform">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
               </div>
               <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Luxury Cars</h3>
@@ -337,7 +337,7 @@ export default async function HomePage() {
 
             {/* With Driver */}
             <Link href="/cars?driver=with" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 mb-4 group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 mb-4 group-hover:scale-110 transition-transform">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2"></path><circle cx="12" cy="14" r="1.5"></circle></svg>
               </div>
               <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">With Driver</h3>
@@ -346,7 +346,7 @@ export default async function HomePage() {
 
             {/* Without Driver */}
             <Link href="/cars?driver=without" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 mb-4 group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 mb-4 group-hover:scale-110 transition-transform">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="9"></line><line x1="12" y1="15" x2="12" y2="22"></line><line x1="2" y1="12" x2="9" y2="12"></line><line x1="15" y1="12" x2="22" y2="12"></line></svg>
               </div>
               <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Without Driver</h3>
@@ -355,7 +355,7 @@ export default async function HomePage() {
 
             {/* Delivery Available */}
             <Link href="/cars?delivery=true" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mb-4 group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mb-4 group-hover:scale-110 transition-transform">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect><rect x="16" y="8" width="7" height="8" rx="1" ry="1"></rect><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
               </div>
               <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Delivery</h3>
@@ -373,7 +373,7 @@ export default async function HomePage() {
 
       {/* How It Works */}
       <section className="py-16 lg:py-24 bg-(--color-surface-alt) border-b border-(--color-border-light)" id="how-it-works">
-        <div className="max-w-[1280px] mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="mb-10 lg:mb-14">
             <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-2">How It Works</h2>
           </div>
@@ -446,7 +446,7 @@ export default async function HomePage() {
 
       {/* Pricing Transparency */}
       <section className="py-16 lg:py-20 bg-white border-b border-(--color-border-light)" id="pricing-transparency">
-        <div className="max-w-[1280px] mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="bg-[#F8FAFC] rounded-[2rem] p-8 lg:p-12 border border-(--color-border-light) shadow-(--shadow-sm)">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16 items-start">
               
@@ -542,7 +542,7 @@ export default async function HomePage() {
 
       {/* Owner CTA Section */}
       <section className="py-12 lg:py-16 bg-white border-b border-(--color-border-light)" id="owner-cta">
-        <div className="max-w-[1280px] mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="bg-[#F8FAFC] rounded-[2rem] overflow-hidden border border-(--color-border-light) shadow-(--shadow-sm) flex flex-col md:flex-row items-stretch">
             {/* Left Image */}
             <div className="w-full md:w-[35%] lg:w-[30%] min-h-[240px] relative bg-slate-200">
@@ -593,7 +593,7 @@ export default async function HomePage() {
 
       {/* Popular Locations */}
       <section className="py-12 lg:py-16 bg-(--color-surface-alt)" id="popular-locations">
-        <div className="max-w-[1280px] mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end mb-6 lg:mb-8">
             <h2 className="text-[1.25rem] lg:text-[1.5rem] font-bold text-(--color-text-heading)">Popular Locations</h2>
             <Link href="/cars" className="hidden sm:flex items-center gap-1 font-semibold text-(--color-primary) hover:underline text-[0.9375rem]">
