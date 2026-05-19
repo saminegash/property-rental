@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CarMarket — Rental Marketplace",
+  title: "MyProperties — Rent with trust. Drive with confidence.",
   description:
-    "Rental-first car marketplace for Ethiopia. List your car or find one to rent.",
+    "Rental-first car marketplace for Ethiopia. Find verified cars to rent or list yours on the platform.",
 };
 
 export default function RootLayout({

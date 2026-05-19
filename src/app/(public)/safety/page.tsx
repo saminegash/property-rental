@@ -9,33 +9,7 @@ export const metadata: Metadata = {
 export default function SafetyRulesPage() {
   return (
     <div className="browse-layout">
-      {/* Header */}
-      <header className="browse-header">
-        <div className="browse-header__inner">
-          <Link href="/" className="browse-header__logo">
-            CarMarket
-          </Link>
-          <nav className="browse-header__nav">
-            <Link href="/cars" className="browse-header__link">
-              ← Browse
-            </Link>
-            <Link href="/login" className="browse-header__link">
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="auth-button"
-              style={{
-                textDecoration: "none",
-                padding: "0.5rem 1.25rem",
-                fontSize: "0.8125rem",
-              }}
-            >
-              Sign up
-            </Link>
-          </nav>
-        </div>
-      </header>
+
 
       <main style={{ padding: "4rem 1rem", backgroundColor: "var(--color-bg)" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
@@ -123,12 +97,7 @@ export default function SafetyRulesPage() {
         </div>
       </main>
 
-      <footer className="browse-footer">
-        <p>© {new Date().getFullYear()} CarMarket. All rights reserved.</p>
-        <div style={{ marginTop: "1rem", display: "flex", gap: "1.5rem", justifyContent: "center" }}>
-          <Link href="/safety" style={{ color: "var(--color-primary)", textDecoration: "none" }}>Safety & Rules</Link>
-        </div>
-      </footer>
+
     </div>
   );
 }
