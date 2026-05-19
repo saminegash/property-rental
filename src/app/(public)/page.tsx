@@ -2,8 +2,14 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CarListingCard } from "@/components/cars/CarListingCard";
 
+import { Metadata } from "next";
+
 export const dynamic = "force-dynamic";
 
+export const metadata: Metadata = {
+  title: "Kode Marketplace - Rent verified cars",
+  description: "Find trusted cars, request rentals, and get your car delivered within hours or days.",
+};
 interface CarListing {
   id: string;
   title: string;
@@ -32,6 +38,7 @@ export default async function HomePage() {
     `)
     .eq("category", "vehicle")
     .eq("listing_type", "rent")
+    .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(8);
 
