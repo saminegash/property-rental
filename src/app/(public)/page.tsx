@@ -274,6 +274,83 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Browse by Category */}
+      <section className="py-16 lg:py-24 bg-white border-b border-(--color-border-light)">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="flex justify-between items-end mb-8 lg:mb-10">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-2">Browse by Category</h2>
+              <p className="text-(--color-text-muted)">Find the perfect car for your specific needs.</p>
+            </div>
+            <Link href="/cars" className="hidden sm:flex items-center gap-1 font-semibold text-(--color-primary) hover:underline">
+              View all categories <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
+            {/* Economy Cars */}
+            <Link href="/cars?category=economy" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="10" rx="2" ry="2"></rect><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="19" y1="8" x2="15" y2="3"></line><line x1="5" y1="8" x2="9" y2="3"></line><line x1="9" y1="3" x2="15" y2="3"></line></svg>
+              </div>
+              <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Economy Cars</h3>
+              <p className="text-[0.8125rem] text-(--color-text-muted)">Budget friendly</p>
+            </Link>
+            
+            {/* SUVs */}
+            <Link href="/cars?category=suv" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4 group-hover:scale-110 transition-transform">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="10" width="18" height="8" rx="2" ry="2"></rect><circle cx="7" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle><path d="M5 10l3-5h8l3 5"></path><line x1="12" y1="5" x2="12" y2="10"></line></svg>
+              </div>
+              <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">SUVs</h3>
+              <p className="text-[0.8125rem] text-(--color-text-muted)">Spacious & tough</p>
+            </Link>
+
+            {/* Luxury Cars */}
+            <Link href="/cars?category=luxury" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 mb-4 group-hover:scale-110 transition-transform">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              </div>
+              <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Luxury Cars</h3>
+              <p className="text-[0.8125rem] text-(--color-text-muted)">Premium rides</p>
+            </Link>
+
+            {/* With Driver */}
+            <Link href="/cars?driver=with" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 mb-4 group-hover:scale-110 transition-transform">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2"></path><circle cx="12" cy="14" r="1.5"></circle></svg>
+              </div>
+              <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">With Driver</h3>
+              <p className="text-[0.8125rem] text-(--color-text-muted)">Sit back & relax</p>
+            </Link>
+
+            {/* Without Driver */}
+            <Link href="/cars?driver=without" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 mb-4 group-hover:scale-110 transition-transform">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="9"></line><line x1="12" y1="15" x2="12" y2="22"></line><line x1="2" y1="12" x2="9" y2="12"></line><line x1="15" y1="12" x2="22" y2="12"></line></svg>
+              </div>
+              <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Without Driver</h3>
+              <p className="text-[0.8125rem] text-(--color-text-muted)">Drive yourself</p>
+            </Link>
+
+            {/* Delivery Available */}
+            <Link href="/cars?delivery=true" className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-(--shadow-sm) border border-(--color-border-light) hover:border-(--color-primary) hover:shadow-md transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 mb-4 group-hover:scale-110 transition-transform">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect><rect x="16" y="8" width="7" height="8" rx="1" ry="1"></rect><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              </div>
+              <h3 className="font-bold text-[1rem] text-(--color-text-heading) mb-1 group-hover:text-(--color-primary) transition-colors">Delivery</h3>
+              <p className="text-[0.8125rem] text-(--color-text-muted)">To your door</p>
+            </Link>
+          </div>
+          
+          <div className="mt-6 sm:hidden">
+            <Link href="/cars" className="block w-full text-center py-3 bg-white border border-(--color-border) rounded-xl text-[0.875rem] font-semibold text-(--color-text-heading) shadow-sm">
+              View all categories
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="mp-steps" id="how-it-works">
         <div className="mp-steps__inner">
