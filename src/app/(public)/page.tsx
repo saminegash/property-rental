@@ -437,6 +437,183 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Pricing Transparency */}
+      <section className="py-16 lg:py-20 bg-white" id="pricing-transparency">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="bg-[#F8FAFC] rounded-[2rem] p-8 lg:p-12 border border-(--color-border-light) shadow-(--shadow-sm)">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16 items-start">
+              
+              {/* Left Column */}
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h2 className="text-2xl lg:text-[2rem] font-bold text-(--color-text-heading) leading-tight mb-4">
+                    We believe in <br className="hidden lg:block" /> pricing transparency
+                  </h2>
+                  <p className="text-[1rem] text-(--color-text-muted) leading-relaxed max-w-sm">
+                    Everything is shown clearly before you send your request.
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 font-semibold px-4 py-3 rounded-xl border border-blue-100 self-start">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span className="text-[0.875rem]">Commission is 5% of rental price only</span>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
+                  {/* Car Rental Price */}
+                  <div className="bg-white p-5 rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm) flex items-start gap-3">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[0.875rem] text-(--color-text-heading) mb-0.5">Car Rental Price</h4>
+                      <div className="font-bold text-[1rem] text-(--color-text-heading) mb-1">3,000 ETB <span className="text-[0.75rem] text-(--color-text-muted) font-medium">/ day</span></div>
+                      <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">Base price for the car</p>
+                    </div>
+                  </div>
+
+                  {/* Driver Fee */}
+                  <div className="bg-white p-5 rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm) flex items-start gap-3">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[0.875rem] text-(--color-text-heading) mb-0.5">Driver Fee</h4>
+                      <div className="font-bold text-[1rem] text-(--color-text-heading) mb-1">+1,500 ETB <span className="text-[0.75rem] text-(--color-text-muted) font-medium">/ day</span></div>
+                      <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">If you choose with driver</p>
+                    </div>
+                  </div>
+
+                  {/* Security Deposit */}
+                  <div className="bg-white p-5 rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm) flex items-start gap-3">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[0.875rem] text-(--color-text-heading) mb-0.5">Security Deposit</h4>
+                      <div className="font-bold text-[1rem] text-(--color-text-heading) mb-1">15,000 ETB</div>
+                      <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">Refundable deposit</p>
+                    </div>
+                  </div>
+
+                  {/* Delivery Fee */}
+                  <div className="bg-white p-5 rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm) flex items-start gap-3">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><rect x="16" y="8" width="7" height="8" rx="1" ry="1"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[0.875rem] text-(--color-text-heading) mb-0.5">Delivery Fee</h4>
+                      <div className="font-bold text-[1rem] text-(--color-text-heading) mb-1">500 ETB</div>
+                      <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">If delivery is needed</p>
+                    </div>
+                  </div>
+
+                  {/* Platform Commission */}
+                  <div className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-(--shadow-sm) flex items-start gap-3 ring-1 ring-emerald-500/10">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[0.875rem] text-(--color-text-heading) mb-0.5">Platform Commission</h4>
+                      <div className="font-bold text-[1rem] text-emerald-600 mb-1">5%</div>
+                      <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">Of rental price only</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start sm:items-center gap-2 text-[0.8125rem] text-(--color-text-muted) bg-white/50 py-3 px-4 rounded-xl border border-dashed border-slate-200 mt-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Driver fee, delivery fee, security deposit, damage fees, and penalties are <strong className="font-semibold text-slate-700">not included</strong> in commission.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Owner CTA Section */}
+      <section className="py-12 lg:py-16 bg-white border-b border-(--color-border-light)" id="owner-cta">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="bg-[#F8FAFC] rounded-[2rem] overflow-hidden border border-(--color-border-light) shadow-(--shadow-sm) flex flex-col md:flex-row items-stretch">
+            {/* Left Image */}
+            <div className="w-full md:w-[35%] lg:w-[30%] min-h-[240px] relative bg-slate-200">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" alt="Car owner" className="absolute inset-0 w-full h-full object-cover" />
+            </div>
+            {/* Right Content */}
+            <div className="w-full md:w-[65%] lg:w-[70%] p-8 lg:p-10 flex flex-col justify-center">
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-8">
+                <div>
+                  <h2 className="text-2xl lg:text-[2rem] font-bold text-(--color-text-heading) leading-tight mb-3">
+                    Own a car? Start earning from it.
+                  </h2>
+                  <p className="text-[1rem] text-(--color-text-muted) leading-relaxed max-w-xl">
+                    List your car, set your rental price, choose with-driver or without-driver options, and let our admin team help manage rental requests.
+                  </p>
+                </div>
+                <div className="shrink-0 lg:mt-2">
+                  <Link href="/dashboard/owner/listings/new" className="inline-flex items-center justify-center gap-2 bg-(--color-primary) hover:bg-(--color-primary-hover) text-white font-semibold py-3.5 px-8 rounded-xl transition-colors shadow-md w-full lg:w-auto whitespace-nowrap">
+                    List Your Car Now
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-4 lg:gap-8 pt-6 border-t border-(--color-border-light)">
+                <div className="flex items-center gap-2 text-[0.875rem] text-(--color-text-heading) font-medium">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><polyline points="20 6 9 17 4 12"/></svg>
+                  Free basic listing
+                </div>
+                <div className="flex items-center gap-2 text-[0.875rem] text-(--color-text-heading) font-medium">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><polyline points="20 6 9 17 4 12"/></svg>
+                  Admin-reviewed requests
+                </div>
+                <div className="flex items-center gap-2 text-[0.875rem] text-(--color-text-heading) font-medium">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><polyline points="20 6 9 17 4 12"/></svg>
+                  Flexible pricing
+                </div>
+                <div className="flex items-center gap-2 text-[0.875rem] text-(--color-text-heading) font-medium">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><polyline points="20 6 9 17 4 12"/></svg>
+                  With or without driver
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Locations */}
+      <section className="py-12 lg:py-16 bg-white" id="popular-locations">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="flex justify-between items-end mb-6 lg:mb-8">
+            <h2 className="text-[1.25rem] lg:text-[1.5rem] font-bold text-(--color-text-heading)">Popular Locations</h2>
+            <Link href="/cars" className="hidden sm:flex items-center gap-1 font-semibold text-(--color-primary) hover:underline text-[0.9375rem]">
+              View all locations <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-3 lg:gap-4">
+            {["Addis Ababa", "Bole", "CMC", "Megenagna", "Kazanchis", "Ayat", "Sarbet", "Piassa"].map((loc) => (
+              <Link 
+                key={loc}
+                href={`/cars?location=${encodeURIComponent(loc)}`}
+                className="px-6 py-3 bg-white border border-(--color-border) hover:border-(--color-primary) rounded-2xl text-[0.9375rem] font-semibold text-(--color-text-heading) hover:text-(--color-primary) shadow-sm hover:shadow-md transition-all flex items-center gap-2"
+              >
+                {loc}
+              </Link>
+            ))}
+          </div>
+          
+          <div className="mt-6 sm:hidden">
+            <Link href="/cars" className="block w-full text-center py-3 bg-white border border-(--color-border) rounded-xl text-[0.875rem] font-semibold text-(--color-text-heading) shadow-sm">
+              View all locations
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Banner */}
       <section className="mp-cta-banner" id="cta-banner">
         <div className="mp-cta-banner__inner">
