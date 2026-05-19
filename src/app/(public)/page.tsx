@@ -193,36 +193,49 @@ export default async function HomePage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="py-12 lg:py-16 bg-white border-b border-(--color-border-light)" id="trust-badges">
-        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
-            <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+      <section className="py-8 lg:py-12 bg-white border-b border-(--color-border-light)" id="trust-badges">
+        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+          
+          <div className="flex items-center gap-4 p-4 lg:p-5 bg-white rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm)">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Verified Owners</h3>
-            <p className="text-[0.875rem] text-(--color-text-muted)">All owners are verified for your safety.</p>
+            <div>
+              <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-0.5">Verified Owners</h3>
+              <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">All owners are verified for your safety.</p>
+            </div>
           </div>
-          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
-            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
+          
+          <div className="flex items-center gap-4 p-4 lg:p-5 bg-white rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm)">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Admin Reviewed</h3>
-            <p className="text-[0.875rem] text-(--color-text-muted)">Every listing is checked by our admin team.</p>
-          </div>
-          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <div>
+              <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-0.5">Admin Reviewed</h3>
+              <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">Every listing is checked by our admin team.</p>
             </div>
-            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">With or Without Driver</h3>
-            <p className="text-[0.875rem] text-(--color-text-muted)">Choose the option that fits your trip.</p>
           </div>
-          <div className="flex flex-col items-center text-center p-6 bg-(--color-surface-alt) rounded-2xl">
-            <div className="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
+
+          <div className="flex items-center gap-4 p-4 lg:p-5 bg-white rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm)">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </div>
+            <div>
+              <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-0.5">With or Without Driver</h3>
+              <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">Choose the option that fits your trip.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 p-4 lg:p-5 bg-white rounded-2xl border border-(--color-border-light) shadow-(--shadow-sm)">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
             </div>
-            <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Transparent Pricing</h3>
-            <p className="text-[0.875rem] text-(--color-text-muted)">Clear price breakdown &amp; low commission.</p>
+            <div>
+              <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-0.5">Transparent Pricing</h3>
+              <p className="text-[0.75rem] text-(--color-text-muted) leading-tight">Clear price breakdown &amp; low commission.</p>
+            </div>
           </div>
+
         </div>
       </section>
 
@@ -352,40 +365,74 @@ export default async function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 lg:py-24 bg-(--color-surface-alt)" id="how-it-works">
+      <section className="py-16 lg:py-24 bg-white" id="how-it-works">
         <div className="max-w-[1280px] mx-auto px-6">
-          <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-4">How It Works</h2>
-            <p className="text-(--color-text-muted) max-w-2xl mx-auto">Rent your dream car in four simple steps with complete peace of mind.</p>
+          <div className="mb-10 lg:mb-14">
+            <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-2">How It Works</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-            {/* Connecting Line for Desktop */}
-            <div className="hidden lg:block absolute top-8 left-[12%] right-[12%] h-[2px] bg-linear-to-r from-blue-100 via-blue-300 to-blue-100 z-0"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4 relative">
 
-            <div className="relative z-10 flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">1</div>
-              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Choose a car</h3>
-              <p className="text-[0.875rem] text-(--color-text-muted)">Browse available cars and select the one you like.</p>
+            {/* Step 1 */}
+            <div className="relative z-10 flex items-start gap-4">
+              <div className="flex-shrink-0 flex items-center mt-1">
+                <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[0.75rem] font-bold z-10 relative">1</div>
+                {/* Connecting Line */}
+                <div className="hidden lg:block absolute top-[16px] left-[1.5rem] w-[calc(100%-1.5rem)] border-t-2 border-dashed border-blue-100 -z-10"></div>
+              </div>
+              <div className="flex-shrink-0 w-12 h-12 rounded-full border border-blue-100 text-blue-600 flex items-center justify-center bg-white shadow-(--shadow-sm)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-1">Choose a car</h3>
+                <p className="text-[0.8125rem] text-(--color-text-muted) leading-relaxed">Browse available cars and select the one you like.</p>
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">2</div>
-              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Send rental request</h3>
-              <p className="text-[0.875rem] text-(--color-text-muted)">Submit your request with dates, driver option and details.</p>
+            {/* Step 2 */}
+            <div className="relative z-10 flex items-start gap-4">
+              <div className="flex-shrink-0 flex items-center mt-1">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[0.75rem] font-bold z-10 relative">2</div>
+                <div className="hidden lg:block absolute top-[16px] left-[1.5rem] w-[calc(100%-1.5rem)] border-t-2 border-dashed border-emerald-100 -z-10"></div>
+              </div>
+              <div className="flex-shrink-0 w-12 h-12 rounded-full border border-emerald-100 text-emerald-600 flex items-center justify-center bg-white shadow-(--shadow-sm)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-1">Send rental request</h3>
+                <p className="text-[0.8125rem] text-(--color-text-muted) leading-relaxed">Submit your request with dates, driver option and details.</p>
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">3</div>
-              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Admin confirms with owner</h3>
-              <p className="text-[0.875rem] text-(--color-text-muted)">Our admin team securely verifies and confirms availability.</p>
+            {/* Step 3 */}
+            <div className="relative z-10 flex items-start gap-4">
+              <div className="flex-shrink-0 flex items-center mt-1">
+                <div className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[0.75rem] font-bold z-10 relative">3</div>
+                <div className="hidden lg:block absolute top-[16px] left-[1.5rem] w-[calc(100%-1.5rem)] border-t-2 border-dashed border-orange-100 -z-10"></div>
+              </div>
+              <div className="flex-shrink-0 w-12 h-12 rounded-full border border-orange-100 text-orange-600 flex items-center justify-center bg-white shadow-(--shadow-sm)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-1">Admin confirms</h3>
+                <p className="text-[0.8125rem] text-(--color-text-muted) leading-relaxed">Our admin team securely verifies and confirms availability.</p>
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-white border-4 border-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-6 shadow-sm">4</div>
-              <h3 className="font-bold text-[1.125rem] text-(--color-text-heading) mb-2">Receive the car</h3>
-              <p className="text-[0.875rem] text-(--color-text-muted)">Pick up or get delivery and enjoy your trip safely.</p>
+            {/* Step 4 */}
+            <div className="relative z-10 flex items-start gap-4">
+              <div className="flex-shrink-0 flex items-center mt-1">
+                <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-[0.75rem] font-bold z-10 relative">4</div>
+              </div>
+              <div className="flex-shrink-0 w-12 h-12 rounded-full border border-purple-100 text-purple-600 flex items-center justify-center bg-white shadow-(--shadow-sm)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><rect x="16" y="8" width="7" height="8" rx="1" ry="1"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-[0.9375rem] text-(--color-text-heading) mb-1">Receive the car</h3>
+                <p className="text-[0.8125rem] text-(--color-text-muted) leading-relaxed">Pick up or get delivery and enjoy your trip safely.</p>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
