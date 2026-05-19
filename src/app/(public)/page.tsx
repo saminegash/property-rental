@@ -372,7 +372,7 @@ export default async function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 lg:py-24 bg-white" id="how-it-works">
+      <section className="py-16 lg:py-24 bg-(--color-surface-alt) border-b border-(--color-border-light)" id="how-it-works">
         <div className="max-w-[1280px] mx-auto px-6">
           <div className="mb-10 lg:mb-14">
             <h2 className="text-2xl lg:text-3xl font-bold text-(--color-text-heading) mb-2">How It Works</h2>
@@ -445,7 +445,7 @@ export default async function HomePage() {
       </section>
 
       {/* Pricing Transparency */}
-      <section className="py-16 lg:py-20 bg-white" id="pricing-transparency">
+      <section className="py-16 lg:py-20 bg-white border-b border-(--color-border-light)" id="pricing-transparency">
         <div className="max-w-[1280px] mx-auto px-6">
           <div className="bg-[#F8FAFC] rounded-[2rem] p-8 lg:p-12 border border-(--color-border-light) shadow-(--shadow-sm)">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16 items-start">
@@ -592,7 +592,7 @@ export default async function HomePage() {
       </section>
 
       {/* Popular Locations */}
-      <section className="py-12 lg:py-16 bg-white" id="popular-locations">
+      <section className="py-12 lg:py-16 bg-(--color-surface-alt)" id="popular-locations">
         <div className="max-w-[1280px] mx-auto px-6">
           <div className="flex justify-between items-end mb-6 lg:mb-8">
             <h2 className="text-[1.25rem] lg:text-[1.5rem] font-bold text-(--color-text-heading)">Popular Locations</h2>
