@@ -64,7 +64,7 @@ export default async function AdminRequestsPage() {
   const requestIds = requests.map((r) => r.id);
   const { data: commissions } = await adminClient
     .from("commissions")
-    .select("id, rental_request_id, commission_base_amount, commission_amount, commission_status")
+    .select("id, rental_request_id, commission_base_amount, commission_amount, commission_status, rental_days")
     .in("rental_request_id", requestIds);
 
   // Batch fetch rental terms

@@ -27,6 +27,7 @@ type RequestCommission = {
   commission_base_amount: number;
   commission_amount: number;
   commission_status: string;
+  rental_days: number | null;
 };
 
 type RequestRentalTerm = {
@@ -202,6 +203,12 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                   </div>
                 ) : (
                   <>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                      <span className="review-label">Rental Days</span>
+                      <span className="review-value" style={{ fontWeight: 500 }}>
+                        {request.commission.rental_days || "N/A"} days
+                      </span>
+                    </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
                       <span className="review-label">Rental Base (excl. fees)</span>
                       <span className="review-value" style={{ fontWeight: 500 }}>

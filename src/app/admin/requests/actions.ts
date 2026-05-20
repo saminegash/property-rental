@@ -122,31 +122,10 @@ export async function generateCommission(requestId: string) {
     baseAmount = days * (terms.daily_price || 0);
   }
 
-  // 5. Apply tiered commission per spec.md
-  //    Short-term (1–30 days): flat fee based on daily price tier
-  //    Long-term (31+ days): 8% of total base rental amount
-  let commissionAmount: number;
-  let commissionRate: number;
-  let commissionType: "flat_fee" | "percentage";
-
-  if (days <= 30) {
-    // Short-term: flat fee determined by daily base price
-    const dailyPrice = terms.daily_price || 0;
-    if (dailyPrice <= 2000) {
-      commissionAmount = 300;
-    } else if (dailyPrice <= 5000) {
-      commissionAmount = 600;
-    } else {
-      commissionAmount = 1000;
-    }
-    commissionRate = 0; // Not percentage-based
-    commissionType = "flat_fee";
-  } else {
-    // Long-term: 8% of base rental amount
-    commissionRate = 8.00;
-    commissionAmount = Math.round(baseAmount * 0.08);
-    commissionType = "percentage";
-  }
+  // 5. Apply fixed 5% commission per spec.md
+  const commissionRate = 5.00;
+  const commissionAmount = Math.round(baseAmount * 0.05);
+  const commissionType = "percentage";
 
   // 6. Check if commission already exists for this request
   const { data: existing } = await adminClient
