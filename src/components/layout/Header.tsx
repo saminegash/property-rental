@@ -5,15 +5,17 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/cars", label: "Browse Cars" },
-  { href: "/dashboard/owner/listings/new", label: "List Your Car" },
+  { href: "/properties?type=buy", label: "Buy" },
+  { href: "/properties?type=rent", label: "Rent" },
+  { href: "/properties?type=sell", label: "Sell" },
+  { href: "/agents", label: "Agents" },
   { href: "/safety", label: "Safety" },
-  { href: "/#help", label: "Help" },
 ] as const;
 
 const LANGUAGES = [
   { code: "en", label: "EN" },
   { code: "am", label: "አማ" },
+  { code: "om", label: "OM" },
 ] as const;
 
 export default function Header() {
@@ -108,12 +110,12 @@ export default function Header() {
             )}
           </div>
 
-          {/* Auth buttons */}
-          <Link href="/login" className="mp-header__login" id="login-btn">
-            Login
+          {/* Favorites & List Property */}
+          <Link href="/saved" className="text-text-heading hover:text-primary p-2 hidden sm:block" aria-label="Saved properties">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
           </Link>
-          <Link href="/signup" className="mp-header__register" id="register-btn">
-            Register
+          <Link href="/dashboard/owner/listings/new" className="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-sm whitespace-nowrap hidden lg:flex items-center gap-1 text-[0.875rem]">
+            List Property <span className="text-[1.125rem] leading-none font-normal">+</span>
           </Link>
 
           {/* Mobile hamburger */}
