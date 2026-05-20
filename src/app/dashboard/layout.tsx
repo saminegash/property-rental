@@ -28,9 +28,11 @@ export default async function DashboardLayout({
     <div className="dashboard-layout">
       <header className="dashboard-header">
         <div className="dashboard-header-inner">
-          <Link href="/dashboard" className="dashboard-logo">
-            CarMarket
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <Link href="/" className="dashboard-logo">
+              MyEthioProperties
+            </Link>
+          </div>
           
           <div className="dashboard-user-nav">
             <span className="dashboard-user-email">{user.email}</span>

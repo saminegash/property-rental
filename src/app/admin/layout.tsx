@@ -40,8 +40,8 @@ export default async function AdminLayout({
       <header className="dashboard-header" style={{ borderBottomColor: "var(--color-primary)" }}>
         <div className="dashboard-header-inner">
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <Link href="/dashboard" className="dashboard-logo">
-              CarMarket
+            <Link href="/" className="dashboard-logo">
+              MyEthioProperties
             </Link>
             <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-primary)", padding: "0.25rem 0.5rem", backgroundColor: "rgba(99, 102, 241, 0.1)", borderRadius: "var(--radius-sm)" }}>
               ADMIN PANEL

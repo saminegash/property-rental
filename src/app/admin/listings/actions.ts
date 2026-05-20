@@ -77,13 +77,10 @@ export async function rejectListing(listingId: string, reason: string) {
     return { error: "Only pending listings can be rejected" };
   }
 
-  // Update status to rejected
-  // Note: We store rejection reason in the description field isn't ideal,
-  // but there's no admin_notes column on listings yet. For MVP, we use
-  // a separate approach — the admin can communicate via other channels.
+  // Update status to rejected and persist the reason for the owner to see
   const { error } = await adminClient
     .from("listings")
-    .update({ status: "rejected" })
+    .update({ status: "rejected", admin_rejection_reason: reason.trim() })
     .eq("id", listingId);
 
   if (error) {

@@ -122,36 +122,7 @@ export default async function CarDetailPage({
     : (vehicleTypeRaw as { name: string } | null)?.name;
 
   return (
-    <div className="browse-layout">
-      {/* Header */}
-      <header className="browse-header">
-        <div className="browse-header__inner">
-          <Link href="/" className="browse-header__logo">
-            CarMarket
-          </Link>
-          <nav className="browse-header__nav">
-            <Link href="/cars" className="browse-header__link">
-              ← Browse
-            </Link>
-            <Link href="/login" className="browse-header__link">
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="auth-button"
-              style={{
-                textDecoration: "none",
-                padding: "0.5rem 1.25rem",
-                fontSize: "0.8125rem",
-              }}
-            >
-              Sign up
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="detail-page">
+    <main className="detail-page">
         {/* Image gallery */}
         <section className="detail-gallery">
           {primaryImage ? (
@@ -425,11 +396,6 @@ export default async function CarDetailPage({
             </div>
           </aside>
         </div>
-      </main>
-
-      <footer className="browse-footer">
-        <p>© {new Date().getFullYear()} CarMarket. All rights reserved.</p>
-      </footer>
-    </div>
+    </main>
   );
 }

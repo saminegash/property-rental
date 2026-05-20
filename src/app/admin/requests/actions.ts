@@ -90,7 +90,7 @@ export async function generateCommission(requestId: string) {
     return { error: "Failed to fetch rental request" };
   }
 
-  // 2. Fetch rental terms to calculate base amount accurately
+  // 2. Fetch rental terms — only base rental price feeds into commission
   const { data: terms, error: termsError } = await adminClient
     .from("rental_terms")
     .select("daily_price, weekly_price, monthly_price")
@@ -101,39 +101,75 @@ export async function generateCommission(requestId: string) {
     return { error: "Failed to fetch rental terms" };
   }
 
-  // 3. Calculate days
+  // 3. Calculate rental duration in days
   const start = new Date(request.start_date);
   const end = new Date(request.end_date);
   const diffTime = Math.abs(end.getTime() - start.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   const days = diffDays > 0 ? diffDays : 1; // Minimum 1 day
 
-  // 4. Calculate commission base amount
+  // 4. Calculate base rental amount (rental price only — no driver/delivery/deposit)
   let baseAmount = 0;
   if (days >= 30 && terms.monthly_price) {
     const months = Math.floor(days / 30);
     const remainder = days % 30;
-    baseAmount = (months * terms.monthly_price) + (remainder * (terms.daily_price || 0));
+    baseAmount = months * terms.monthly_price + remainder * (terms.daily_price || 0);
   } else if (days >= 7 && terms.weekly_price) {
     const weeks = Math.floor(days / 7);
     const remainder = days % 7;
-    baseAmount = (weeks * terms.weekly_price) + (remainder * (terms.daily_price || 0));
+    baseAmount = weeks * terms.weekly_price + remainder * (terms.daily_price || 0);
   } else {
     baseAmount = days * (terms.daily_price || 0);
   }
 
-  // 5. Calculate 5% fixed commission
-  const commissionAmount = Math.round(baseAmount * 0.05);
+  // 5. Apply tiered commission per spec.md
+  //    Short-term (1–30 days): flat fee based on daily price tier
+  //    Long-term (31+ days): 8% of total base rental amount
+  let commissionAmount: number;
+  let commissionRate: number;
+  let commissionType: "flat_fee" | "percentage";
 
-  // 6. Insert into commissions table
+  if (days <= 30) {
+    // Short-term: flat fee determined by daily base price
+    const dailyPrice = terms.daily_price || 0;
+    if (dailyPrice <= 2000) {
+      commissionAmount = 300;
+    } else if (dailyPrice <= 5000) {
+      commissionAmount = 600;
+    } else {
+      commissionAmount = 1000;
+    }
+    commissionRate = 0; // Not percentage-based
+    commissionType = "flat_fee";
+  } else {
+    // Long-term: 8% of base rental amount
+    commissionRate = 8.00;
+    commissionAmount = Math.round(baseAmount * 0.08);
+    commissionType = "percentage";
+  }
+
+  // 6. Check if commission already exists for this request
+  const { data: existing } = await adminClient
+    .from("commissions")
+    .select("id")
+    .eq("rental_request_id", requestId)
+    .single();
+
+  if (existing) {
+    return { error: "Commission has already been generated for this request" };
+  }
+
+  // 7. Insert into commissions table
   const { error: insertError } = await adminClient
     .from("commissions")
     .insert({
       rental_request_id: requestId,
-      commission_rate: 5.00,
+      commission_rate: commissionRate,
       commission_base_amount: baseAmount,
       commission_amount: commissionAmount,
-      commission_status: "pending"
+      commission_status: "pending",
+      commission_type: commissionType,
+      rental_days: days,
     });
 
   if (insertError) {
@@ -141,8 +177,14 @@ export async function generateCommission(requestId: string) {
   }
 
   revalidatePath("/admin/requests");
-  return { success: true };
+  return {
+    success: true,
+    commission_amount: commissionAmount,
+    commission_type: commissionType,
+    rental_days: days,
+  };
 }
+
 
 export async function updateCommissionStatus(commissionId: string, status: string) {
   await ensureAdmin();
