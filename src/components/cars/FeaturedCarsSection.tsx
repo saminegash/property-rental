@@ -6,6 +6,8 @@ interface FeaturedCarListing {
   id: string;
   title: string;
   location: string | null;
+  owner_id: string;
+  is_featured: boolean;
   vehicle_details: {
     make: string;
     model: string;
@@ -26,60 +28,14 @@ interface FeaturedCarListing {
   }[];
 }
 
-const fallbackCars: FeaturedCarListing[] = [
-  {
-    id: "car-fb-1",
-    title: "Toyota Corolla 2018",
-    location: "Kazanchis, Addis Ababa",
-    vehicle_details: [{ make: "Toyota", model: "Corolla", year: 2018 }],
-    rental_terms: [{
-      daily_price: 3000, daily_driver_fee: 1200, security_deposit_amount: 12000,
-      delivery_fee: 500, available_with_driver: true, available_without_driver: true, delivery_available: true,
-    }],
-    listing_images: [{ image_url: "https://images.unsplash.com/photo-1623869675781-80aa31012a5a?auto=format&fit=crop&w=800&q=80", is_primary: true }],
-  },
-  {
-    id: "car-fb-2",
-    title: "Hyundai Tucson 2021",
-    location: "Bole, Addis Ababa",
-    vehicle_details: [{ make: "Hyundai", model: "Tucson", year: 2021 }],
-    rental_terms: [{
-      daily_price: 4500, daily_driver_fee: 1500, security_deposit_amount: 20000,
-      delivery_fee: 500, available_with_driver: true, available_without_driver: false, delivery_available: true,
-    }],
-    listing_images: [{ image_url: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&q=80", is_primary: true }],
-  },
-  {
-    id: "car-fb-3",
-    title: "Toyota Land Cruiser 2016",
-    location: "CMC, Addis Ababa",
-    vehicle_details: [{ make: "Toyota", model: "Land Cruiser", year: 2016 }],
-    rental_terms: [{
-      daily_price: 7500, daily_driver_fee: 2000, security_deposit_amount: 40000,
-      delivery_fee: 800, available_with_driver: true, available_without_driver: true, delivery_available: true,
-    }],
-    listing_images: [{ image_url: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80", is_primary: true }],
-  },
-  {
-    id: "car-fb-4",
-    title: "Kia Rio 2017",
-    location: "Megenagna, Addis Ababa",
-    vehicle_details: [{ make: "Kia", model: "Rio", year: 2017 }],
-    rental_terms: [{
-      daily_price: 2200, daily_driver_fee: null, security_deposit_amount: 8000,
-      delivery_fee: null, available_with_driver: false, available_without_driver: true, delivery_available: false,
-    }],
-    listing_images: [{ image_url: "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80", is_primary: true }],
-  },
-];
-
 export async function FeaturedCarsSection() {
   const supabase = await createClient();
 
+  // 1. Fetch only published vehicle rental listings — RLS-safe, no service-role key
   const { data: listings } = await supabase
     .from("listings")
     .select(`
-      id, title, location,
+      id, title, location, owner_id, is_featured,
       vehicle_details ( make, model, year ),
       rental_terms (
         daily_price, daily_driver_fee, security_deposit_amount,
@@ -90,13 +46,30 @@ export async function FeaturedCarsSection() {
     .eq("category", "vehicle")
     .eq("listing_type", "rent")
     .eq("status", "published")
+    .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(8);
 
-  const cars: FeaturedCarListing[] =
-    listings && listings.length > 0
-      ? (listings as unknown as FeaturedCarListing[])
-      : fallbackCars;
+  const cars = (listings || []) as unknown as FeaturedCarListing[];
+
+  // 2. Fetch verification status for all owners via the public-safe view
+  //    No service-role key needed — the view bypasses RLS safely
+  const ownerIds = [...new Set(cars.map((c) => c.owner_id))];
+  const verifiedOwnerIds = new Set<string>();
+
+  if (ownerIds.length > 0) {
+    const { data: ownerProfiles } = await supabase
+      .from("owner_public_profiles")
+      .select("user_id, verification_status")
+      .in("user_id", ownerIds)
+      .eq("verification_status", "verified");
+
+    if (ownerProfiles) {
+      for (const op of ownerProfiles) {
+        verifiedOwnerIds.add(op.user_id);
+      }
+    }
+  }
 
   return (
     <section className="featured-cars" id="featured-cars">
@@ -114,35 +87,54 @@ export async function FeaturedCarsSection() {
           </Link>
         </div>
 
-        {/* Cards */}
-        <div className="featured-cars__grid">
-          {cars.map((car) => {
-            const rt = car.rental_terms?.[0];
-            const coverImage =
-              car.listing_images?.find((img) => img.is_primary)?.image_url ||
-              car.listing_images?.[0]?.image_url ||
-              "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80";
-            const isFallback = car.id.startsWith("car-fb-");
-            const href = isFallback ? "/cars" : `/cars/${car.id}`;
+        {/* Cards or Empty State */}
+        {cars.length > 0 ? (
+          <div className="featured-cars__grid">
+            {cars.map((car) => {
+              const rt = car.rental_terms?.[0];
+              const coverImage =
+                car.listing_images?.find((img) => img.is_primary)?.image_url ||
+                car.listing_images?.[0]?.image_url ||
+                "";
 
-            return (
-              <CarListingCard
-                key={car.id}
-                id={car.id}
-                title={car.title}
-                location={car.location || "Addis Ababa"}
-                image={coverImage}
-                dailyPrice={rt?.daily_price ?? null}
-                driverFee={rt?.daily_driver_fee ?? 0}
-                securityDeposit={rt?.security_deposit_amount ?? 0}
-                deliveryAvailable={rt?.delivery_available ?? false}
-                withDriver={rt?.available_with_driver ?? false}
-                withoutDriver={rt?.available_without_driver ?? false}
-                href={href}
-              />
-            );
-          })}
-        </div>
+              return (
+                <CarListingCard
+                  key={car.id}
+                  id={car.id}
+                  title={car.title}
+                  location={car.location || "Addis Ababa"}
+                  image={coverImage}
+                  dailyPrice={rt?.daily_price ?? null}
+                  driverFee={rt?.daily_driver_fee ?? 0}
+                  securityDeposit={rt?.security_deposit_amount ?? 0}
+                  deliveryAvailable={rt?.delivery_available ?? false}
+                  withDriver={rt?.available_with_driver ?? false}
+                  withoutDriver={rt?.available_without_driver ?? false}
+                  isVerifiedOwner={verifiedOwnerIds.has(car.owner_id)}
+                  isFeatured={car.is_featured}
+                  href={`/cars/${car.id}`}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          /* Polished empty state — no fake listings */
+          <div className="featured-cars__empty" id="featured-cars-empty">
+            <div className="featured-cars__empty-icon" aria-hidden="true">🚗</div>
+            <h3 className="featured-cars__empty-title">No cars listed yet</h3>
+            <p className="featured-cars__empty-text">
+              We&apos;re onboarding verified car owners right now. Check back soon or list your own car to be among the first.
+            </p>
+            <div className="featured-cars__empty-actions">
+              <Link href="/dashboard/owner/cars/new" className="featured-cars__empty-btn featured-cars__empty-btn--primary">
+                List Your Car
+              </Link>
+              <Link href="/cars" className="featured-cars__empty-btn featured-cars__empty-btn--secondary">
+                Browse All Cars
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

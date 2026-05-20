@@ -6,6 +6,7 @@ interface FeaturedCarData {
   id: string;
   title: string;
   location: string | null;
+  owner_id: string;
   vehicle_details: {
     make: string;
     model: string;
@@ -26,34 +27,15 @@ interface FeaturedCarData {
   }[];
 }
 
-const fallbackCar = {
-  id: "featured-fallback",
-  title: "Toyota RAV4 2020",
-  location: "Bole, Addis Ababa",
-  vehicle_details: [{ make: "Toyota", model: "RAV4", year: 2020 }],
-  rental_terms: [{
-    daily_price: 3500,
-    daily_driver_fee: 1500,
-    security_deposit_amount: 15000,
-    delivery_fee: 500,
-    available_with_driver: true,
-    available_without_driver: true,
-    delivery_available: true,
-  }],
-  listing_images: [{
-    image_url: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80",
-    is_primary: true,
-  }],
-};
-
 export async function CarHeroSection() {
   const supabase = await createClient();
 
-  // Fetch the most recent published car listing to feature
+  // Fetch the most recent published car listing to feature in the hero
+  // Uses standard RLS-bound client — no service-role key, no private owner data
   const { data: listings } = await supabase
     .from("listings")
     .select(`
-      id, title, location,
+      id, title, location, owner_id,
       vehicle_details ( make, model, year ),
       rental_terms ( daily_price, daily_driver_fee, security_deposit_amount, delivery_fee, available_with_driver, available_without_driver, delivery_available ),
       listing_images ( image_url, is_primary )
@@ -61,23 +43,39 @@ export async function CarHeroSection() {
     .eq("category", "vehicle")
     .eq("listing_type", "rent")
     .eq("status", "published")
+    .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(1);
 
-  const featured: FeaturedCarData = (listings && listings.length > 0)
-    ? (listings[0] as unknown as FeaturedCarData)
-    : fallbackCar;
+  const featured: FeaturedCarData | null =
+    listings && listings.length > 0
+      ? (listings[0] as unknown as FeaturedCarData)
+      : null;
 
-  const vd = featured.vehicle_details?.[0];
-  const rt = featured.rental_terms?.[0];
-  const coverImage = featured.listing_images?.find((img) => img.is_primary)?.image_url
-    || featured.listing_images?.[0]?.image_url
-    || fallbackCar.listing_images[0].image_url;
+  // Check verification status via public-safe view (no service-role key)
+  let isVerifiedOwner = false;
+  if (featured) {
+    const { data: ownerProfile } = await supabase
+      .from("owner_public_profiles")
+      .select("verification_status")
+      .eq("user_id", featured.owner_id)
+      .eq("verification_status", "verified")
+      .maybeSingle();
 
-  const carName = vd ? `${vd.make} ${vd.model} ${vd.year}` : featured.title;
-  const carLocation = featured.location || "Addis Ababa";
-  const isFallback = featured.id === "featured-fallback";
-  const carHref = isFallback ? "/cars" : `/cars/${featured.id}`;
+    isVerifiedOwner = !!ownerProfile;
+  }
+
+  // Extract data from the featured car (if available)
+  const vd = featured?.vehicle_details?.[0];
+  const rt = featured?.rental_terms?.[0];
+  const coverImage =
+    featured?.listing_images?.find((img) => img.is_primary)?.image_url ||
+    featured?.listing_images?.[0]?.image_url ||
+    null;
+
+  const carName = vd ? `${vd.make} ${vd.model} ${vd.year}` : featured?.title;
+  const carLocation = featured?.location || "Addis Ababa";
+  const carHref = featured ? `/cars/${featured.id}` : "/cars";
 
   return (
     <section className="car-hero" id="car-hero">
@@ -115,77 +113,98 @@ export async function CarHeroSection() {
           </div>
         </div>
 
-        {/* Right Column: Featured Car Card */}
+        {/* Right Column: Featured Car Card — only shown when a real listing exists */}
         <div className="car-hero__right">
-          <Link href={carHref} className="car-hero-card" id="car-hero-featured-card">
-            {/* Verified Owner Badge */}
-            <div className="car-hero-card__verified">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              Verified Owner
-            </div>
+          {featured && coverImage ? (
+            <Link href={carHref} className="car-hero-card" id="car-hero-featured-card">
+              {/* Verified Owner Badge — only shown for admin-verified owners */}
+              {isVerifiedOwner && (
+                <div className="car-hero-card__verified">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                  Verified Owner
+                </div>
+              )}
 
-            {/* Favorite */}
-            <div
-              className="car-hero-card__fav"
-              aria-label="Save to favorites"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-            </div>
-
-            {/* Car Image */}
-            <div className="car-hero-card__image">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={coverImage} alt={carName} className="car-hero-card__img" />
-            </div>
-
-            {/* Car Info */}
-            <div className="car-hero-card__info">
-              <h3 className="car-hero-card__name">{carName}</h3>
-              <p className="car-hero-card__location">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
+              {/* Favorite */}
+              <div
+                className="car-hero-card__fav"
+                aria-label="Save to favorites"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
-                {carLocation}
-              </p>
-            </div>
+              </div>
 
-            {/* Price Breakdown */}
-            <div className="car-hero-card__pricing">
-              <div className="car-hero-card__price-row car-hero-card__price-row--main">
-                <span className="car-hero-card__price-label">
-                  <span className="car-hero-card__price-icon">🚗</span>
-                  Car rental
-                </span>
-                <span className="car-hero-card__price-value car-hero-card__price-value--bold">
-                  {rt?.daily_price ? `${rt.daily_price.toLocaleString()} ETB/day` : "Contact"}
-                </span>
+              {/* Car Image */}
+              <div className="car-hero-card__image">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={coverImage} alt={carName || "Featured car"} className="car-hero-card__img" />
               </div>
-              <div className="car-hero-card__price-row">
-                <span className="car-hero-card__price-label">Driver fee</span>
-                <span className="car-hero-card__price-value">
-                  {rt?.daily_driver_fee ? `+${rt.daily_driver_fee.toLocaleString()}/day` : "N/A"}
-                </span>
+
+              {/* Car Info */}
+              <div className="car-hero-card__info">
+                <h3 className="car-hero-card__name">{carName}</h3>
+                <p className="car-hero-card__location">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {carLocation}
+                </p>
               </div>
-              <div className="car-hero-card__price-row">
-                <span className="car-hero-card__price-label">Security deposit</span>
-                <span className="car-hero-card__price-value">
-                  {rt?.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()}` : "0"}
-                </span>
+
+              {/* Price Breakdown */}
+              <div className="car-hero-card__pricing">
+                <div className="car-hero-card__price-row car-hero-card__price-row--main">
+                  <span className="car-hero-card__price-label">
+                    <span className="car-hero-card__price-icon">🚗</span>
+                    Car rental
+                  </span>
+                  <span className="car-hero-card__price-value car-hero-card__price-value--bold">
+                    {rt?.daily_price ? `${rt.daily_price.toLocaleString()} ETB/day` : "Contact"}
+                  </span>
+                </div>
+                <div className="car-hero-card__price-row">
+                  <span className="car-hero-card__price-label">Driver fee</span>
+                  <span className="car-hero-card__price-value">
+                    {rt?.daily_driver_fee ? `+${rt.daily_driver_fee.toLocaleString()}/day` : "N/A"}
+                  </span>
+                </div>
+                <div className="car-hero-card__price-row">
+                  <span className="car-hero-card__price-label">Security deposit</span>
+                  <span className="car-hero-card__price-value">
+                    {rt?.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()}` : "0"}
+                  </span>
+                </div>
+                <div className="car-hero-card__price-row">
+                  <span className="car-hero-card__price-label">Delivery fee</span>
+                  <span className="car-hero-card__price-value">
+                    {rt?.delivery_fee ? `${rt.delivery_fee.toLocaleString()}` : "Free"}
+                  </span>
+                </div>
               </div>
-              <div className="car-hero-card__price-row">
-                <span className="car-hero-card__price-label">Delivery fee</span>
-                <span className="car-hero-card__price-value">
-                  {rt?.delivery_fee ? `${rt.delivery_fee.toLocaleString()}` : "Free"}
-                </span>
+            </Link>
+          ) : (
+            /* No real listing — show a CTA card instead of a fake car */
+            <div className="car-hero-card car-hero-card--empty" id="car-hero-empty-card">
+              <div className="car-hero-card__empty-content">
+                <div className="car-hero-card__empty-icon" aria-hidden="true">🚗</div>
+                <h3 className="car-hero-card__empty-title">List your car today</h3>
+                <p className="car-hero-card__empty-text">
+                  Be among the first verified car owners on our platform. Set your own pricing and start earning.
+                </p>
+                <Link
+                  href="/dashboard/owner/cars/new"
+                  className="car-hero-card__empty-btn"
+                >
+                  Get Started →
+                </Link>
               </div>
             </div>
-          </Link>
+          )}
         </div>
       </div>
     </section>
