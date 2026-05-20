@@ -213,7 +213,7 @@ How It Works
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-> **Note:** The screenshot shows "5% commission" as simplified marketing copy. The actual implementation uses the tiered model defined in `spec.md` (flat 300–1,000 Birr for short-term, 8% for long-term). The UI copy should be updated to reflect the tiered model accurately or use a simplified summary that links to full pricing details.
+> **Note:** The commission is fixed at 5% of the base rental price only. The UI copy correctly states "5% commission of rental price only". Driver fees, delivery fees, security deposits, damage fees, late return penalties, and all other extra charges are explicitly excluded from commission.
 
 - Light gray/blue background section
 - Left side: Heading + description + commission callout with checkmark
@@ -458,5 +458,5 @@ The `ListingCard` component renders differently based on `listing.type` — poly
 2. **Search-first hero** — The search box is the primary CTA, not "Browse" or "Sign Up".
 3. **Transparent pricing** — A dedicated section explains all fees. Commission is clearly disclosed.
 4. **Admin-reviewed badge** — Prominently displayed in trust badges to differentiate from peer-to-peer platforms.
-5. **No ratings in MVP** — Rating stars appear in the reference but ratings are documented as post-MVP (per `tasks.md` Task Group 3). Cards should reserve space for ratings but show nothing until implemented.
-6. **Multilingual from day one** — Language switcher is in the header nav. All strings must be externalized.
+5. **Ratings are required for MVP** — Both renters and owners can rate each other after a completed rental. Rating stars appear on listing cards and detail pages. The `rental_reviews` table is already created.
+6. **Multilingual from day one** — Language switcher is in the header nav. All strings must be externalized. Supported languages: English, Amharic, Afaan Oromo.

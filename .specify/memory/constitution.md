@@ -35,7 +35,7 @@ This document defines the non-negotiable rules, constraints, and principles that
 
 ### 3. Business Logic
 
-- **Commission**: The platform charges a 5% commission maximum. This logic executes server-side only.
+- **Commission**: The platform charges a fixed 5% commission on the base rental price only. Commission must NOT apply to driver fee, delivery fee, security deposit, damage fee, late return penalty, or any other extra charge. This logic executes server-side only.
 - **Admin Intermediation**:
   - All listings require admin review before becoming public.
   - All rental/purchase requests pass through an admin intermediary.

@@ -300,9 +300,9 @@ The current implementation is light-mode only. The existing dark mode tokens in 
 
 ## 15. Multilingual Support
 
-- **Languages:** English (default), Amharic (አማርኛ), Oromo (planned)
+- **Languages:** English (default), Amharic (አማርኛ), Afaan Oromo
 - **Direction:** LTR for all supported languages
-- **Font considerations:** Inter supports Latin characters. Amharic (Ethiopic script) uses `Noto Sans Ethiopic` as a fallback
+- **Font considerations:** Inter supports Latin characters. Amharic (Ethiopic script) uses `Noto Sans Ethiopic` as a fallback. Afaan Oromo uses the Latin script and is served by Inter.
 - **Implementation:** Language switcher in header nav, `next-intl` or similar i18n library
 - **UI impact:** All text strings externalized. Button and label widths accommodate longer Amharic text (typically 20-40% wider)
 
