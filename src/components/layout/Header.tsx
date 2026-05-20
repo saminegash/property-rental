@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -32,24 +33,18 @@ export default function Header() {
       <div className="mp-header__inner">
         {/* Logo */}
         <Link href="/" className="mp-header__logo" id="site-logo">
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-            aria-hidden="true"
-            className="mp-header__logo-icon"
-          >
-            <circle cx="14" cy="14" r="14" fill="#1A6DFF" />
-            <path
-              d="M8 19V10.5L11.5 7H16.5L20 10.5V19H16V14.5H12V19H8Z"
-              fill="white"
-            />
-          </svg>
+          <Image
+            src="/logo.webp"
+            alt="MyEthioProperties Logo"
+            width={80}
+            height={80}
+            className="mp-header__logo-image"
+            style={{ height: '80px', width: 'auto', objectFit: 'contain' }}
+          />
           <span className="mp-header__logo-text">
-            MyProperties
+            MyEthioProperties
             <span className="mp-header__tagline">
-              Rent with trust. Drive with confidence.
+              Rent, Buy and Sell verified cars, house, apartments with trust. Drive with confidence.
             </span>
           </span>
         </Link>

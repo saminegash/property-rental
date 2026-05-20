@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const FOOTER_LINKS = {
   company: [
@@ -31,19 +32,14 @@ export default function Footer() {
           {/* Brand column */}
           <div className="mp-footer__brand">
             <Link href="/" className="mp-footer__logo" id="footer-logo">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 28 28"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle cx="14" cy="14" r="14" fill="#1A6DFF" />
-                <path
-                  d="M8 19V10.5L11.5 7H16.5L20 10.5V19H16V14.5H12V19H8Z"
-                  fill="white"
-                />
-              </svg>
+              <Image
+                src="/logo.webp"
+                alt="MyProperties Logo"
+                width={28}
+                height={28}
+                className="mp-footer__logo-image"
+                style={{ height: '28px', width: 'auto', objectFit: 'contain' }}
+              />
               <span className="mp-footer__logo-text">MyProperties</span>
             </Link>
             <p className="mp-footer__tagline">
