@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import RentalRequestForm from "./RentalRequestForm";
+import ListingGallery from "@/components/shared/ListingGallery";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -92,8 +92,6 @@ export default async function CarDetailPage({
     Array.isArray(listing.listing_images) ? listing.listing_images : []
   ).sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order);
 
-  const primaryImage = images.find((img: { is_primary: boolean }) => img.is_primary) || images[0];
-
   // Fetch owner verification status (using admin client to bypass owner_profiles RLS)
   // We only expose verification_status and owner_type — never private data
   const adminClient = createAdminClient();
@@ -123,41 +121,9 @@ export default async function CarDetailPage({
 
   return (
     <main className="detail-page">
+      <div className="detail-container">
         {/* Image gallery */}
-        <section className="detail-gallery">
-          {primaryImage ? (
-            <div className="detail-gallery__hero">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={(primaryImage as { image_url: string }).image_url}
-                alt={listing.title}
-                className="detail-gallery__hero-img"
-              />
-            </div>
-          ) : (
-            <div className="detail-gallery__hero detail-gallery__placeholder">
-              <span style={{ fontSize: "3rem", opacity: 0.3 }}>🚗</span>
-            </div>
-          )}
-
-          {images.length > 1 && (
-            <div className="detail-gallery__thumbs">
-              {images.map((img: { id: string; image_url: string; is_primary: boolean }) => (
-                <div
-                  key={img.id}
-                  className={`detail-gallery__thumb ${img.is_primary ? "detail-gallery__thumb--active" : ""}`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={img.image_url}
-                    alt="Vehicle"
-                    className="detail-gallery__thumb-img"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+        <ListingGallery images={images} title={listing.title} />
 
         {/* Content columns */}
         <div className="detail-content">
@@ -396,6 +362,7 @@ export default async function CarDetailPage({
             </div>
           </aside>
         </div>
+      </div>
     </main>
   );
 }

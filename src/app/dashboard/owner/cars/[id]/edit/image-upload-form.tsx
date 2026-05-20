@@ -19,6 +19,7 @@ type ListingImage = {
 type Props = {
   listingId: string;
   existingImages: ListingImage[];
+  listingType?: "car" | "property";
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -29,6 +30,7 @@ const MAX_IMAGES = 10;
 export default function ImageUploadForm({
   listingId,
   existingImages,
+  listingType = "car",
 }: Props) {
   const [images, setImages] = useState<ListingImage[]>(existingImages);
   const [uploading, setUploading] = useState(false);
@@ -175,8 +177,10 @@ export default function ImageUploadForm({
         Listing Photos
       </h2>
       <p className="dashboard-hint" style={{ marginBottom: "2rem" }}>
-        Upload {MIN_IMAGES} to {MAX_IMAGES} photos of your vehicle. The primary image will
+        Upload {MIN_IMAGES} to {MAX_IMAGES} photos of your {listingType === "property" ? "property" : "vehicle"}. The primary image will
         be shown as the cover photo. JPEG, PNG, or WebP — max 5 MB each.
+        <br/><br/>
+        <strong>Recommended:</strong> {listingType === "property" ? "Exterior, Living room, Bedroom, Kitchen, Bathroom." : "Front exterior, Back exterior, Side exterior, Interior, Dashboard/Details."}
       </p>
 
       {error && (

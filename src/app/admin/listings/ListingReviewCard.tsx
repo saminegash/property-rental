@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { approveListing, rejectListing, suspendListing, saveAdminNotes } from "./actions";
+import ListingGallery from "@/components/shared/ListingGallery";
 
 type VehicleDetails = {
   make: string;
@@ -378,44 +379,9 @@ export default function ListingReviewCard({ listing }: Props) {
             <span style={{ fontSize: "0.75rem" }}>{expandedSection === "images" ? "▲" : "▼"}</span>
           </div>
           {expandedSection === "images" && (
-            <div className="review-section__body">
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.5rem" }}>
-                {listing.images.map((img) => (
-                  <div
-                    key={img.id}
-                    style={{
-                      aspectRatio: "4 / 3",
-                      borderRadius: "var(--radius-sm)",
-                      overflow: "hidden",
-                      position: "relative",
-                      backgroundColor: "var(--color-surface-hover)",
-                    }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.image_url}
-                      alt="Listing"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                    {img.is_primary && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          top: "4px",
-                          left: "4px",
-                          fontSize: "0.5625rem",
-                          fontWeight: 600,
-                          padding: "1px 6px",
-                          borderRadius: "9999px",
-                          backgroundColor: "var(--color-primary)",
-                          color: "#fff",
-                        }}
-                      >
-                        PRIMARY
-                      </span>
-                    )}
-                  </div>
-                ))}
+            <div className="review-section__body" style={{ padding: "0" }}>
+              <div style={{ backgroundColor: "var(--color-surface)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+                <ListingGallery images={listing.images} title={listing.title} />
               </div>
             </div>
           )}
