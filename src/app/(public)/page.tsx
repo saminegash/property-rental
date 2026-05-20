@@ -4,6 +4,8 @@ import { PropertyListingCard } from "@/components/properties/PropertyListingCard
 import { CarHeroSection } from "@/components/cars/CarHeroSection";
 import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
 import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
+import { TrustFeaturesSection } from "@/components/cars/TrustFeaturesSection";
+import { HowItWorksSection } from "@/components/cars/HowItWorksSection";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +52,7 @@ export default async function HomePage() {
     .limit(4);
 
   // Fallback data if no properties exist
-  const fallbackProperties = [
+  const fallbackProperties: PropertyListing[] = [
     {
       id: "prop-1",
       title: "Bole Modern Apartment",
@@ -89,7 +91,7 @@ export default async function HomePage() {
     }
   ];
 
-  const featuredListings = listings && listings.length > 0 ? listings : fallbackProperties;
+  const featuredListings: PropertyListing[] = listings && listings.length > 0 ? (listings as unknown as PropertyListing[]) : fallbackProperties;
 
   return (
     <>
@@ -101,6 +103,12 @@ export default async function HomePage() {
 
       {/* Browse by Category */}
       <CarCategoriesSection />
+
+      {/* Trust Features */}
+      <TrustFeaturesSection />
+
+      {/* How It Works */}
+      <HowItWorksSection />
 
       {/* Featured Properties */}
       <section className="py-16 lg:py-24 bg-surface-alt border-b border-border-light">
@@ -116,10 +124,10 @@ export default async function HomePage() {
           </div>
 
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:pb-0 lg:overflow-visible" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {featuredListings.map((prop: any) => {
+            {featuredListings.map((prop: PropertyListing) => {
               const details = prop.property_details || { bedrooms: 0, bathrooms: 0, area_sqm: 0 };
               const price = prop.rental_terms?.daily_price || prop.sale_terms?.price || 0;
-              const coverImg = prop.listing_images?.find((img: any) => img.is_primary)?.image_url || prop.listing_images?.[0]?.image_url || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80";
+              const coverImg = prop.listing_images?.find((img) => img.is_primary)?.image_url || prop.listing_images?.[0]?.image_url || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80";
 
               return (
                 <PropertyListingCard
@@ -129,7 +137,7 @@ export default async function HomePage() {
                   location={prop.location || "Addis Ababa"}
                   image={coverImg}
                   price={price}
-                  type={prop.listing_type}
+                  type={prop.listing_type === "sale" ? "buy" : "rent"}
                   beds={details.bedrooms || 0}
                   baths={details.bathrooms || 0}
                   area={details.area_sqm || 0}
@@ -250,7 +258,7 @@ export default async function HomePage() {
               
               <div className="bg-slate-200 rounded-2xl h-[140px] relative overflow-hidden flex items-center justify-center border border-border">
                 {/* Fake map placeholder */}
-                <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-100 via-slate-200 to-slate-300"></div>
+                <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-blue-100 via-slate-200 to-slate-300"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md text-xs font-bold text-primary flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                   Bole: High demand
