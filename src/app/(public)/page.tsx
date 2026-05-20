@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PropertyListingCard } from "@/components/properties/PropertyListingCard";
 import { CarHeroSection } from "@/components/cars/CarHeroSection";
+import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -93,6 +94,9 @@ export default async function HomePage() {
     <>
       {/* Car Hero Section */}
       <CarHeroSection />
+
+      {/* Featured Cars */}
+      <FeaturedCarsSection />
 
       {/* Popular Categories */}
       <section className="py-16 bg-white border-b border-border-light">
