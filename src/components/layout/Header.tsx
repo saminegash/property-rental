@@ -44,7 +44,7 @@ export default function Header() {
           <span className="mp-header__logo-text">
             MyEthioProperties
             <span className="mp-header__tagline">
-              Rent, Buy and Sell verified cars, house, apartments with trust. Drive with confidence.
+              Rent, Buy and Sell with trust.
             </span>
           </span>
         </Link>
