@@ -133,6 +133,122 @@ export async function saveVehicleDetails(formData: FormData) {
   return { success: true };
 }
 
+// ─── Rental Pricing ──────────────────────────────────────────────
+
+const rentalPricingSchema = z.object({
+  listing_id: z.string().uuid("Invalid listing ID"),
+  daily_price: z.coerce
+    .number()
+    .int()
+    .min(1, "Daily rental price is required and must be at least 1 ETB"),
+  weekly_price: z.coerce
+    .number()
+    .int()
+    .min(1, "Weekly price must be at least 1 ETB")
+    .nullable(),
+  monthly_price: z.coerce
+    .number()
+    .int()
+    .min(1, "Monthly price must be at least 1 ETB")
+    .nullable(),
+  security_deposit_amount: z.coerce
+    .number()
+    .int()
+    .min(0, "Security deposit cannot be negative"),
+  minimum_rental_days: z.coerce
+    .number()
+    .int()
+    .min(1, "Minimum rental days must be at least 1")
+    .max(365, "Minimum rental days cannot exceed 365"),
+});
+
+export async function saveRentalPricing(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const listingId = formData.get("listing_id");
+
+  // Verify listing ownership (RLS + defense-in-depth)
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("id, owner_id")
+    .eq("id", listingId)
+    .single();
+
+  if (listingError || !listing) {
+    return { error: "Listing not found or you don't have permission to edit it" };
+  }
+
+  if (listing.owner_id !== user.id) {
+    return { error: "You can only set pricing for your own listings" };
+  }
+
+  const rawWeekly = formData.get("weekly_price");
+  const rawMonthly = formData.get("monthly_price");
+
+  const parseResult = rentalPricingSchema.safeParse({
+    listing_id: listingId,
+    daily_price: formData.get("daily_price"),
+    weekly_price: rawWeekly === "" || rawWeekly === null ? null : rawWeekly,
+    monthly_price: rawMonthly === "" || rawMonthly === null ? null : rawMonthly,
+    security_deposit_amount: formData.get("security_deposit_amount"),
+    minimum_rental_days: formData.get("minimum_rental_days"),
+  });
+
+  if (!parseResult.success) {
+    return { error: parseResult.error.issues[0].message };
+  }
+
+  const data = parseResult.data;
+
+  // Check if rental_terms already exist for this listing (upsert)
+  const { data: existing } = await supabase
+    .from("rental_terms")
+    .select("id")
+    .eq("listing_id", data.listing_id)
+    .single();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("rental_terms")
+      .update({
+        daily_price: data.daily_price,
+        weekly_price: data.weekly_price,
+        monthly_price: data.monthly_price,
+        security_deposit_amount: data.security_deposit_amount,
+        minimum_rental_days: data.minimum_rental_days,
+      })
+      .eq("listing_id", data.listing_id);
+
+    if (error) {
+      return { error: "Failed to update pricing: " + error.message };
+    }
+  } else {
+    const { error } = await supabase.from("rental_terms").insert({
+      listing_id: data.listing_id,
+      daily_price: data.daily_price,
+      weekly_price: data.weekly_price,
+      monthly_price: data.monthly_price,
+      security_deposit_amount: data.security_deposit_amount,
+      minimum_rental_days: data.minimum_rental_days,
+    });
+
+    if (error) {
+      return { error: "Failed to save pricing: " + error.message };
+    }
+  }
+
+  revalidatePath(`/dashboard/owner/cars/${data.listing_id}/edit`);
+  revalidatePath("/dashboard/owner");
+  return { success: true };
+}
+
 // ─── Driver Options ──────────────────────────────────────────────
 
 const driverOptionsSchema = z
@@ -606,6 +722,17 @@ export async function submitForReview(listingId: string) {
     missing.push("At least one driver option must be selected");
   }
 
+  // 3b. Rental pricing
+  const { data: pricingCheck } = await supabase
+    .from("rental_terms")
+    .select("daily_price")
+    .eq("listing_id", listingId)
+    .single();
+
+  if (!pricingCheck || !pricingCheck.daily_price || pricingCheck.daily_price <= 0) {
+    missing.push("Daily rental price must be set");
+  }
+
   // 4. At least one image
   const { count } = await supabase
     .from("listing_images")
@@ -613,7 +740,9 @@ export async function submitForReview(listingId: string) {
     .eq("listing_id", listingId);
 
   if (!count || count === 0) {
-    missing.push("At least one listing photo");
+    missing.push("At least 5 listing photos (minimum 5, maximum 10)");
+  } else if (count < 5) {
+    missing.push(`At least 5 listing photos (you have ${count}, need ${5 - count} more)`);
   }
 
   if (missing.length > 0) {

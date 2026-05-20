@@ -23,6 +23,7 @@ type Props = {
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MIN_IMAGES = 5;
 const MAX_IMAGES = 10;
 
 export default function ImageUploadForm({
@@ -174,7 +175,7 @@ export default function ImageUploadForm({
         Listing Photos
       </h2>
       <p className="dashboard-hint" style={{ marginBottom: "2rem" }}>
-        Upload up to {MAX_IMAGES} photos of your vehicle. The primary image will
+        Upload {MIN_IMAGES} to {MAX_IMAGES} photos of your vehicle. The primary image will
         be shown as the cover photo. JPEG, PNG, or WebP — max 5 MB each.
       </p>
 
@@ -210,7 +211,10 @@ export default function ImageUploadForm({
                 : "Click to upload or drag photos here"}
             </span>
             <span className="image-upload-hint">
-              {images.length} of {MAX_IMAGES} photos used
+              {images.length} of {MIN_IMAGES}–{MAX_IMAGES} photos
+              {images.length < MIN_IMAGES && (
+                <> — need {MIN_IMAGES - images.length} more</>  
+              )}
             </span>
           </div>
         </label>

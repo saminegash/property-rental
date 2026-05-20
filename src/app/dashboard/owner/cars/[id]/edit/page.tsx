@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import VehicleDetailsForm from "./vehicle-details-form";
+import RentalPricingForm from "./rental-pricing-form";
 import DriverOptionsForm from "./driver-options-form";
 import PickupDeliveryForm from "./pickup-delivery-form";
 import ImageUploadForm from "./image-upload-form";
@@ -55,11 +56,11 @@ export default async function EditCarPage({
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  // Fetch existing rental terms (driver options + pickup/delivery)
+  // Fetch existing rental terms (pricing, driver options, pickup/delivery)
   const { data: rentalTerms } = await supabase
     .from("rental_terms")
     .select(
-      "available_with_driver, available_without_driver, daily_driver_fee, weekly_driver_fee, monthly_driver_fee, pickup_available, delivery_available, delivery_fee, estimated_delivery_time, rental_notes"
+      "daily_price, weekly_price, monthly_price, security_deposit_amount, minimum_rental_days, available_with_driver, available_without_driver, daily_driver_fee, weekly_driver_fee, monthly_driver_fee, pickup_available, delivery_available, delivery_fee, estimated_delivery_time, rental_notes"
     )
     .eq("listing_id", id)
     .single();
@@ -71,8 +72,12 @@ export default async function EditCarPage({
     .eq("listing_id", id)
     .order("sort_order", { ascending: true });
 
+  // Determine if pricing has been set
+  const hasPricing = !!(rentalTerms?.daily_price && rentalTerms.daily_price > 0);
+
   return (
     <>
+      {/* Section 1: Vehicle Details */}
       <VehicleDetailsForm
         listingId={listing.id}
         listingTitle={listing.title}
@@ -80,6 +85,23 @@ export default async function EditCarPage({
         existingDetails={vehicleDetails || null}
       />
 
+      {/* Section 2: Rental Pricing */}
+      <RentalPricingForm
+        listingId={listing.id}
+        existingPricing={
+          rentalTerms
+            ? {
+                daily_price: rentalTerms.daily_price,
+                weekly_price: rentalTerms.weekly_price,
+                monthly_price: rentalTerms.monthly_price,
+                security_deposit_amount: rentalTerms.security_deposit_amount,
+                minimum_rental_days: rentalTerms.minimum_rental_days,
+              }
+            : null
+        }
+      />
+
+      {/* Section 3: Driver Options */}
       <DriverOptionsForm
         listingId={listing.id}
         existingOptions={
@@ -95,6 +117,7 @@ export default async function EditCarPage({
         }
       />
 
+      {/* Section 4: Pickup & Delivery */}
       <PickupDeliveryForm
         listingId={listing.id}
         existingData={
@@ -110,15 +133,18 @@ export default async function EditCarPage({
         }
       />
 
+      {/* Section 5: Photo Gallery (5-10 required) */}
       <ImageUploadForm
         listingId={listing.id}
         existingImages={listingImages || []}
       />
 
+      {/* Section 6: Submit for Review */}
       <SubmitReviewPanel
         listingId={listing.id}
         listingStatus={listing.status}
         hasVehicleDetails={!!vehicleDetails}
+        hasPricing={hasPricing}
         hasRentalTerms={!!rentalTerms}
         imageCount={(listingImages || []).length}
       />

@@ -8,6 +8,7 @@ type Props = {
   listingId: string;
   listingStatus: string;
   hasVehicleDetails: boolean;
+  hasPricing: boolean;
   hasRentalTerms: boolean;
   imageCount: number;
 };
@@ -25,6 +26,7 @@ export default function SubmitReviewPanel({
   listingId,
   listingStatus,
   hasVehicleDetails,
+  hasPricing,
   hasRentalTerms,
   imageCount,
 }: Props) {
@@ -43,8 +45,9 @@ export default function SubmitReviewPanel({
   // Pre-flight checklist for the UI
   const checks = [
     { label: "Vehicle details", done: hasVehicleDetails },
+    { label: "Rental pricing (daily rate)", done: hasPricing },
     { label: "Driver & rental options", done: hasRentalTerms },
-    { label: "At least 1 photo", done: imageCount > 0 },
+    { label: `At least 5 photos (${imageCount}/5)`, done: imageCount >= 5 },
   ];
 
   const allChecksPassed = checks.every((c) => c.done);
