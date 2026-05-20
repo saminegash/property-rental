@@ -7,6 +7,8 @@ import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
 import { TrustFeaturesSection } from "@/components/cars/TrustFeaturesSection";
 import { HowItWorksSection } from "@/components/cars/HowItWorksSection";
 import { PricingTransparencySection } from "@/components/cars/PricingTransparencySection";
+import { OwnerCTASection } from "@/components/cars/OwnerCTASection";
+import { PopularLocationsSection } from "@/components/cars/PopularLocationsSection";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -113,6 +115,12 @@ export default async function HomePage() {
 
       {/* Pricing Transparency */}
       <PricingTransparencySection />
+
+      {/* Popular Locations */}
+      <PopularLocationsSection />
+
+      {/* Owner CTA */}
+      <OwnerCTASection />
 
       {/* Featured Properties */}
       <section className="py-16 lg:py-24 bg-surface-alt border-b border-border-light">
