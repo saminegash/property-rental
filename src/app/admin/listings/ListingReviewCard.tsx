@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { approveListing, rejectListing } from "./actions";
+import { approveListing, rejectListing, suspendListing, saveAdminNotes } from "./actions";
 
 type VehicleDetails = {
   make: string;
@@ -17,6 +17,11 @@ type VehicleDetails = {
 };
 
 type RentalTerms = {
+  daily_price: number | null;
+  weekly_price: number | null;
+  monthly_price: number | null;
+  security_deposit_amount: number;
+  minimum_rental_days: number;
   available_with_driver: boolean;
   available_without_driver: boolean;
   daily_driver_fee: number | null;
@@ -38,6 +43,9 @@ type PendingListing = {
   title: string;
   description: string | null;
   location: string | null;
+  category: string;
+  listing_type: string;
+  admin_notes: string | null;
   created_at: string;
   owner: {
     full_name: string | null;
@@ -62,12 +70,16 @@ function formatEnum(value: string): string {
 
 export default function ListingReviewCard({ listing }: Props) {
   const [status, setStatus] = useState<
-    "pending" | "approved" | "rejected"
+    "pending" | "approved" | "rejected" | "suspended"
   >("pending");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const [showSuspendForm, setShowSuspendForm] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [suspendReason, setSuspendReason] = useState("");
+  const [adminNotes, setAdminNotes] = useState(listing.admin_notes || "");
+  const [notesSaved, setNotesSaved] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const primaryImage = listing.images.find((img) => img.is_primary);
@@ -109,6 +121,36 @@ export default function ListingReviewCard({ listing }: Props) {
     setLoading(false);
   }
 
+  async function handleSuspend() {
+    if (!suspendReason.trim()) {
+      setError("Please provide a suspension reason");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+    const result = await suspendListing(listing.id, suspendReason);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setStatus("suspended");
+    }
+    setLoading(false);
+  }
+
+  async function handleSaveNotes() {
+    setNotesSaved(false);
+    const result = await saveAdminNotes(listing.id, adminNotes);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setNotesSaved(true);
+      setTimeout(() => setNotesSaved(false), 2000);
+    }
+  }
+
+  // Post-action states
   if (status === "approved") {
     return (
       <div className="dashboard-card" style={{ marginBottom: "1.5rem", borderColor: "var(--color-success-border)" }}>
@@ -129,6 +171,19 @@ export default function ListingReviewCard({ listing }: Props) {
           <span className="status-badge status-badge--rejected">Rejected</span>
           <span style={{ fontSize: "0.875rem", color: "var(--color-text)" }}>
             <strong>{listing.title}</strong> — rejected.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "suspended") {
+    return (
+      <div className="dashboard-card" style={{ marginBottom: "1.5rem", borderColor: "var(--color-warning-border, #f59e0b)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <span className="status-badge status-badge--rejected">Suspended</span>
+          <span style={{ fontSize: "0.875rem", color: "var(--color-text)" }}>
+            <strong>{listing.title}</strong> — suspended.
           </span>
         </div>
       </div>
@@ -164,6 +219,14 @@ export default function ListingReviewCard({ listing }: Props) {
           <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
             {listing.title}
           </h3>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.25rem" }}>
+            <span className="status-badge status-badge--pending" style={{ fontSize: "0.6875rem" }}>
+              {formatEnum(listing.category)}
+            </span>
+            <span className="status-badge status-badge--draft" style={{ fontSize: "0.6875rem" }}>
+              {formatEnum(listing.listing_type)}
+            </span>
+          </div>
           {vd && (
             <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>
               {vd.year} {vd.make} {vd.model}
@@ -176,6 +239,21 @@ export default function ListingReviewCard({ listing }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Image count warning */}
+      {listing.images.length < 5 && (
+        <div style={{
+          padding: "0.5rem 0.75rem",
+          marginBottom: "1rem",
+          backgroundColor: "#fef3cd",
+          border: "1px solid #ffc107",
+          borderRadius: "var(--radius-sm)",
+          fontSize: "0.8125rem",
+          color: "#856404",
+        }}>
+          ⚠️ Only {listing.images.length} photo{listing.images.length !== 1 ? "s" : ""} uploaded. Minimum required: 5.
+        </div>
+      )}
 
       {/* Owner Info */}
       <div
@@ -228,7 +306,33 @@ export default function ListingReviewCard({ listing }: Props) {
         </div>
       )}
 
-      {/* Rental Terms */}
+      {/* Rental Pricing */}
+      {rt && (
+        <div
+          className="review-section"
+          style={{ cursor: "pointer" }}
+          onClick={() => toggleSection("pricing")}
+        >
+          <div className="review-section__header">
+            <span>💰 Pricing & Terms</span>
+            <span style={{ fontSize: "0.75rem" }}>{expandedSection === "pricing" ? "▲" : "▼"}</span>
+          </div>
+          {expandedSection === "pricing" && (
+            <div className="review-section__body">
+              <div className="review-grid">
+                <div><span className="review-label">Daily price</span><span className="review-value">{rt.daily_price ? `${rt.daily_price.toLocaleString()} ETB` : "—"}</span></div>
+                <div><span className="review-label">Weekly price</span><span className="review-value">{rt.weekly_price ? `${rt.weekly_price.toLocaleString()} ETB` : "—"}</span></div>
+                <div><span className="review-label">Monthly price</span><span className="review-value">{rt.monthly_price ? `${rt.monthly_price.toLocaleString()} ETB` : "—"}</span></div>
+                <div><span className="review-label">Security deposit</span><span className="review-value">{rt.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()} ETB` : "0"}</span></div>
+                <div><span className="review-label">Min rental days</span><span className="review-value">{rt.minimum_rental_days}</span></div>
+                <div><span className="review-label">Commission (5%)</span><span className="review-value">{rt.daily_price ? `${Math.round(rt.daily_price * 0.05).toLocaleString()} ETB/day` : "—"}</span></div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Driver & Delivery */}
       {rt && (
         <div
           className="review-section"
@@ -236,7 +340,7 @@ export default function ListingReviewCard({ listing }: Props) {
           onClick={() => toggleSection("rental")}
         >
           <div className="review-section__header">
-            <span>📋 Rental Terms</span>
+            <span>📋 Driver & Delivery</span>
             <span style={{ fontSize: "0.75rem" }}>{expandedSection === "rental" ? "▲" : "▼"}</span>
           </div>
           {expandedSection === "rental" && (
@@ -246,15 +350,15 @@ export default function ListingReviewCard({ listing }: Props) {
                 <div><span className="review-label">With driver</span><span className="review-value">{rt.available_with_driver ? "✅ Yes" : "❌ No"}</span></div>
                 {rt.available_with_driver && (
                   <>
-                    <div><span className="review-label">Daily driver fee</span><span className="review-value">{rt.daily_driver_fee ? `${rt.daily_driver_fee.toLocaleString()} Birr` : "—"}</span></div>
-                    <div><span className="review-label">Weekly driver fee</span><span className="review-value">{rt.weekly_driver_fee ? `${rt.weekly_driver_fee.toLocaleString()} Birr` : "—"}</span></div>
-                    <div><span className="review-label">Monthly driver fee</span><span className="review-value">{rt.monthly_driver_fee ? `${rt.monthly_driver_fee.toLocaleString()} Birr` : "—"}</span></div>
+                    <div><span className="review-label">Daily driver fee</span><span className="review-value">{rt.daily_driver_fee ? `${rt.daily_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Weekly driver fee</span><span className="review-value">{rt.weekly_driver_fee ? `${rt.weekly_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Monthly driver fee</span><span className="review-value">{rt.monthly_driver_fee ? `${rt.monthly_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
                   </>
                 )}
                 <div><span className="review-label">Pickup</span><span className="review-value">{rt.pickup_available ? "✅ Yes" : "❌ No"}</span></div>
                 <div><span className="review-label">Delivery</span><span className="review-value">{rt.delivery_available ? "✅ Yes" : "❌ No"}</span></div>
                 {rt.delivery_available && rt.delivery_fee !== null && (
-                  <div><span className="review-label">Delivery fee</span><span className="review-value">{rt.delivery_fee.toLocaleString()} Birr</span></div>
+                  <div><span className="review-label">Delivery fee</span><span className="review-value">{rt.delivery_fee.toLocaleString()} ETB</span></div>
                 )}
               </div>
             </div>
@@ -326,6 +430,31 @@ export default function ListingReviewCard({ listing }: Props) {
         </div>
       )}
 
+      {/* Admin Notes */}
+      <div style={{ margin: "1rem 0" }}>
+        <label className="form-label" style={{ display: "block", marginBottom: "0.375rem", fontSize: "0.8125rem" }}>
+          🗒️ Admin Notes <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>(internal, not visible to owner)</span>
+        </label>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <textarea
+            className="form-input"
+            rows={2}
+            style={{ resize: "vertical", minHeight: "60px", flex: 1, fontSize: "0.8125rem" }}
+            placeholder="Add internal notes about this listing..."
+            value={adminNotes}
+            onChange={(e) => setAdminNotes(e.target.value)}
+          />
+          <button
+            type="button"
+            className="auth-button auth-button--secondary"
+            style={{ alignSelf: "flex-end", fontSize: "0.75rem", padding: "0.5rem 0.75rem" }}
+            onClick={handleSaveNotes}
+          >
+            {notesSaved ? "✓ Saved" : "Save"}
+          </button>
+        </div>
+      </div>
+
       {/* Error */}
       {error && (
         <div className="auth-error" role="alert" style={{ marginBottom: "1rem" }}>
@@ -334,12 +463,12 @@ export default function ListingReviewCard({ listing }: Props) {
       )}
 
       {/* Action buttons */}
-      {!showRejectForm ? (
-        <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+      {!showRejectForm && !showSuspendForm ? (
+        <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem", flexWrap: "wrap" }}>
           <button
             type="button"
             className="auth-button"
-            style={{ flex: 1, backgroundColor: "#059669" }}
+            style={{ flex: "1 1 auto", backgroundColor: "#059669" }}
             onClick={handleApprove}
             disabled={loading}
           >
@@ -348,17 +477,26 @@ export default function ListingReviewCard({ listing }: Props) {
           <button
             type="button"
             className="auth-button"
-            style={{ flex: 1, backgroundColor: "transparent", border: "1px solid var(--color-error-border)", color: "var(--color-error-text)" }}
+            style={{ flex: "1 1 auto", backgroundColor: "transparent", border: "1px solid var(--color-error-border)", color: "var(--color-error-text)" }}
             onClick={() => setShowRejectForm(true)}
             disabled={loading}
           >
             ✕ Reject
           </button>
+          <button
+            type="button"
+            className="auth-button"
+            style={{ flex: "1 1 auto", backgroundColor: "transparent", border: "1px solid #f59e0b", color: "#92400e" }}
+            onClick={() => setShowSuspendForm(true)}
+            disabled={loading}
+          >
+            ⏸ Suspend
+          </button>
         </div>
-      ) : (
+      ) : showRejectForm ? (
         <div style={{ marginTop: "1rem" }}>
           <label className="form-label" style={{ marginBottom: "0.5rem", display: "block" }}>
-            Rejection reason
+            Rejection reason <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>(visible to owner)</span>
           </label>
           <textarea
             className="form-input"
@@ -390,6 +528,44 @@ export default function ListingReviewCard({ listing }: Props) {
               disabled={loading || !rejectReason.trim()}
             >
               {loading ? "Rejecting..." : "Confirm Rejection"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ marginTop: "1rem" }}>
+          <label className="form-label" style={{ marginBottom: "0.5rem", display: "block" }}>
+            Suspension reason <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>(visible to owner)</span>
+          </label>
+          <textarea
+            className="form-input"
+            rows={3}
+            style={{ resize: "vertical", minHeight: "80px", width: "100%", marginBottom: "0.75rem" }}
+            placeholder="Explain why this listing is being suspended..."
+            value={suspendReason}
+            onChange={(e) => setSuspendReason(e.target.value)}
+          />
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <button
+              type="button"
+              className="auth-button auth-button--secondary"
+              style={{ flex: 1 }}
+              onClick={() => {
+                setShowSuspendForm(false);
+                setSuspendReason("");
+                setError(null);
+              }}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="auth-button"
+              style={{ flex: 1, backgroundColor: "#f59e0b", color: "#fff" }}
+              onClick={handleSuspend}
+              disabled={loading || !suspendReason.trim()}
+            >
+              {loading ? "Suspending..." : "Confirm Suspension"}
             </button>
           </div>
         </div>

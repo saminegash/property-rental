@@ -9,7 +9,7 @@ export default async function AdminListingsPage() {
   // Fetch all pending_review listings with owner_id
   const { data: listings, error: listingsError } = await adminClient
     .from("listings")
-    .select("id, title, description, location, status, owner_id, created_at")
+    .select("id, title, description, location, category, listing_type, status, owner_id, admin_notes, admin_rejection_reason, created_at")
     .eq("status", "pending_review")
     .order("created_at", { ascending: true });
 
@@ -66,11 +66,11 @@ export default async function AdminListingsPage() {
     )
     .in("listing_id", listingIds);
 
-  // Fetch rental terms for all listings
+  // Fetch rental terms (pricing + driver options + delivery) for all listings
   const { data: rentalTerms } = await adminClient
     .from("rental_terms")
     .select(
-      "listing_id, available_with_driver, available_without_driver, daily_driver_fee, weekly_driver_fee, monthly_driver_fee, pickup_available, delivery_available, delivery_fee"
+      "listing_id, daily_price, weekly_price, monthly_price, security_deposit_amount, minimum_rental_days, available_with_driver, available_without_driver, daily_driver_fee, weekly_driver_fee, monthly_driver_fee, pickup_available, delivery_available, delivery_fee, estimated_delivery_time"
     )
     .in("listing_id", listingIds);
 
@@ -105,6 +105,9 @@ export default async function AdminListingsPage() {
       title: listing.title,
       description: listing.description,
       location: listing.location,
+      category: listing.category,
+      listing_type: listing.listing_type,
+      admin_notes: listing.admin_notes,
       created_at: listing.created_at,
       owner: profile,
       vehicle_details: vd
@@ -125,6 +128,11 @@ export default async function AdminListingsPage() {
         : null,
       rental_terms: rt
         ? {
+            daily_price: rt.daily_price,
+            weekly_price: rt.weekly_price,
+            monthly_price: rt.monthly_price,
+            security_deposit_amount: rt.security_deposit_amount,
+            minimum_rental_days: rt.minimum_rental_days,
             available_with_driver: rt.available_with_driver,
             available_without_driver: rt.available_without_driver,
             daily_driver_fee: rt.daily_driver_fee,

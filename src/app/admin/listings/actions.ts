@@ -51,6 +51,8 @@ export async function approveListing(listingId: string) {
   }
 
   revalidatePath("/admin/listings");
+  revalidatePath("/");
+  revalidatePath("/cars");
   return { success: true };
 }
 
@@ -89,4 +91,59 @@ export async function rejectListing(listingId: string, reason: string) {
 
   revalidatePath("/admin/listings");
   return { success: true, reason };
+}
+
+export async function suspendListing(listingId: string, reason: string) {
+  await ensureAdmin();
+  const adminClient = createAdminClient();
+
+  if (!reason || reason.trim().length === 0) {
+    return { error: "A suspension reason is required" };
+  }
+
+  // Verify listing exists and is in an active state
+  const { data: listing, error: fetchError } = await adminClient
+    .from("listings")
+    .select("id, status")
+    .eq("id", listingId)
+    .single();
+
+  if (fetchError || !listing) {
+    return { error: "Listing not found" };
+  }
+
+  if (listing.status === "suspended") {
+    return { error: "Listing is already suspended" };
+  }
+
+  const { error } = await adminClient
+    .from("listings")
+    .update({ status: "suspended", admin_rejection_reason: reason.trim() })
+    .eq("id", listingId);
+
+  if (error) {
+    return { error: "Failed to suspend listing: " + error.message };
+  }
+
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
+  revalidatePath("/cars");
+  return { success: true };
+}
+
+export async function saveAdminNotes(listingId: string, notes: string) {
+  await ensureAdmin();
+  const adminClient = createAdminClient();
+
+  const { error } = await adminClient
+    .from("listings")
+    .update({ admin_notes: notes.trim() || null })
+    .eq("id", listingId);
+
+  if (error) {
+    return { error: "Failed to save admin notes: " + error.message };
+  }
+
+  revalidatePath("/admin/listings");
+  return { success: true };
 }
