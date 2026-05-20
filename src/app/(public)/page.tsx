@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PropertyListingCard } from "@/components/properties/PropertyListingCard";
 import { CarHeroSection } from "@/components/cars/CarHeroSection";
 import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
+import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -98,38 +99,8 @@ export default async function HomePage() {
       {/* Featured Cars */}
       <FeaturedCarsSection />
 
-      {/* Popular Categories */}
-      <section className="py-16 bg-white border-b border-border-light">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between items-end mb-8">
-            <div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-text-heading mb-1">Popular Categories</h2>
-              <p className="text-text-muted">Browse by property type</p>
-            </div>
-            <Link href="/properties" className="hidden sm:block text-sm font-semibold text-primary hover:underline">
-              View all
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-            {[
-              { title: "Apartments", count: "3,250+", icon: "🏢", color: "bg-blue-50 text-blue-600", link: "apartment" },
-              { title: "Villas", count: "1,420+", icon: "🏡", color: "bg-emerald-50 text-emerald-600", link: "villa" },
-              { title: "Condos", count: "980+", icon: "🏬", color: "bg-purple-50 text-purple-600", link: "condo" },
-              { title: "Commercial", count: "760+", icon: "🏪", color: "bg-orange-50 text-orange-600", link: "commercial" },
-              { title: "Land", count: "650+", icon: "🌳", color: "bg-green-50 text-green-600", link: "land" },
-            ].map((cat) => (
-              <Link key={cat.title} href={`/properties?type=${cat.link}`} className="group flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm border border-border hover:border-primary hover:shadow-md transition-all duration-300">
-                <div className={`shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform ${cat.color}`}>
-                  {cat.icon}
-                </div>
-                <h3 className="font-bold text-base text-text-heading mb-1 group-hover:text-primary transition-colors">{cat.title}</h3>
-                <p className="text-xs font-medium text-text-muted">{cat.count}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Browse by Category */}
+      <CarCategoriesSection />
 
       {/* Featured Properties */}
       <section className="py-16 lg:py-24 bg-surface-alt border-b border-border-light">
