@@ -4,8 +4,8 @@ import VehicleDetailsForm from "./vehicle-details-form";
 import RentalPricingForm from "./rental-pricing-form";
 import DriverOptionsForm from "./driver-options-form";
 import PickupDeliveryForm from "./pickup-delivery-form";
-import ImageUploadForm from "./image-upload-form";
-import SubmitReviewPanel from "./submit-review-panel";
+import ImageUploadForm from "@/components/dashboard/shared/ImageUploadForm";
+import SubmitReviewPanel from "@/components/dashboard/shared/SubmitReviewPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -147,6 +147,13 @@ export default async function EditCarPage({
         hasPricing={hasPricing}
         hasRentalTerms={!!rentalTerms}
         imageCount={(listingImages || []).length}
+        backHref="/dashboard/owner/cars"
+        category="vehicle"
+        onSubmit={async () => {
+          "use server";
+          const { submitForReview } = await import("./actions");
+          return submitForReview(listing.id);
+        }}
       />
     </>
   );

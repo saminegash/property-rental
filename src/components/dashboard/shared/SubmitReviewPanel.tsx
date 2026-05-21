@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { submitForReview } from "./actions";
 import Link from "next/link";
 
 type Props = {
   listingId: string;
   listingStatus: string;
-  hasVehicleDetails: boolean;
+  hasVehicleDetails?: boolean;
+  hasPropertyDetails?: boolean;
   hasPricing: boolean;
-  hasRentalTerms: boolean;
+  hasRentalTerms?: boolean;
   imageCount: number;
+  backHref: string;
+  category: "vehicle" | "property";
+  onSubmit: () => Promise<{ error?: string; missing?: string[]; success?: boolean }>;
 };
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -26,9 +29,13 @@ export default function SubmitReviewPanel({
   listingId,
   listingStatus,
   hasVehicleDetails,
+  hasPropertyDetails,
   hasPricing,
   hasRentalTerms,
   imageCount,
+  backHref,
+  category,
+  onSubmit,
 }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [missingItems, setMissingItems] = useState<string[]>([]);
@@ -43,12 +50,16 @@ export default function SubmitReviewPanel({
   };
 
   // Pre-flight checklist for the UI
-  const checks = [
-    { label: "Vehicle details", done: hasVehicleDetails },
-    { label: "Rental pricing (daily rate)", done: hasPricing },
-    { label: "Driver & rental options", done: hasRentalTerms },
-    { label: `At least 5 photos (${imageCount}/5)`, done: imageCount >= 5 },
-  ];
+  const checks = [];
+  if (category === "vehicle") {
+    checks.push({ label: "Vehicle details", done: !!hasVehicleDetails });
+    checks.push({ label: "Rental pricing (daily rate)", done: hasPricing });
+    checks.push({ label: "Driver & rental options", done: !!hasRentalTerms });
+  } else {
+    checks.push({ label: "Property details", done: !!hasPropertyDetails });
+    checks.push({ label: "Pricing / Terms", done: hasPricing });
+  }
+  checks.push({ label: `At least 5 photos (${imageCount}/5)`, done: imageCount >= 5 });
 
   const allChecksPassed = checks.every((c) => c.done);
 
@@ -58,7 +69,7 @@ export default function SubmitReviewPanel({
     setSuccess(false);
     setLoading(true);
 
-    const result = await submitForReview(listingId);
+    const result = await onSubmit();
 
     if (result.error) {
       setError(result.error);
@@ -197,11 +208,11 @@ export default function SubmitReviewPanel({
 
       <div style={{ display: "flex", gap: "1rem" }}>
         <Link
-          href="/dashboard/owner"
+          href={backHref}
           className="auth-button auth-button--secondary"
           style={{ flex: 1, textDecoration: "none", textAlign: "center" }}
         >
-          ← Back to My Cars
+          ← Back
         </Link>
 
         {isDraft && (

@@ -2,95 +2,178 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
+const propertyDetailsSchema = z.object({
+  listing_id: z.string().uuid("Invalid listing ID"),
+  property_type_id: z.string().uuid("Please select a property type"),
+  bedrooms: z.coerce.number().int().min(0, "Cannot be negative").nullable(),
+  bathrooms: z.coerce.number().int().min(0, "Cannot be negative").nullable(),
+  area_sqm: z.coerce.number().int().min(1, "Must be at least 1").nullable(),
+  floor: z.coerce.number().int().nullable(),
+  furnished_status: z.enum(["unfurnished", "semi_furnished", "fully_furnished"], { message: "Select furnished status" }),
+  property_condition: z.enum(["newly_built", "excellent", "good", "fair", "needs_repair"], { message: "Select condition" }),
+  parking_available: z.boolean().default(false),
+  compound_available: z.boolean().default(false),
+  water_available: z.boolean().default(false),
+  electricity_available: z.boolean().default(false),
+  internet_available: z.boolean().default(false),
+});
+
+const rentPricingSchema = z.object({
+  listing_id: z.string().uuid("Invalid listing ID"),
+  monthly_price: z.coerce.number().int().min(1, "Monthly rent is required"),
+  security_deposit_amount: z.coerce.number().int().min(0).nullable(),
+});
+
+const salePricingSchema = z.object({
+  listing_id: z.string().uuid("Invalid listing ID"),
+  sale_price: z.coerce.number().int().min(1, "Sale price is required"),
+  is_negotiable: z.boolean().default(false),
+});
 
 export async function savePropertyDetails(formData: FormData) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
 
-  const listing_id = formData.get("listing_id") as string;
-  const property_type_id = formData.get("property_type_id") as string;
-  const bedrooms = formData.get("bedrooms") ? parseInt(formData.get("bedrooms") as string, 10) : null;
-  const bathrooms = formData.get("bathrooms") ? parseInt(formData.get("bathrooms") as string, 10) : null;
-  const area_sqm = formData.get("area_sqm") ? parseInt(formData.get("area_sqm") as string, 10) : null;
-  const floor = formData.get("floor") ? parseInt(formData.get("floor") as string, 10) : null;
-  const total_floors = formData.get("total_floors") ? parseInt(formData.get("total_floors") as string, 10) : null;
-  const furnished_status = formData.get("furnished_status") as string || null;
-  const property_condition = formData.get("property_condition") as string || null;
+  const parseResult = propertyDetailsSchema.safeParse({
+    listing_id: formData.get("listing_id"),
+    property_type_id: formData.get("property_type_id"),
+    bedrooms: formData.get("bedrooms") || null,
+    bathrooms: formData.get("bathrooms") || null,
+    area_sqm: formData.get("area_sqm") || null,
+    floor: formData.get("floor") || null,
+    furnished_status: formData.get("furnished_status"),
+    property_condition: formData.get("property_condition"),
+    parking_available: formData.get("parking_available") === "on",
+    compound_available: formData.get("compound_available") === "on",
+    water_available: formData.get("water_available") === "on",
+    electricity_available: formData.get("electricity_available") === "on",
+    internet_available: formData.get("internet_available") === "on",
+  });
 
-  const parking_available = formData.get("parking_available") === "true";
-  const compound_available = formData.get("compound_available") === "true";
-  const water_available = formData.get("water_available") === "true";
-  const electricity_available = formData.get("electricity_available") === "true";
-  const internet_available = formData.get("internet_available") === "true";
+  if (!parseResult.success) return { error: parseResult.error.issues[0].message };
+  const data = parseResult.data;
 
-  if (!listing_id || !property_type_id) {
-    return { error: "Missing required fields" };
-  }
-
-  // Use upsert to handle both create and update
-  const { error } = await supabase
+  // UPSERT property_details
+  const { data: existing } = await supabase
     .from("property_details")
-    .upsert(
-      {
-        listing_id,
-        property_type_id,
-        bedrooms,
-        bathrooms,
-        area_sqm,
-        floor,
-        total_floors,
-        furnished_status: furnished_status as "unfurnished" | "semi_furnished" | "fully_furnished" | null,
-        property_condition: property_condition as "newly_built" | "excellent" | "good" | "fair" | "needs_repair" | null,
-        parking_available,
-        compound_available,
-        water_available,
-        electricity_available,
-        internet_available,
-      },
-      { onConflict: "listing_id" }
-    );
+    .select("id")
+    .eq("listing_id", data.listing_id)
+    .single();
 
-  if (error) {
-    return { error: error.message };
+  if (existing) {
+    const { error } = await supabase.from("property_details").update(data).eq("listing_id", data.listing_id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("property_details").insert(data);
+    if (error) return { error: error.message };
   }
 
-  revalidatePath(`/dashboard/owner/properties/${listing_id}/edit`);
+  revalidatePath(`/dashboard/owner/properties/${data.listing_id}/edit`);
   return { success: true };
 }
 
-export async function savePropertyPricing(formData: FormData) {
+export async function saveRentPricing(formData: FormData) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
 
-  const listing_id = formData.get("listing_id") as string;
-  const monthly_price = formData.get("monthly_price") ? parseFloat(formData.get("monthly_price") as string) : null;
-  const daily_price = formData.get("daily_price") ? parseFloat(formData.get("daily_price") as string) : null;
-  const security_deposit_amount = parseFloat(formData.get("security_deposit_amount") as string) || 0;
-  const minimum_rental_days = parseInt(formData.get("minimum_rental_days") as string, 10) || null;
+  const parseResult = rentPricingSchema.safeParse({
+    listing_id: formData.get("listing_id"),
+    monthly_price: formData.get("monthly_price"),
+    security_deposit_amount: formData.get("security_deposit_amount") || null,
+  });
 
-  if (!listing_id) {
-    return { error: "Missing listing ID" };
+  if (!parseResult.success) return { error: parseResult.error.issues[0].message };
+  const data = parseResult.data;
+
+  const { data: existing } = await supabase.from("rental_terms").select("id").eq("listing_id", data.listing_id).single();
+
+  if (existing) {
+    const { error } = await supabase.from("rental_terms").update(data).eq("listing_id", data.listing_id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("rental_terms").insert(data);
+    if (error) return { error: error.message };
   }
 
-  const { error } = await supabase
-    .from("rental_terms")
-    .upsert(
-      {
-        listing_id,
-        monthly_price,
-        daily_price,
-        security_deposit_amount,
-        minimum_rental_days,
-        available_with_driver: false,
-        available_without_driver: false,
-        delivery_available: false,
-        pickup_available: false,
-      },
-      { onConflict: "listing_id" }
-    );
+  revalidatePath(`/dashboard/owner/properties/${data.listing_id}/edit`);
+  return { success: true };
+}
 
-  if (error) {
-    return { error: error.message };
+export async function saveSalePricing(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const parseResult = salePricingSchema.safeParse({
+    listing_id: formData.get("listing_id"),
+    sale_price: formData.get("sale_price"),
+    is_negotiable: formData.get("is_negotiable") === "on",
+  });
+
+  if (!parseResult.success) return { error: parseResult.error.issues[0].message };
+  const data = parseResult.data;
+
+  const { data: existing } = await supabase.from("sale_terms").select("id").eq("listing_id", data.listing_id).single();
+
+  if (existing) {
+    const { error } = await supabase.from("sale_terms").update(data).eq("listing_id", data.listing_id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("sale_terms").insert(data);
+    if (error) return { error: error.message };
   }
 
-  revalidatePath(`/dashboard/owner/properties/${listing_id}/edit`);
+  revalidatePath(`/dashboard/owner/properties/${data.listing_id}/edit`);
+  return { success: true };
+}
+
+export async function submitPropertyForReview(listingId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  // Fetch listing
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("id, status, owner_id, listing_type")
+    .eq("id", listingId)
+    .single();
+
+  if (listingError || !listing || listing.owner_id !== user.id) {
+    return { error: "Listing not found" };
+  }
+
+  // Pre-flight checks
+  const missing = [];
+  const { data: pd } = await supabase.from("property_details").select("id").eq("listing_id", listingId).single();
+  if (!pd) missing.push("Property details are missing");
+
+  if (listing.listing_type === "rent") {
+    const { data: rt } = await supabase.from("rental_terms").select("id").eq("listing_id", listingId).single();
+    if (!rt) missing.push("Rental pricing is missing");
+  } else {
+    const { data: st } = await supabase.from("sale_terms").select("id").eq("listing_id", listingId).single();
+    if (!st) missing.push("Sale pricing is missing");
+  }
+
+  const { data: images } = await supabase.from("listing_images").select("id").eq("listing_id", listingId);
+  const imgCount = images?.length || 0;
+  if (imgCount < 5) missing.push(`At least 5 photos required (you have ${imgCount})`);
+
+  if (missing.length > 0) return { error: "Cannot submit yet", missing };
+
+  // Update status
+  const { error: updateError } = await supabase
+    .from("listings")
+    .update({ status: "pending" }) // pending review
+    .eq("id", listingId);
+
+  if (updateError) return { error: updateError.message };
+
+  revalidatePath(`/dashboard/owner/properties/${listingId}/edit`);
   return { success: true };
 }
