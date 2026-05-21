@@ -81,6 +81,11 @@ export default async function AdminListingsPage() {
     )
     .in("listing_id", listingIds);
 
+  const { data: saleTerms } = await adminClient
+    .from("sale_terms")
+    .select("listing_id, sale_price, is_negotiable")
+    .in("listing_id", listingIds);
+
   // Fetch images for all listings
   const { data: images } = await adminClient
     .from("listing_images")
@@ -106,6 +111,7 @@ export default async function AdminListingsPage() {
     );
 
     const rt = rentalTerms?.find((r) => r.listing_id === listing.id);
+    const st = saleTerms?.find((s) => s.listing_id === listing.id);
 
     const listingImages = (images || []).filter(
       (img) => img.listing_id === listing.id
@@ -152,6 +158,12 @@ export default async function AdminListingsPage() {
             pickup_available: rt.pickup_available,
             delivery_available: rt.delivery_available,
             delivery_fee: rt.delivery_fee,
+          }
+        : null,
+      sale_terms: st
+        ? {
+            sale_price: st.sale_price,
+            is_negotiable: st.is_negotiable,
           }
         : null,
       property_details: pd

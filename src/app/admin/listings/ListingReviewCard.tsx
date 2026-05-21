@@ -49,6 +49,11 @@ type RentalTerms = {
   delivery_fee: number | null;
 };
 
+type SaleTerms = {
+  sale_price: number | null;
+  is_negotiable: boolean;
+};
+
 type ListingImage = {
   id: string;
   image_url: string;
@@ -73,6 +78,7 @@ type PendingListing = {
   vehicle_details: VehicleDetails | null;
   property_details: PropertyDetails | null;
   rental_terms: RentalTerms | null;
+  sale_terms: SaleTerms | null;
   images: ListingImage[];
 };
 
@@ -104,6 +110,7 @@ export default function ListingReviewCard({ listing }: Props) {
   const vd = listing.vehicle_details;
   const pd = listing.property_details;
   const rt = listing.rental_terms;
+  const st = listing.sale_terms;
 
   function toggleSection(section: string) {
     setExpandedSection((prev) => (prev === section ? null : section));
@@ -378,8 +385,8 @@ export default function ListingReviewCard({ listing }: Props) {
         </div>
       )}
 
-      {/* Rental Pricing */}
-      {rt && (
+      {/* Pricing & Terms */}
+      {(rt || st) && (
         <div
           className="review-section"
           style={{ cursor: "pointer" }}
@@ -392,20 +399,32 @@ export default function ListingReviewCard({ listing }: Props) {
           {expandedSection === "pricing" && (
             <div className="review-section__body">
               <div className="review-grid">
-                <div><span className="review-label">Daily price</span><span className="review-value">{rt.daily_price ? `${rt.daily_price.toLocaleString()} ETB` : "—"}</span></div>
-                <div><span className="review-label">Weekly price</span><span className="review-value">{rt.weekly_price ? `${rt.weekly_price.toLocaleString()} ETB` : "—"}</span></div>
-                <div><span className="review-label">Monthly price</span><span className="review-value">{rt.monthly_price ? `${rt.monthly_price.toLocaleString()} ETB` : "—"}</span></div>
-                <div><span className="review-label">Security deposit</span><span className="review-value">{rt.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()} ETB` : "0"}</span></div>
-                <div><span className="review-label">Min rental days</span><span className="review-value">{rt.minimum_rental_days}</span></div>
-                <div><span className="review-label">Commission (5%)</span><span className="review-value">{rt.daily_price ? `${Math.round(rt.daily_price * 0.05).toLocaleString()} ETB/day` : "—"}</span></div>
+                {listing.listing_type === "rent" && rt && (
+                  <>
+                    <div><span className="review-label">Daily price</span><span className="review-value">{rt.daily_price ? `${rt.daily_price.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Weekly price</span><span className="review-value">{rt.weekly_price ? `${rt.weekly_price.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Monthly price</span><span className="review-value">{rt.monthly_price ? `${rt.monthly_price.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Security deposit</span><span className="review-value">{rt.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()} ETB` : "0"}</span></div>
+                    <div><span className="review-label">Min rental days</span><span className="review-value">{rt.minimum_rental_days}</span></div>
+                    {rt.daily_price && (
+                      <div><span className="review-label">Commission (5%)</span><span className="review-value">{`${Math.round(rt.daily_price * 0.05).toLocaleString()} ETB/day`}</span></div>
+                    )}
+                  </>
+                )}
+                {listing.listing_type === "sale" && st && (
+                  <>
+                    <div><span className="review-label">Sale Price</span><span className="review-value">{st.sale_price ? `${st.sale_price.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Negotiable</span><span className="review-value">{st.is_negotiable ? "✅ Yes" : "❌ No"}</span></div>
+                  </>
+                )}
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Driver & Delivery */}
-      {rt && (
+      {/* Driver & Delivery (Only for vehicles for rent) */}
+      {listing.category === "vehicle" && listing.listing_type === "rent" && rt && (
         <div
           className="review-section"
           style={{ cursor: "pointer" }}

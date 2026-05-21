@@ -116,10 +116,7 @@ export default async function CarDetailPage({
     ? (reviews.reduce((acc, r) => acc + r.overall_rating, 0) / reviews.length).toFixed(1) 
     : "New";
   const ownerReviewCount = reviews?.length || 0;
-  const vehicleTypeRaw = vd?.vehicle_types as unknown;
-  const vehicleTypeName = Array.isArray(vehicleTypeRaw)
-    ? (vehicleTypeRaw[0] as { name: string } | undefined)?.name
-    : (vehicleTypeRaw as { name: string } | null)?.name;
+
 
   return (
     <main className="detail-page" style={{ backgroundColor: "var(--color-bg)", minHeight: "100vh", paddingBottom: "4rem" }}>
