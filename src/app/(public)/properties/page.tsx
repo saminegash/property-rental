@@ -27,6 +27,9 @@ type SearchParams = {
   min_beds?: string;
   min_price?: string;
   max_price?: string;
+  seoTitle?: string;
+  seoSubtitle?: string;
+  forceFilters?: boolean;
 };
 
 type PropertyCard = {
@@ -67,7 +70,7 @@ export default async function BrowsePropertiesPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  const hasFilters = !!(params.location || params.type || params.property_type || params.min_beds || params.min_price || params.max_price);
+  const hasFilters = !!(params.forceFilters || params.location || params.type || params.property_type || params.min_beds || params.min_price || params.max_price);
 
   let error = null;
   let filtered: PropertyCard[] = [];
@@ -143,10 +146,10 @@ export default async function BrowsePropertiesPage({
       {/* ── Page hero ── */}
       <section className="browse-hero">
         <h1 className="browse-hero__title">
-          {hasFilters ? "Search Results" : "Find Your Next Home or Space"}
+          {params.seoTitle ? params.seoTitle : hasFilters ? "Search Results" : "Find Your Perfect Property"}
         </h1>
         <p className="browse-hero__subtitle">
-          Verified properties across Ethiopia — to rent or buy.
+          {params.seoSubtitle ? params.seoSubtitle : "Verified apartments, villas, and commercial spaces across Ethiopia."}
         </p>
       </section>
 

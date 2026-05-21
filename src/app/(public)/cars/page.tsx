@@ -31,6 +31,10 @@ type SearchParams = {
   category?: string;
   min_price?: string;
   max_price?: string;
+  listing_type?: string;
+  seoTitle?: string;
+  seoSubtitle?: string;
+  forceFilters?: boolean;
 };
 
 type ListingCard = {
@@ -65,6 +69,17 @@ function formatEnum(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function buildQueryString(params: SearchParams, overrides: Record<string, string>): string {
+  const p = new URLSearchParams();
+  const merged = { ...params, ...overrides };
+  Object.entries(merged).forEach(([k, v]) => {
+    if (v !== undefined && v !== "" && typeof v !== "boolean") {
+      p.set(k, String(v));
+    }
+  });
+  return p.toString();
+}
+
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -77,7 +92,7 @@ export default async function BrowseCarsPage({
   const supabase = await createClient();
 
   // Active filter summary
-  const hasFilters = !!(params.location || params.driver || params.delivery || params.min_price || params.max_price);
+  const hasFilters = !!(params.forceFilters || params.listing_type || params.location || params.driver || params.delivery || params.min_price || params.max_price);
 
   let error = null;
   let filtered: ListingCard[] = [];
@@ -95,9 +110,14 @@ export default async function BrowseCarsPage({
       `
       )
       .eq("category", "vehicle")
-      .eq("listing_type", "rent")
       .eq("status", "published")
       .order("created_at", { ascending: false });
+
+    if (params.listing_type) {
+      query = query.eq("listing_type", params.listing_type);
+    } else {
+      query = query.eq("listing_type", "rent"); // Default to rent for generic cars page
+    }
 
     if (params.location) {
       query = query.ilike("location", `%${params.location}%`);
@@ -133,10 +153,10 @@ export default async function BrowseCarsPage({
       {/* ── Page hero ── */}
       <section className="browse-hero">
         <h1 className="browse-hero__title">
-          {hasFilters ? "Search Results" : "Find Your Perfect Car"}
+          {params.seoTitle ? params.seoTitle : hasFilters ? "Search Results" : "Find Your Perfect Car"}
         </h1>
         <p className="browse-hero__subtitle">
-          Verified rentals across Ethiopia — with or without a driver.
+          {params.seoSubtitle ? params.seoSubtitle : "Verified rentals across Ethiopia — with or without a driver."}
         </p>
       </section>
 
@@ -256,25 +276,25 @@ export default async function BrowseCarsPage({
             {params.location && (
               <span className="browse-active-chip">
                 📍 {params.location}
-                <Link href={`/cars?${new URLSearchParams({ ...params, location: "" }).toString()}`} aria-label="Remove location filter">×</Link>
+                <Link href={`/cars?${buildQueryString(params, { location: "" })}`} aria-label="Remove location filter">×</Link>
               </span>
             )}
             {params.driver && (
               <span className="browse-active-chip">
                 🚗 {params.driver === "with" ? "With Driver" : "Self-Drive"}
-                <Link href={`/cars?${new URLSearchParams({ ...params, driver: "" }).toString()}`} aria-label="Remove driver filter">×</Link>
+                <Link href={`/cars?${buildQueryString(params, { driver: "" })}`} aria-label="Remove driver filter">×</Link>
               </span>
             )}
             {params.delivery === "true" && (
               <span className="browse-active-chip">
                 📦 Delivery
-                <Link href={`/cars?${new URLSearchParams({ ...params, delivery: "" }).toString()}`} aria-label="Remove delivery filter">×</Link>
+                <Link href={`/cars?${buildQueryString(params, { delivery: "" })}`} aria-label="Remove delivery filter">×</Link>
               </span>
             )}
             {(params.min_price || params.max_price) && (
               <span className="browse-active-chip">
                 💰 {params.min_price || "0"}–{params.max_price || "∞"} Birr/day
-                <Link href={`/cars?${new URLSearchParams({ ...params, min_price: "", max_price: "" }).toString()}`} aria-label="Remove price filter">×</Link>
+                <Link href={`/cars?${buildQueryString(params, { min_price: "", max_price: "" })}`} aria-label="Remove price filter">×</Link>
               </span>
             )}
           </div>
