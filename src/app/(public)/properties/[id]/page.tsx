@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
-import PropertyRequestForm from "./PropertyRequestForm";
 import ListingGallery from "@/components/shared/ListingGallery";
+import { OwnerTrustCard } from "@/components/cars/OwnerTrustCard";
+import { PropertyPriceSummaryCard } from "@/components/properties/PropertyPriceSummaryCard";
+import { SimilarProperties } from "@/components/properties/SimilarProperties";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -53,7 +55,7 @@ export default async function PropertyDetailPage({
       `
       id, title, description, location, owner_id, listing_type,
       property_details (
-        bedrooms, bathrooms, area_sqm, floor, total_floors,
+        property_type_id, bedrooms, bathrooms, area_sqm, floor, total_floors,
         furnished_status, parking_available, compound_available,
         water_available, electricity_available, internet_available,
         property_condition,
@@ -111,110 +113,113 @@ export default async function PropertyDetailPage({
     : (propertyTypeRaw as { name: string } | null)?.name;
 
   return (
-    <main className="detail-page">
-      <div className="detail-container">
+    <main className="detail-page" style={{ backgroundColor: "var(--color-bg)", minHeight: "100vh", paddingBottom: "4rem" }}>
+      <div className="detail-container" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1.5rem" }}>
         {/* Image gallery */}
-        <ListingGallery images={images} title={listing.title} />
+        <div style={{ marginTop: "1.5rem", marginBottom: "2rem", borderRadius: "var(--radius-xl)", overflow: "hidden" }}>
+          <ListingGallery images={images} title={listing.title} />
+        </div>
 
         {/* Content columns */}
-        <div className="detail-content">
+        <div className="detail-content" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2rem" }}>
+          
           {/* Left: details */}
-          <div className="detail-main">
-            {/* Title + badges */}
-            <div style={{ marginBottom: "1.5rem" }}>
-              <h1 className="detail-title">{listing.title}</h1>
-              {pd && (
-                <p className="detail-subtitle">
-                  {propertyTypeName ? propertyTypeName : "Property"}
-                  {pd.area_sqm ? ` · ${pd.area_sqm} m²` : ""}
+          <div className="detail-main" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            
+            {/* Title + basic info */}
+            <div>
+              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-primary)", backgroundColor: "var(--color-primary-light)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)" }}>
+                  {listing.listing_type === "sale" ? "For Sale" : "For Rent"}
+                </span>
+                {propertyTypeName && (
+                  <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#fff", backgroundColor: "var(--color-primary)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)" }}>
+                    {propertyTypeName}
+                  </span>
+                )}
+              </div>
+              <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1.2, marginBottom: "0.5rem" }}>
+                {listing.title}
+              </h1>
+              {listing.location && (
+                <p style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "var(--color-text-muted)", fontSize: "0.9375rem" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  {listing.location}
                 </p>
               )}
-              {listing.location && (
-                <p className="detail-location">📍 {listing.location}</p>
-              )}
-
-              <div className="detail-badges">
-                <span className="detail-badge" style={{ backgroundColor: "var(--color-surface-hover)", color: "var(--color-text-heading)", border: "1px solid var(--color-border)" }}>
-                  ⭐ {ownerRating} Owner Score {ownerReviewCount > 0 ? `(${ownerReviewCount})` : ""}
-                </span>
-
-                {isVerified && (
-                  <span className="detail-badge detail-badge--verified">
-                    ✓ Verified Owner
-                  </span>
-                )}
-                {ownerProfile?.owner_type === "rental_company" && ownerProfile.business_name && (
-                  <span className="detail-badge detail-badge--company">
-                    {ownerProfile.business_name}
-                  </span>
-                )}
-                <span className="detail-badge" style={{ backgroundColor: "var(--color-surface-hover)", color: "var(--color-text-muted)", border: "1px solid var(--color-border)" }}>
-                  {listing.listing_type === "rent" ? "For Rent" : "For Sale"}
-                </span>
-              </div>
             </div>
 
-            {/* Description */}
+            {/* Description Card */}
             {listing.description && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Description</h2>
-                <p className="detail-section__text">{listing.description}</p>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Description</h2>
+                <p style={{ color: "var(--color-text-muted)", lineHeight: 1.6, whiteSpace: "pre-line" }}>{listing.description}</p>
               </div>
             )}
 
-            {/* Property specifications */}
+            {/* Property Details Card */}
             {pd && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Property Details</h2>
-                <div className="detail-specs-grid">
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Bedrooms</span>
-                    <span className="detail-spec__value">{pd.bedrooms || "-"}</span>
-                  </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Bathrooms</span>
-                    <span className="detail-spec__value">{pd.bathrooms || "-"}</span>
-                  </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Area</span>
-                    <span className="detail-spec__value">{pd.area_sqm ? `${pd.area_sqm} m²` : "-"}</span>
-                  </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Condition</span>
-                    <span className="detail-spec__value">{formatEnum(pd.property_condition) || "-"}</span>
-                  </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Furnished</span>
-                    <span className="detail-spec__value">{formatEnum(pd.furnished_status) || "-"}</span>
-                  </div>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Property Details</h2>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "1.25rem" }}>
+                  {pd.bedrooms != null && (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Bedrooms</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{pd.bedrooms}</span>
+                    </div>
+                  )}
+                  {pd.bathrooms != null && (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Bathrooms</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{pd.bathrooms}</span>
+                    </div>
+                  )}
+                  {pd.area_sqm != null && (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Area</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{pd.area_sqm} m²</span>
+                    </div>
+                  )}
+                  {pd.property_condition && (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Condition</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{formatEnum(pd.property_condition)}</span>
+                    </div>
+                  )}
+                  {pd.furnished_status && (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Furnished</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{formatEnum(pd.furnished_status)}</span>
+                    </div>
+                  )}
                   {pd.floor != null && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Floor</span>
-                      <span className="detail-spec__value">{pd.floor} {pd.total_floors ? `of ${pd.total_floors}` : ""}</span>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Floor</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{pd.floor} {pd.total_floors ? `of ${pd.total_floors}` : ""}</span>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Amenities */}
+            {/* Amenities Card */}
             {pd && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Amenities</h2>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", fontSize: "0.9375rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.parking_available ? "var(--color-text)" : "var(--color-text-muted)", textDecoration: pd.parking_available ? "none" : "line-through" }}>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Amenities</h2>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", fontSize: "0.9375rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.parking_available ? "var(--color-text-heading)" : "var(--color-text-muted)", textDecoration: pd.parking_available ? "none" : "line-through" }}>
                     <span>🚗</span> Parking
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.compound_available ? "var(--color-text)" : "var(--color-text-muted)", textDecoration: pd.compound_available ? "none" : "line-through" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.compound_available ? "var(--color-text-heading)" : "var(--color-text-muted)", textDecoration: pd.compound_available ? "none" : "line-through" }}>
                     <span>🌳</span> Compound
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.water_available ? "var(--color-text)" : "var(--color-text-muted)", textDecoration: pd.water_available ? "none" : "line-through" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.water_available ? "var(--color-text-heading)" : "var(--color-text-muted)", textDecoration: pd.water_available ? "none" : "line-through" }}>
                     <span>💧</span> Water
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.electricity_available ? "var(--color-text)" : "var(--color-text-muted)", textDecoration: pd.electricity_available ? "none" : "line-through" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.electricity_available ? "var(--color-text-heading)" : "var(--color-text-muted)", textDecoration: pd.electricity_available ? "none" : "line-through" }}>
                     <span>⚡</span> Electricity
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.internet_available ? "var(--color-text)" : "var(--color-text-muted)", textDecoration: pd.internet_available ? "none" : "line-through" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: pd.internet_available ? "var(--color-text-heading)" : "var(--color-text-muted)", textDecoration: pd.internet_available ? "none" : "line-through" }}>
                     <span>🌐</span> Internet
                   </div>
                 </div>
@@ -223,65 +228,55 @@ export default async function PropertyDetailPage({
 
             {/* Rental Notes (if rent) */}
             {listing.listing_type === "rent" && rt?.rental_notes && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Rental Notes</h2>
-                <p className="detail-section__text">{rt.rental_notes}</p>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Rental Notes</h2>
+                <p style={{ color: "var(--color-text-muted)", lineHeight: 1.6, whiteSpace: "pre-line" }}>{rt.rental_notes}</p>
               </div>
             )}
-          </div>
-
-          {/* Right: Booking/Pricing Card */}
-          <div className="detail-sidebar">
-            <div className="detail-booking-card">
-              {listing.listing_type === "rent" && rt ? (
-                <>
-                  <div className="detail-price-main">
-                    <span className="detail-price-amount">
-                      {rt.monthly_price ? rt.monthly_price.toLocaleString() : rt.daily_price ? rt.daily_price.toLocaleString() : "-"}
-                      <span style={{ fontSize: "1rem" }}> ETB</span>
-                    </span>
-                    <span className="detail-price-period">
-                      /{rt.monthly_price ? "month" : "day"}
-                    </span>
-                  </div>
-
-                  <div className="detail-price-breakdown">
-                    {rt.daily_price && rt.monthly_price && (
-                      <div className="detail-price-row">
-                        <span className="detail-price-label">Daily rate</span>
-                        <span className="detail-price-value">{rt.daily_price.toLocaleString()} ETB</span>
-                      </div>
-                    )}
-                    
-                    {rt.security_deposit_amount > 0 && (
-                      <div className="detail-price-row">
-                        <span className="detail-price-label">Security deposit (refundable)</span>
-                        <span className="detail-price-value">{rt.security_deposit_amount.toLocaleString()} ETB</span>
-                      </div>
-                    )}
-                    
-                    {rt.minimum_rental_days && (
-                      <div className="detail-price-row" style={{ marginTop: "0.5rem", paddingTop: "0.5rem", borderTop: "1px dashed var(--color-border-light)" }}>
-                        <span className="detail-price-label" style={{ fontWeight: 600 }}>Minimum rent period</span>
-                        <span className="detail-price-value" style={{ fontWeight: 600 }}>{rt.minimum_rental_days} days</span>
-                      </div>
-                    )}
-                  </div>
-                </>
-              ) : listing.listing_type === "sale" ? (
-                <div className="detail-price-main">
-                  <span className="detail-price-amount">Price on Request</span>
-                </div>
-              ) : null}
-
-              {/* Request Form */}
-              <PropertyRequestForm
-                listingId={listing.id}
-                type={listing.listing_type as "rent" | "sale"}
+            
+            {/* Owner Trust Card (Mobile stacked) */}
+            <div className="mobile-only-trust-card" style={{ display: "block" }}>
+              <OwnerTrustCard
+                isVerified={isVerified}
+                ownerRating={ownerRating}
+                ownerReviewCount={ownerReviewCount}
+                ownerType={ownerProfile?.owner_type}
+                businessName={ownerProfile?.business_name}
               />
             </div>
+            
           </div>
+
+          {/* Right: pricing sidebar */}
+          <aside className="detail-sidebar" style={{ width: "100%" }}>
+            <div className="desktop-only-trust-card" style={{ display: "none" }}>
+              <OwnerTrustCard
+                isVerified={isVerified}
+                ownerRating={ownerRating}
+                ownerReviewCount={ownerReviewCount}
+                ownerType={ownerProfile?.owner_type}
+                businessName={ownerProfile?.business_name}
+              />
+            </div>
+
+            <PropertyPriceSummaryCard
+              listingId={listing.id}
+              listingType={listing.listing_type as "rent" | "sale"}
+              dailyPrice={rt?.daily_price}
+              monthlyPrice={rt?.monthly_price}
+              securityDeposit={rt?.security_deposit_amount}
+              minimumRentalDays={rt?.minimum_rental_days}
+            />
+          </aside>
         </div>
+
+        {/* Similar Properties Section */}
+        <SimilarProperties 
+          currentListingId={listing.id} 
+          location={listing.location} 
+          listingType={listing.listing_type} 
+          propertyTypeId={pd?.property_type_id}
+        />
       </div>
     </main>
   );
