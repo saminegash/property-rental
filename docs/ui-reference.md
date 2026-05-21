@@ -12,17 +12,19 @@
 
 | Page | Route | Status | Description |
 |---|---|---|---|
-| Homepage | `/` | 🔵 To build | Full marketing landing with hero, search, featured cars, categories, trust badges, pricing, CTA |
-| Browse Cars | `/cars` | 🟡 Exists (dark theme) | Grid of active listings with search + filters |
-| Car Detail | `/cars/[id]` | 🟡 Exists (dark theme) | Full gallery, attributes, pricing breakdown, rental request CTA |
-| Login | `/login` | 🟡 Exists (dark theme) | Email/password auth |
-| Sign Up | `/signup` | 🟡 Exists (dark theme) | Registration with role selection |
-| Safety | `/safety` | 🟡 Exists (dark theme) | Marketplace rules and guidelines |
-| Owner Dashboard | `/dashboard/owner` | 🟡 Exists (dark theme) | Listing management, confirmed rentals |
-| Renter Dashboard | `/dashboard/renter` | 🟡 Exists (dark theme) | Request history, status tracking |
-| Admin Dashboard | `/dashboard/admin` | 🟡 Exists (dark theme) | Request queue, status transitions |
+| Homepage | `/` | 🔵 To build | Full marketing landing with hero, search, featured assets, categories, trust badges, pricing, CTA |
+| Browse Cars | `/cars` | 🟡 Exists | Grid of active vehicle listings with search + filters |
+| Car Detail | `/cars/[id]` | 🟡 Exists | Full gallery, attributes, pricing breakdown, rental request CTA |
+| Browse Properties | `/properties` | 🟡 Exists | Grid of active property listings with search + filters |
+| Property Detail | `/properties/[id]` | 🟡 Exists | Full gallery, property details, amenities, pricing, inquiry CTA |
+| Login | `/login` | 🟡 Exists | Email/password auth |
+| Sign Up | `/signup` | 🟡 Exists | Registration with role selection |
+| Safety | `/safety` | 🟡 Exists | Marketplace rules and guidelines |
+| Owner Dashboard | `/dashboard/owner` | 🟡 Exists | Listing management (Cars & Properties), confirmed requests |
+| Renter Dashboard | `/dashboard/renter` | 🟡 Exists | Request history, status tracking |
+| Admin Dashboard | `/dashboard/admin` | 🟡 Exists | Request queue, admin review of Cars & Properties |
 
-> All existing pages need theme migration from dark to the new white/blue design system.
+> All pages adhere to the new white/blue design system.
 
 ---
 
@@ -41,7 +43,7 @@ The homepage is the single most important page. It follows a vertical section-ba
 
 - **Position:** Sticky top, white background, subtle bottom border
 - **Logo:** Blue icon + "MyProperties" text + muted tagline
-- **Nav links:** Browse Cars, How It Works, List Your Car, Safety, Help
+- **Nav links:** Browse Cars, Browse Properties, How It Works, List with Us, Safety, Help
 - **Right side:** Language switcher (EN ▾), dark mode toggle (future), Login button (text), Register button (primary blue pill)
 - **Mobile:** Hamburger menu, logo + register button visible
 
@@ -51,41 +53,40 @@ The homepage is the single most important page. It follows a vertical section-ba
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
 │  Rent verified cars              ┌──────────────────────┐       │
-│  with or without a driver        │ ✅ Verified Owner    │       │
+│  or discover prime properties    │ ✅ Verified Owner    │       │
 │                                  │                      │       │
-│  Find trusted cars, request      │  [Car Image]         │       │
-│  rentals, and get your car       │                      │       │
-│  delivered within hours or days. │  Toyota RAV4 2020    │       │
+│  Find trusted assets, request    │  [Asset Image]       │       │
+│  rentals or purchases, directly  │                      │       │
+│  from verified owners.           │  Toyota RAV4 / Villa │       │
 │                                  │  📍 Bole, Addis Ababa│       │
 │  ┌──────────────────────────┐    │                      │       │
-│  │ Pick-up  Start   End     │    │  3,500 ETB/day       │       │
-│  │ location date    date    │    │  Driver fee  +1,500  │       │
-│  │ Driver option            │    │  Deposit     15,000  │       │
-│  │        [🔍 Search Cars]  │    │  Delivery    500     │       │
+│  │ Asset Type Location      │    │  From 3,500 ETB/day  │       │
+│  │ Start date End date      │    │  (Cars: Driver fee)  │       │
+│  │        [🔍 Search]       │    │  Deposit / Comm.     │       │
 │  └──────────────────────────┘    └──────────────────────┘       │
 │                                                                 │
-│  👥👥👥 Join 2,000+ happy renters    How it works 🔵            │
+│  👥👥👥 Join 2,000+ happy users      How it works 🔵            │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 **Left column:**
-- Headline: "Rent verified cars with or **without** a driver" — bold emphasis on "without"
+- Headline: "Rent verified cars or discover prime properties"
 - Subtext paragraph
 - **Search box** (white card, rounded corners, light shadow):
-  - Row 1: Pick-up location (input), Start date (date picker), End date (date picker)
-  - Row 2: Driver option (select dropdown)
-  - Search button: Primary blue, full or partial width, "🔍 Search Cars"
-- Social proof: Overlapping avatar circles + "Join 2,000+ happy renters"
+  - Row 1: Asset Type (Car/Property), Location
+  - Row 2: Dates (if rental)
+  - Search button: Primary blue, full or partial width, "🔍 Search"
+- Social proof: Overlapping avatar circles + "Join 2,000+ happy users"
 - "How it works" link with blue arrow
 
 **Right column (desktop only):**
-- Featured car card with:
+- Featured asset card with:
   - "✅ Verified Owner" badge (top)
   - Heart/favorite icon (top right)
-  - Car photo (large, rounded)
-  - Car name + location
-  - Price breakdown: base price/day, driver fee, security deposit, delivery fee
+  - Asset photo (large, rounded)
+  - Name/Title + location
+  - Price breakdown: base price, driver fee (if car), deposit, etc.
 
 **Background:** Light blue gradient or `--color-primary-surface`
 **Mobile:** Single column — headline, search box, social proof. Featured card hidden or below.
@@ -110,11 +111,11 @@ The homepage is the single most important page. It follows a vertical section-ba
 - White background, subtle border, no shadow
 - Reinforces key value propositions
 
-### 2.4 Featured Cars Section
+### 2.4 Featured Listings Section
 
 ```
-Featured Cars                                    View all cars →
-Top rated and most trusted cars, ready for you.
+Featured Cars & Properties                       View all →
+Top rated and most trusted assets, ready for you.
 
 ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
 │ [Image]  │  │ [Image]  │  │ [Image]  │  │ [Image]  │
@@ -137,16 +138,15 @@ Top rated and most trusted cars, ready for you.
 
 **Listing Card Anatomy:**
 1. **Image area** (aspect 4:3, rounded top corners)
-   - Badge pills overlay (top-left): "With Driver" (blue), "Without Driver" (gray), "Delivery" (green)
+   - Badge pills overlay (top-left): e.g., "With Driver" (blue), "For Rent" / "For Sale"
    - Heart/favorite icon (top-right)
    - "Verified Owner" small badge if applicable
 2. **Content area** (padded below image)
-   - Car name (bold, 16px)
+   - Asset title (bold, 16px)
    - Location with pin icon (muted text, 13px)
-   - Price row: car icon + base fee label + "ETB/day" price (bold blue or dark)
-   - Additional fees row: small muted text showing driver fee, deposit
-   - Rating: star icon + score + review count
-   - "Request Now" button (primary outline or text link)
+   - Key specs: e.g., Beds/Baths for properties, Transmission for cars
+   - Price row: icon + price label
+   - "View Details" or "Request Now" button (primary outline or text link)
 
 **Layout:** Horizontal scrollable carousel (desktop 4 visible), with left/right arrows. 2 columns on tablet, 1 on mobile.
 
@@ -156,12 +156,12 @@ Top rated and most trusted cars, ready for you.
 Browse by Category
 
 ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
-│  🚗     │ │  🚙     │ │  ✨     │ │  👨‍✈️     │ │  🔑     │ │  🚚     │
-│ Economy │ │  SUVs   │ │ Luxury  │ │  With   │ │ Without │ │Delivery │
-│  Cars   │ │         │ │  Cars   │ │ Driver  │ │ Driver  │ │Available│
-│         │ │ Spacious│ │ Premium │ │ Profess-│ │ Drive   │ │ We bring│
-│Affordab-│ │ & comfy │ │ & styl- │ │ ional   │ │ yourself│ │ the car │
-│le & eff-│ │         │ │ ish     │ │ driver  │ │ freely  │ │ to you  │
+│  🚗     │ │  🏢     │ │  🏠     │ │  💼     │ │  🏕️     │ │  🔑     │
+│ Economy │ │Apartment│ │ Villas  │ │Commerci-│ │ Land    │ │ Without │
+│  Cars   │ │         │ │         │ │al Space │ │         │ │ Driver  │
+│         │ │ City    │ │ Luxury  │ │ For     │ │ Build   │ │ Drive   │
+│Affordab-│ │ living  │ │ & styl- │ │ your    │ │ your    │ │ freely  │
+│le & eff-│ │         │ │ ish     │ │business │ │ dream   │ │         │
 │icient  │ │         │ │ rides   │ │ included│ │         │ │         │
 └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘
 ```
@@ -195,16 +195,16 @@ How It Works
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
 │  We believe in                                                  │
-│  pricing transparency     💰 Car Rental  💰 Driver    💰 Security│
+│  pricing transparency     💰 Rental      💰 Driver    💰 Security│
 │                              Price         Fee          Deposit │
 │  Everything is shown         3,000/day     +1,500/day   15,000  │
 │  clearly before you          Base price    If you need  Refund- │
-│  send your request.          for the car   a driver     able    │
+│  send your request.          (Car/Prop)    a driver     able    │
 │                                                                 │
 │  ✅ Commission is 5%      💰 Delivery   💰 Platform               │
-│     of rental price only     Fee          Commission             │
+│     of rental/sale price     Fee          Commission             │
 │                              500 ETB      5%                     │
-│                              If delivery  Of rental              │
+│                              If delivery  Of base                │
 │                              is needed    price only             │
 │                                                                 │
 │  ⚠️ Driver fee, delivery fee, security deposit, damage fees,    │
@@ -220,20 +220,20 @@ How It Works
 - Right side: 5 pricing cards in a grid showing each fee type with example values
 - Footer disclaimer about excluded fees
 
-### 2.8 List Your Car CTA Banner
+### 2.8 List With Us CTA Banner
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  [Car Image]    Own a car? Start earning from it.               │
+│  [Asset Image]  Own a car or property? Start earning today.     │
 │                                                                 │
-│                 List your car, set your rental price, choose    │
-│                 with-driver or without-driver options, and let  │
-│                 our admin team help manage rental requests.      │
+│                 List your asset, set your pricing, specify      │
+│                 terms, and let our admin team help manage       │
+│                 requests.                                       │
 │                                                                 │
 │                 ✅ Free basic listing  ✅ Admin-reviewed requests│
-│                 ✅ Flexible pricing    ✅ With or without driver │
+│                 ✅ Flexible pricing    ✅ Cars & Properties      │
 │                                                                 │
-│                                    [List Your Car Now →]        │
+│                                    [List With Us Now →]         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -260,9 +260,9 @@ Popular Locations
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Find your next rental car today                                │
-│  Trusted cars. Verified owners. Safe rentals.                   │
-│                            [Browse Cars]  [List Your Car]       │
+│  Find your next car or property today                           │
+│  Trusted assets. Verified owners. Safe transactions.            │
+│                            [Browse All]  [List With Us]         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -275,9 +275,9 @@ Popular Locations
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ 🔵 MyProperties          Company      Support       Legal      │
-│ Rent with trust.          About Us     Help Center   ToS       │
-│ Drive with confidence.    How It Works Safety Rules  Privacy   │
-│                           List Your Car Contact Us   Refund &  │
+│ Rent & buy with trust.    About Us     Help Center   ToS       │
+│                           How It Works Safety Rules  Privacy   │
+│                           List With Us Contact Us   Refund &  │
 │ [f] [x] [ig] [in]        Blog         Report        Deposit   │
 │                                                                 │
 │                           Need help?                            │

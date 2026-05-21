@@ -15,7 +15,7 @@ The marketplace follows a **clean, white/blue, premium-but-simple** aesthetic. T
 - **Trust-first visual language** — verified badges, transparent pricing, admin-reviewed flows
 - **Mobile-first responsive design** — all layouts designed for 320px+ and scale up
 - **Search-focused interaction** — the hero search bar is the primary user action
-- **Scalable UI patterns** — components work for cars now, properties later
+- **Scalable UI patterns** — components designed generically to support cars, properties (houses, apartments, villas, land, commercial), and future assets
 
 ---
 
@@ -24,7 +24,7 @@ The marketplace follows a **clean, white/blue, premium-but-simple** aesthetic. T
 | Token | Value | Notes |
 |---|---|---|
 | **Product name** | MyProperties | Appears in header and footer |
-| **Tagline** | *Rent with trust. Drive with confidence.* | Below logo in header and in CTA banner |
+| **Tagline** | *Rent & buy with trust.* | Below logo in header and in CTA banner |
 | **Favicon** | Blue circle with "M" mark | Matches primary blue |
 | **Tone** | Professional, trustworthy, approachable | Never playful, never aggressive |
 
