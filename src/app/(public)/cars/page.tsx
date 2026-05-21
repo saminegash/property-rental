@@ -2,6 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import type { Metadata } from "next";
 
+// Landing Page Components
+import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
+import { CarRowSection } from "@/components/cars/CarRowSection";
+import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
+import { TrustFeaturesSection } from "@/components/cars/TrustFeaturesSection";
+import { PricingTransparencySection } from "@/components/cars/PricingTransparencySection";
+import { HowItWorksSection } from "@/components/cars/HowItWorksSection";
+import { OwnerCTASection } from "@/components/cars/OwnerCTASection";
+import { PopularLocationsSection } from "@/components/cars/PopularLocationsSection";
+
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -55,10 +65,6 @@ function formatEnum(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-const POPULAR_LOCATIONS = [
-  "Addis Ababa", "Bole", "CMC", "Megenagna",
-  "Kazanchis", "Ayat", "Sarbet", "Piassa",
-];
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -70,58 +76,65 @@ export default async function BrowseCarsPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  // Build Supabase query — RLS ensures only published listings are returned
-  let query = supabase
-    .from("listings")
-    .select(
-      `
-      id, title, location,
-      vehicle_details ( make, model, year, transmission, fuel_type, seats, condition ),
-      rental_terms ( daily_price, available_with_driver, available_without_driver, delivery_available, security_deposit_amount ),
-      listing_images ( image_url, is_primary )
-    `
-    )
-    .eq("category", "vehicle")
-    .eq("listing_type", "rent")
-    .order("created_at", { ascending: false });
-
-  // Apply location filter (case-insensitive partial match)
-  if (params.location) {
-    query = query.ilike("location", `%${params.location}%`);
-  }
-
-  const { data: listings, error } = await query;
-
-  // Post-query JS filters for rental_terms fields (Supabase can't filter on joined columns)
-  let filtered = (listings || []) as unknown as ListingCard[];
-
-  if (params.driver === "with") {
-    filtered = filtered.filter((l) => l.rental_terms?.[0]?.available_with_driver);
-  } else if (params.driver === "without") {
-    filtered = filtered.filter((l) => l.rental_terms?.[0]?.available_without_driver);
-  }
-
-  if (params.delivery === "true") {
-    filtered = filtered.filter((l) => l.rental_terms?.[0]?.delivery_available);
-  }
-
-  if (params.min_price) {
-    const min = parseInt(params.min_price, 10);
-    filtered = filtered.filter((l) => (l.rental_terms?.[0]?.daily_price ?? 0) >= min);
-  }
-  if (params.max_price) {
-    const max = parseInt(params.max_price, 10);
-    filtered = filtered.filter((l) => (l.rental_terms?.[0]?.daily_price ?? Infinity) <= max);
-  }
-
   // Active filter summary
   const hasFilters = !!(params.location || params.driver || params.delivery || params.min_price || params.max_price);
 
+  let error = null;
+  let filtered: ListingCard[] = [];
+
+  // Only run complex DB query if we are in Search Mode (filters are active)
+  if (hasFilters) {
+    let query = supabase
+      .from("listings")
+      .select(
+        `
+        id, title, location,
+        vehicle_details ( make, model, year, transmission, fuel_type, seats, condition ),
+        rental_terms ( daily_price, available_with_driver, available_without_driver, delivery_available, security_deposit_amount ),
+        listing_images ( image_url, is_primary )
+      `
+      )
+      .eq("category", "vehicle")
+      .eq("listing_type", "rent")
+      .eq("status", "published")
+      .order("created_at", { ascending: false });
+
+    if (params.location) {
+      query = query.ilike("location", `%${params.location}%`);
+    }
+
+    const { data: listings, error: fetchError } = await query;
+    error = fetchError;
+
+    filtered = (listings || []) as unknown as ListingCard[];
+
+    if (params.driver === "with") {
+      filtered = filtered.filter((l) => l.rental_terms?.[0]?.available_with_driver);
+    } else if (params.driver === "without") {
+      filtered = filtered.filter((l) => l.rental_terms?.[0]?.available_without_driver);
+    }
+
+    if (params.delivery === "true") {
+      filtered = filtered.filter((l) => l.rental_terms?.[0]?.delivery_available);
+    }
+
+    if (params.min_price) {
+      const min = parseInt(params.min_price, 10);
+      filtered = filtered.filter((l) => (l.rental_terms?.[0]?.daily_price ?? 0) >= min);
+    }
+    if (params.max_price) {
+      const max = parseInt(params.max_price, 10);
+      filtered = filtered.filter((l) => (l.rental_terms?.[0]?.daily_price ?? Infinity) <= max);
+    }
+  }
+
   return (
-    <div className="browse-layout">
+    <div className={hasFilters ? "browse-layout" : ""}>
       {/* ── Page hero ── */}
       <section className="browse-hero">
-        <h1 className="browse-hero__title">Find Your Perfect Car</h1>
+        <h1 className="browse-hero__title">
+          {hasFilters ? "Search Results" : "Find Your Perfect Car"}
+        </h1>
         <p className="browse-hero__subtitle">
           Verified rentals across Ethiopia — with or without a driver.
         </p>
@@ -234,175 +247,191 @@ export default async function BrowseCarsPage({
         </form>
       </div>
 
-      {/* ── Active filter chips ── */}
-      {hasFilters && (
-        <div className="browse-active-filters" aria-label="Active filters">
-          <span className="browse-active-filters__label">Filtered by:</span>
-          {params.location && (
-            <span className="browse-active-chip">
-              📍 {params.location}
-              <Link href={`/cars?${new URLSearchParams({ ...params, location: "" }).toString()}`} aria-label="Remove location filter">×</Link>
-            </span>
-          )}
-          {params.driver && (
-            <span className="browse-active-chip">
-              🚗 {params.driver === "with" ? "With Driver" : "Self-Drive"}
-              <Link href={`/cars?${new URLSearchParams({ ...params, driver: "" }).toString()}`} aria-label="Remove driver filter">×</Link>
-            </span>
-          )}
-          {params.delivery === "true" && (
-            <span className="browse-active-chip">
-              📦 Delivery
-              <Link href={`/cars?${new URLSearchParams({ ...params, delivery: "" }).toString()}`} aria-label="Remove delivery filter">×</Link>
-            </span>
-          )}
-          {(params.min_price || params.max_price) && (
-            <span className="browse-active-chip">
-              💰 {params.min_price || "0"}–{params.max_price || "∞"} Birr/day
-              <Link href={`/cars?${new URLSearchParams({ ...params, min_price: "", max_price: "" }).toString()}`} aria-label="Remove price filter">×</Link>
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* ── Popular location chips ── */}
-      {!params.location && (
-        <div className="browse-location-chips" aria-label="Browse by popular location">
-          <span className="browse-location-chips__label">Browse by area:</span>
-          {POPULAR_LOCATIONS.map((loc) => (
-            <Link
-              key={loc}
-              href={`/cars?location=${encodeURIComponent(loc)}`}
-              className="browse-location-chip"
-            >
-              {loc}
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* ── Results ── */}
-      <main className="browse-main">
-        {error && (
-          <div className="auth-error" style={{ maxWidth: "600px", margin: "0 auto" }}>
-            Failed to load listings: {error.message}
-          </div>
-        )}
-
-        {!error && filtered.length === 0 && (
-          <div className="browse-empty">
-            <div className="browse-empty__icon">🚗</div>
-            <h2 className="browse-empty__title">No cars found</h2>
-            <p className="browse-empty__text">
-              {hasFilters
-                ? "Try adjusting your filters or clearing them to see all available cars."
-                : "No cars are currently listed. Check back soon!"}
-            </p>
-            {hasFilters && (
-              <Link href="/cars" className="auth-button" style={{ textDecoration: "none", display: "inline-block", marginTop: "1rem" }}>
-                Clear all filters
-              </Link>
+      {hasFilters ? (
+        // ── Search Mode Layout ──
+        <>
+          {/* Active filter chips */}
+          <div className="browse-active-filters" aria-label="Active filters">
+            <span className="browse-active-filters__label">Filtered by:</span>
+            {params.location && (
+              <span className="browse-active-chip">
+                📍 {params.location}
+                <Link href={`/cars?${new URLSearchParams({ ...params, location: "" }).toString()}`} aria-label="Remove location filter">×</Link>
+              </span>
+            )}
+            {params.driver && (
+              <span className="browse-active-chip">
+                🚗 {params.driver === "with" ? "With Driver" : "Self-Drive"}
+                <Link href={`/cars?${new URLSearchParams({ ...params, driver: "" }).toString()}`} aria-label="Remove driver filter">×</Link>
+              </span>
+            )}
+            {params.delivery === "true" && (
+              <span className="browse-active-chip">
+                📦 Delivery
+                <Link href={`/cars?${new URLSearchParams({ ...params, delivery: "" }).toString()}`} aria-label="Remove delivery filter">×</Link>
+              </span>
+            )}
+            {(params.min_price || params.max_price) && (
+              <span className="browse-active-chip">
+                💰 {params.min_price || "0"}–{params.max_price || "∞"} Birr/day
+                <Link href={`/cars?${new URLSearchParams({ ...params, min_price: "", max_price: "" }).toString()}`} aria-label="Remove price filter">×</Link>
+              </span>
             )}
           </div>
-        )}
 
-        {filtered.length > 0 && (
-          <>
-            <p className="browse-count">
-              {filtered.length} car{filtered.length !== 1 ? "s" : ""} found
-              {params.location ? ` in ${params.location}` : ""}
-            </p>
+          {/* Results */}
+          <main className="browse-main">
+            {error && (
+              <div className="auth-error" style={{ maxWidth: "600px", margin: "0 auto" }}>
+                Failed to load listings: {error.message}
+              </div>
+            )}
 
-            <div className="car-grid">
-              {filtered.map((listing) => {
-                const vd = listing.vehicle_details?.[0];
-                const rt = listing.rental_terms?.[0];
-                const primaryImg = listing.listing_images?.find((img) => img.is_primary);
-                const coverImage = primaryImg || listing.listing_images?.[0];
+            {!error && filtered.length === 0 && (
+              <div className="browse-empty">
+                <div className="browse-empty__icon">🚗</div>
+                <h2 className="browse-empty__title">No cars found</h2>
+                <p className="browse-empty__text">
+                  Try adjusting your filters or clearing them to see all available cars.
+                </p>
+                <Link href="/cars" className="auth-button" style={{ textDecoration: "none", display: "inline-block", marginTop: "1rem" }}>
+                  Clear all filters
+                </Link>
+              </div>
+            )}
 
-                return (
-                  <Link key={listing.id} href={`/cars/${listing.id}`} className="car-card">
-                    {/* Image */}
-                    <div className="car-card__image">
-                      {coverImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={coverImage.image_url}
-                          alt={listing.title}
-                          className="car-card__img"
-                        />
-                      ) : (
-                        <div className="car-card__placeholder">
-                          <span>🚗</span>
-                        </div>
-                      )}
-                      {/* Driver/delivery badges */}
-                      {rt && (
-                        <div className="car-card__badges">
-                          {rt.available_with_driver && (
-                            <span className="car-card__badge">Driver available</span>
-                          )}
-                          {rt.available_without_driver && (
-                            <span className="car-card__badge car-card__badge--alt">Self-drive</span>
-                          )}
-                          {rt.delivery_available && (
-                            <span className="car-card__badge car-card__badge--delivery">Delivery</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
+            {filtered.length > 0 && (
+              <>
+                <p className="browse-count">
+                  {filtered.length} car{filtered.length !== 1 ? "s" : ""} found
+                  {params.location ? ` in ${params.location}` : ""}
+                </p>
 
-                    {/* Body */}
-                    <div className="car-card__body">
-                      <h3 className="car-card__title">{listing.title}</h3>
-                      {vd && (
-                        <p className="car-card__subtitle">
-                          {vd.year} {vd.make} {vd.model}
-                        </p>
-                      )}
-                      {vd && (
-                        <div className="car-card__specs">
-                          <span>{formatEnum(vd.transmission)}</span>
-                          <span className="car-card__dot">·</span>
-                          <span>{formatEnum(vd.fuel_type)}</span>
-                          {vd.seats && (
-                            <>
-                              <span className="car-card__dot">·</span>
-                              <span>{vd.seats} seats</span>
-                            </>
-                          )}
-                        </div>
-                      )}
-                      {listing.location && (
-                        <p className="car-card__location">📍 {listing.location}</p>
-                      )}
-                      <div className="car-card__footer">
-                        <div>
-                          {rt?.daily_price ? (
-                            <>
-                              <span className="car-card__price">
-                                {rt.daily_price.toLocaleString()} Birr
-                              </span>
-                              <span className="car-card__price-unit"> / day</span>
-                            </>
+                <div className="car-grid">
+                  {filtered.map((listing) => {
+                    const vd = listing.vehicle_details?.[0];
+                    const rt = listing.rental_terms?.[0];
+                    const primaryImg = listing.listing_images?.find((img) => img.is_primary);
+                    const coverImage = primaryImg || listing.listing_images?.[0];
+
+                    return (
+                      <Link key={listing.id} href={`/cars/${listing.id}`} className="car-card">
+                        {/* Image */}
+                        <div className="car-card__image">
+                          {coverImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={coverImage.image_url}
+                              alt={listing.title}
+                              className="car-card__img"
+                            />
                           ) : (
-                            <span className="car-card__price-unit">Contact for price</span>
+                            <div className="car-card__placeholder">
+                              <span>🚗</span>
+                            </div>
+                          )}
+                          {/* Driver/delivery badges */}
+                          {rt && (
+                            <div className="car-card__badges">
+                              {rt.available_with_driver && (
+                                <span className="car-card__badge">Driver available</span>
+                              )}
+                              {rt.available_without_driver && (
+                                <span className="car-card__badge car-card__badge--alt">Self-drive</span>
+                              )}
+                              {rt.delivery_available && (
+                                <span className="car-card__badge car-card__badge--delivery">Delivery</span>
+                              )}
+                            </div>
                           )}
                         </div>
-                        {rt && rt.security_deposit_amount > 0 && (
-                          <span className="car-card__deposit">
-                            {rt.security_deposit_amount.toLocaleString()} Birr deposit
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </main>
+
+                        {/* Body */}
+                        <div className="car-card__body">
+                          <h3 className="car-card__title">{listing.title}</h3>
+                          {vd && (
+                            <p className="car-card__subtitle">
+                              {vd.year} {vd.make} {vd.model}
+                            </p>
+                          )}
+                          {vd && (
+                            <div className="car-card__specs">
+                              <span>{formatEnum(vd.transmission)}</span>
+                              <span className="car-card__dot">·</span>
+                              <span>{formatEnum(vd.fuel_type)}</span>
+                              {vd.seats && (
+                                <>
+                                  <span className="car-card__dot">·</span>
+                                  <span>{vd.seats} seats</span>
+                                </>
+                              )}
+                            </div>
+                          )}
+                          {listing.location && (
+                            <p className="car-card__location">📍 {listing.location}</p>
+                          )}
+                          <div className="car-card__footer">
+                            <div>
+                              {rt?.daily_price ? (
+                                <>
+                                  <span className="car-card__price">
+                                    {rt.daily_price.toLocaleString()} Birr
+                                  </span>
+                                  <span className="car-card__price-unit"> / day</span>
+                                </>
+                              ) : (
+                                <span className="car-card__price-unit">Contact for price</span>
+                              )}
+                            </div>
+                            {rt && rt.security_deposit_amount > 0 && (
+                              <span className="car-card__deposit">
+                                {rt.security_deposit_amount.toLocaleString()} Birr deposit
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </main>
+        </>
+      ) : (
+        // ── Landing Mode Layout ──
+        <div className="landing-layout">
+          <FeaturedCarsSection />
+          
+          <CarRowSection
+            title="Cars With Driver"
+            subtitle="Sit back, relax, and let our professional drivers navigate."
+            filterType="with_driver"
+            viewAllLink="/cars?driver=with"
+          />
+
+          <CarRowSection
+            title="Self-Drive Cars"
+            subtitle="Take the wheel and explore at your own pace."
+            filterType="without_driver"
+            viewAllLink="/cars?driver=without"
+          />
+
+          <CarRowSection
+            title="Cars For Sale"
+            subtitle="Find your next personal or business vehicle."
+            filterType="sale"
+            viewAllLink="/cars?listing_type=sale"
+          />
+
+          <CarCategoriesSection />
+          <PricingTransparencySection />
+          <TrustFeaturesSection />
+          <HowItWorksSection />
+          <PopularLocationsSection />
+          <OwnerCTASection />
+        </div>
+      )}
     </div>
   );
 }
