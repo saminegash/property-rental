@@ -1,60 +1,101 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { MarketplaceHeroClient } from "./MarketplaceHeroClient";
+import { CarListingCardProps } from "@/components/cars/CarListingCard";
+import { PropertyListingCardProps } from "@/components/properties/PropertyListingCard";
 
 export async function MarketplaceHeroSection() {
   const supabase = await createClient();
 
-  // Count published listings by category
-  const { count: carCount } = await supabase
+  // Fetch 1 featured car (or just newest published)
+  const { data: carData } = await supabase
     .from("listings")
-    .select("id", { count: "exact", head: true })
+    .select(`
+      id, title, location, listing_type,
+      vehicle_details ( driver_fee, security_deposit_amount, delivery_available, with_driver, without_driver ),
+      rental_terms ( daily_price, security_deposit_amount, delivery_available, available_with_driver, available_without_driver ),
+      listing_images ( image_url, is_primary )
+    `)
     .eq("category", "vehicle")
-    .eq("status", "published");
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
 
-  const { count: propertyCount } = await supabase
+  let featuredCar: CarListingCardProps | null = null;
+  if (carData) {
+    const vd = Array.isArray(carData.vehicle_details) ? carData.vehicle_details[0] : carData.vehicle_details;
+    const rt = Array.isArray(carData.rental_terms) ? carData.rental_terms[0] : carData.rental_terms;
+    const images = Array.isArray(carData.listing_images) ? carData.listing_images : [];
+    const primaryImage = images.find((img: any) => img.is_primary)?.image_url || images[0]?.image_url || "/placeholder-car.jpg";
+
+    featuredCar = {
+      id: carData.id,
+      title: carData.title,
+      location: carData.location,
+      image: primaryImage,
+      dailyPrice: rt?.daily_price || null,
+      driverFee: vd?.driver_fee || 0,
+      securityDeposit: rt?.security_deposit_amount || 0,
+      deliveryAvailable: rt?.delivery_available || false,
+      withDriver: rt?.available_with_driver || false,
+      withoutDriver: rt?.available_without_driver || false,
+      isFeatured: true,
+      href: `/cars/${carData.id}`,
+    };
+  }
+
+  // Fetch 1 featured property
+  const { data: propData } = await supabase
     .from("listings")
-    .select("id", { count: "exact", head: true })
+    .select(`
+      id, title, location, listing_type,
+      property_details ( bedrooms, bathrooms, area_sqm ),
+      rental_terms ( monthly_price, daily_price ),
+      listing_images ( image_url, is_primary )
+    `)
     .eq("category", "property")
-    .eq("status", "published");
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  let featuredProperty: PropertyListingCardProps | null = null;
+  if (propData) {
+    const pd = Array.isArray(propData.property_details) ? propData.property_details[0] : propData.property_details;
+    const rt = Array.isArray(propData.rental_terms) ? propData.rental_terms[0] : propData.rental_terms;
+    const images = Array.isArray(propData.listing_images) ? propData.listing_images : [];
+    const primaryImage = images.find((img: any) => img.is_primary)?.image_url || images[0]?.image_url || "/placeholder-property.jpg";
+    
+    // For sale properties, we might not have rental terms. In a real app we'd have a sale price field.
+    // For now we'll just fall back to 0 or derive from a future field.
+    const price = rt?.monthly_price || rt?.daily_price || 0;
+
+    featuredProperty = {
+      id: propData.id,
+      title: propData.title,
+      location: propData.location,
+      image: primaryImage,
+      price: price,
+      type: propData.listing_type as "rent" | "sale",
+      beds: pd?.bedrooms || 0,
+      baths: pd?.bathrooms || 0,
+      area: pd?.area_sqm || 0,
+      isFeatured: true,
+      href: `/properties/${propData.id}`,
+    };
+  }
+
+  // Fetch property types for the dropdown
+  const { data: propertyTypes } = await supabase
+    .from("property_types")
+    .select("id, name")
+    .order("name", { ascending: true });
 
   return (
-    <section className="marketplace-hero" id="marketplace-hero">
-      <div className="marketplace-hero__inner">
-        <h1 className="marketplace-hero__headline">
-          Rent &amp; buy with{" "}
-          <span className="marketplace-hero__highlight">trust</span>
-        </h1>
-        <p className="marketplace-hero__subtext">
-          Ethiopia&apos;s verified marketplace for cars and properties.
-          Transparent pricing, admin-reviewed listings, and secure transactions.
-        </p>
-
-        {/* Category Tabs */}
-        <div className="marketplace-hero__tabs">
-          <Link href="/cars" className="marketplace-hero__tab" id="hero-tab-cars">
-            🚗 Browse Cars
-          </Link>
-          <Link href="/properties" className="marketplace-hero__tab" id="hero-tab-properties">
-            🏠 Browse Properties
-          </Link>
-        </div>
-
-        {/* Platform Stats */}
-        <div className="marketplace-hero__stats">
-          <div className="marketplace-hero__stat">
-            <div className="marketplace-hero__stat-value">{carCount || 0}</div>
-            <div className="marketplace-hero__stat-label">Cars Listed</div>
-          </div>
-          <div className="marketplace-hero__stat">
-            <div className="marketplace-hero__stat-value">{propertyCount || 0}</div>
-            <div className="marketplace-hero__stat-label">Properties Listed</div>
-          </div>
-          <div className="marketplace-hero__stat">
-            <div className="marketplace-hero__stat-value">5%</div>
-            <div className="marketplace-hero__stat-label">Commission Only</div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <MarketplaceHeroClient
+      featuredCar={featuredCar}
+      featuredProperty={featuredProperty}
+      propertyTypes={propertyTypes || []}
+    />
   );
 }
