@@ -8,6 +8,7 @@ interface FeaturedCarListing {
   location: string | null;
   owner_id: string;
   is_featured: boolean;
+  listing_type: "rent" | "sale";
   vehicle_details: {
     make: string;
     model: string;
@@ -31,11 +32,11 @@ interface FeaturedCarListing {
 export async function FeaturedCarsSection() {
   const supabase = await createClient();
 
-  // 1. Fetch only published vehicle rental listings — RLS-safe, no service-role key
+  // 1. Fetch only published vehicle listings (rent and sale)
   const { data: listings } = await supabase
     .from("listings")
     .select(`
-      id, title, location, owner_id, is_featured,
+      id, title, location, owner_id, is_featured, listing_type,
       vehicle_details ( make, model, year ),
       rental_terms (
         daily_price, daily_driver_fee, security_deposit_amount,
@@ -44,7 +45,6 @@ export async function FeaturedCarsSection() {
       listing_images ( image_url, is_primary )
     `)
     .eq("category", "vehicle")
-    .eq("listing_type", "rent")
     .eq("status", "published")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
@@ -103,13 +103,16 @@ export async function FeaturedCarsSection() {
                   id={car.id}
                   title={car.title}
                   location={car.location || "Addis Ababa"}
-                  image={coverImage}
-                  dailyPrice={rt?.daily_price ?? null}
-                  driverFee={rt?.daily_driver_fee ?? 0}
-                  securityDeposit={rt?.security_deposit_amount ?? 0}
-                  deliveryAvailable={rt?.delivery_available ?? false}
-                  withDriver={rt?.available_with_driver ?? false}
-                  withoutDriver={rt?.available_without_driver ?? false}
+                  image={coverImage || "/placeholder-car.jpg"}
+                  listingType={car.listing_type}
+                  dailyPrice={rt?.daily_price || null}
+                  salePrice={null} // Sale price handling will be added when DB supports it
+                  driverFee={rt?.daily_driver_fee || 0}
+                  securityDeposit={rt?.security_deposit_amount || 0}
+                  deliveryAvailable={rt?.delivery_available || false}
+                  withDriver={rt?.available_with_driver || false}
+                  withoutDriver={rt?.available_without_driver || false}
+                  isNegotiable={false} // Negotiable flag handling will be added later
                   isVerifiedOwner={verifiedOwnerIds.has(car.owner_id)}
                   isFeatured={car.is_featured}
                   href={`/cars/${car.id}`}
@@ -118,18 +121,25 @@ export async function FeaturedCarsSection() {
             })}
           </div>
         ) : (
-          /* Polished empty state — no fake listings */
           <div className="featured-cars__empty" id="featured-cars-empty">
-            <div className="featured-cars__empty-icon" aria-hidden="true">🚗</div>
+            <div className="featured-cars__empty-icon" aria-hidden="true">
+              🚗
+            </div>
             <h3 className="featured-cars__empty-title">No cars listed yet</h3>
             <p className="featured-cars__empty-text">
               We&apos;re onboarding verified car owners right now. Check back soon or list your own car to be among the first.
             </p>
             <div className="featured-cars__empty-actions">
-              <Link href="/dashboard/owner/cars/new" className="featured-cars__empty-btn featured-cars__empty-btn--primary">
+              <Link
+                href="/dashboard/owner/cars/new"
+                className="featured-cars__empty-btn featured-cars__empty-btn--primary"
+              >
                 List Your Car
               </Link>
-              <Link href="/cars" className="featured-cars__empty-btn featured-cars__empty-btn--secondary">
+              <Link
+                href="/cars"
+                className="featured-cars__empty-btn featured-cars__empty-btn--secondary"
+              >
                 Browse All Cars
               </Link>
             </div>

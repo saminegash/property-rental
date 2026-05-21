@@ -5,12 +5,15 @@ export interface CarListingCardProps {
   title: string;
   location: string;
   image: string;
-  dailyPrice: number | null;
-  driverFee: number;
-  securityDeposit: number;
-  deliveryAvailable: boolean;
-  withDriver: boolean;
-  withoutDriver: boolean;
+  listingType?: "rent" | "sale";
+  dailyPrice?: number | null;
+  salePrice?: number | null;
+  driverFee?: number;
+  securityDeposit?: number;
+  deliveryAvailable?: boolean;
+  withDriver?: boolean;
+  withoutDriver?: boolean;
+  isNegotiable?: boolean;
   rating?: number | null;
   reviewCount?: number | null;
   isVerifiedOwner?: boolean;
@@ -20,25 +23,21 @@ export interface CarListingCardProps {
 
 /**
  * Reusable car listing card used across homepage, browse page, and related listings.
- *
- * Follows the design system tokens from `docs/design-system.md`:
- * - `--radius-lg` (12px) for card corners
- * - `--shadow-card` for default, `--shadow-lg` on hover
- * - `--color-primary` for "With Driver" badge
- * - `--color-text-muted` for "Without Driver" badge
- * - `--color-success` for "Delivery" and "Verified Owner" badges
- * - Card hover: translateY(-2px) with shadow increase
+ * Supports both rental and sale listings.
  */
 export function CarListingCard({
   title,
   location,
   image,
+  listingType = "rent",
   dailyPrice,
-  driverFee,
-  securityDeposit,
-  deliveryAvailable,
-  withDriver,
-  withoutDriver,
+  salePrice,
+  driverFee = 0,
+  securityDeposit = 0,
+  deliveryAvailable = false,
+  withDriver = false,
+  withoutDriver = false,
+  isNegotiable = false,
   rating,
   reviewCount,
   isVerifiedOwner = false,
@@ -46,6 +45,7 @@ export function CarListingCard({
   href,
 }: CarListingCardProps) {
   const hasRating = rating != null && rating > 0;
+  const isSale = listingType === "sale";
 
   return (
     <div className="car-listing-card group">
@@ -54,26 +54,31 @@ export function CarListingCard({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image}
-          alt={`${title} — rental car in ${location}`}
+          alt={`${title} — ${isSale ? 'car for sale' : 'rental car'} in ${location}`}
           className="car-listing-card__img"
           loading="lazy"
         />
 
         {/* Badge overlays — top-left */}
         <div className="car-listing-card__badges">
-          {withDriver && (
+          {!isSale && withDriver && (
             <span className="car-listing-card__badge car-listing-card__badge--driver">
               With Driver
             </span>
           )}
-          {withoutDriver && (
+          {!isSale && withoutDriver && (
             <span className="car-listing-card__badge car-listing-card__badge--self">
               Without Driver
             </span>
           )}
-          {deliveryAvailable && (
+          {!isSale && deliveryAvailable && (
             <span className="car-listing-card__badge car-listing-card__badge--delivery">
               Delivery
+            </span>
+          )}
+          {isSale && isNegotiable && (
+            <span className="car-listing-card__badge car-listing-card__badge--delivery">
+              Negotiable
             </span>
           )}
         </div>
@@ -125,27 +130,46 @@ export function CarListingCard({
         <div className="car-listing-card__price-block">
           <div className="car-listing-card__price-icon" aria-hidden="true">🚗</div>
           <div>
-            <div className="car-listing-card__price-label">Base Price</div>
+            <div className="car-listing-card__price-label">{isSale ? 'Sale Price' : 'Base Price'}</div>
             <div className="car-listing-card__price-value">
-              {dailyPrice ? `${dailyPrice.toLocaleString()} ETB/day` : "Contact for price"}
+              {isSale ? (
+                salePrice ? `${salePrice.toLocaleString()} ETB` : "Contact for price"
+              ) : (
+                dailyPrice ? `${dailyPrice.toLocaleString()} ETB/day` : "Contact for price"
+              )}
             </div>
           </div>
         </div>
 
-        {/* Fee breakdown */}
+        {/* Fee breakdown or Status for Sale */}
         <div className="car-listing-card__fees">
-          <div className="car-listing-card__fee-row">
-            <span className="car-listing-card__fee-label">Driver fee</span>
-            <span className="car-listing-card__fee-value">
-              {driverFee > 0 ? `+${driverFee.toLocaleString()}/day` : "Included"}
-            </span>
-          </div>
-          <div className="car-listing-card__fee-row">
-            <span className="car-listing-card__fee-label">Deposit</span>
-            <span className="car-listing-card__fee-value">
-              {securityDeposit > 0 ? securityDeposit.toLocaleString() : "0"}
-            </span>
-          </div>
+          {!isSale ? (
+            <>
+              <div className="car-listing-card__fee-row">
+                <span className="car-listing-card__fee-label">Driver fee</span>
+                <span className="car-listing-card__fee-value">
+                  {driverFee > 0 ? `+${driverFee.toLocaleString()}/day` : "Included"}
+                </span>
+              </div>
+              <div className="car-listing-card__fee-row">
+                <span className="car-listing-card__fee-label">Deposit</span>
+                <span className="car-listing-card__fee-value">
+                  {securityDeposit > 0 ? securityDeposit.toLocaleString() : "0"}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="car-listing-card__fee-row">
+                <span className="car-listing-card__fee-label">Status</span>
+                <span className="car-listing-card__fee-value">For Sale</span>
+              </div>
+              <div className="car-listing-card__fee-row">
+                <span className="car-listing-card__fee-label">Condition</span>
+                <span className="car-listing-card__fee-value">Used</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer: Rating + CTA */}
@@ -170,9 +194,9 @@ export function CarListingCard({
           <Link
             href={href}
             className="car-listing-card__cta"
-            aria-label={`Request ${title} now`}
+            aria-label={`View ${title} details`}
           >
-            Request Now →
+            {isSale ? 'View Details →' : 'Request Now →'}
           </Link>
         </div>
       </div>
