@@ -2,6 +2,7 @@ import { MarketplaceHeroSection } from "@/components/shared/MarketplaceHeroSecti
 import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
 import { FeaturedPropertiesSection } from "@/components/properties/FeaturedPropertiesSection";
 import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
+import { PropertyCategoriesSection } from "@/components/properties/PropertyCategoriesSection";
 import { TrustFeaturesSection } from "@/components/cars/TrustFeaturesSection";
 import { HowItWorksSection } from "@/components/cars/HowItWorksSection";
 import { PricingTransparencySection } from "@/components/cars/PricingTransparencySection";
@@ -30,6 +31,9 @@ export default function HomePage() {
 
       {/* Browse by Car Category */}
       <CarCategoriesSection />
+
+      {/* Browse by Property Category */}
+      <PropertyCategoriesSection />
 
       {/* Trust Features */}
       <TrustFeaturesSection />
