@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
-import RentalRequestForm from "./RentalRequestForm";
 import ListingGallery from "@/components/shared/ListingGallery";
+import { OwnerTrustCard } from "@/components/cars/OwnerTrustCard";
+import { PriceSummaryCard } from "@/components/cars/PriceSummaryCard";
+import { SimilarCars } from "@/components/cars/SimilarCars";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -60,7 +62,7 @@ export default async function CarDetailPage({
     .from("listings")
     .select(
       `
-      id, title, description, location, owner_id,
+      id, title, description, location, owner_id, listing_type,
       vehicle_details (
         make, model, year, transmission, fuel_type, seats, mileage, color, condition,
         vehicle_types ( name )
@@ -120,248 +122,179 @@ export default async function CarDetailPage({
     : (vehicleTypeRaw as { name: string } | null)?.name;
 
   return (
-    <main className="detail-page">
-      <div className="detail-container">
+    <main className="detail-page" style={{ backgroundColor: "var(--color-bg)", minHeight: "100vh", paddingBottom: "4rem" }}>
+      <div className="detail-container" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1.5rem" }}>
         {/* Image gallery */}
-        <ListingGallery images={images} title={listing.title} />
+        <div style={{ marginTop: "1.5rem", marginBottom: "2rem", borderRadius: "var(--radius-xl)", overflow: "hidden" }}>
+          <ListingGallery images={images} title={listing.title} />
+        </div>
 
         {/* Content columns */}
-        <div className="detail-content">
+        <div className="detail-content" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2rem" }}>
+          
           {/* Left: details */}
-          <div className="detail-main">
-            {/* Title + badges */}
-            <div style={{ marginBottom: "1.5rem" }}>
-              <h1 className="detail-title">{listing.title}</h1>
-              {vd && (
-                <p className="detail-subtitle">
-                  {vd.year} {vd.make} {vd.model}
-                  {vehicleTypeName ? ` · ${vehicleTypeName}` : ""}
-                </p>
-              )}
-              {listing.location && (
-                <p className="detail-location">📍 {listing.location}</p>
-              )}
-
-              <div className="detail-badges">
-                <span className="detail-badge" style={{ backgroundColor: "var(--color-surface-hover)", color: "var(--color-text-heading)", border: "1px solid var(--color-border)" }}>
-                  ⭐ {ownerRating} Owner Score {ownerReviewCount > 0 ? `(${ownerReviewCount})` : ""}
+          <div className="detail-main" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            
+            {/* Title + basic info */}
+            <div>
+              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-primary)", backgroundColor: "var(--color-primary-light)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)" }}>
+                  {listing.listing_type === "sale" ? "For Sale" : "For Rent"}
                 </span>
-                <span className="detail-badge" style={{ backgroundColor: "var(--color-surface-hover)", color: "var(--color-text-muted)", border: "1px dashed var(--color-border)" }}>
-                  🚗 Car Rating: Coming Soon
-                </span>
-
-                {isVerified && (
-                  <span className="detail-badge detail-badge--verified">
-                    ✓ Verified Owner
-                  </span>
-                )}
-                {ownerProfile?.owner_type === "rental_company" && ownerProfile.business_name && (
-                  <span className="detail-badge detail-badge--company">
-                    {ownerProfile.business_name}
-                  </span>
-                )}
                 {rt?.available_with_driver && (
-                  <span className="detail-badge detail-badge--driver">
+                  <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#fff", backgroundColor: "var(--color-primary)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)" }}>
                     Driver Available
                   </span>
                 )}
-                {rt?.available_without_driver && (
-                  <span className="detail-badge detail-badge--self">
-                    Self-drive
-                  </span>
-                )}
               </div>
+              <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1.2, marginBottom: "0.5rem" }}>
+                {listing.title}
+              </h1>
+              {listing.location && (
+                <p style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "var(--color-text-muted)", fontSize: "0.9375rem" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  {listing.location}
+                </p>
+              )}
             </div>
 
-            {/* Description */}
+            {/* Description Card */}
             {listing.description && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Description</h2>
-                <p className="detail-section__text">{listing.description}</p>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Description</h2>
+                <p style={{ color: "var(--color-text-muted)", lineHeight: 1.6, whiteSpace: "pre-line" }}>{listing.description}</p>
               </div>
             )}
 
-            {/* Vehicle specifications */}
+            {/* Vehicle specifications Card */}
             {vd && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Vehicle Specifications</h2>
-                <div className="detail-specs-grid">
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Make</span>
-                    <span className="detail-spec__value">{vd.make}</span>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Vehicle Specifications</h2>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Make & Model</span>
+                    <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{vd.make} {vd.model}</span>
                   </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Model</span>
-                    <span className="detail-spec__value">{vd.model}</span>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Year</span>
+                    <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{vd.year}</span>
                   </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Year</span>
-                    <span className="detail-spec__value">{vd.year}</span>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Transmission</span>
+                    <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{formatEnum(vd.transmission)}</span>
                   </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Transmission</span>
-                    <span className="detail-spec__value">{formatEnum(vd.transmission)}</span>
-                  </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Fuel Type</span>
-                    <span className="detail-spec__value">{formatEnum(vd.fuel_type)}</span>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Fuel Type</span>
+                    <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{formatEnum(vd.fuel_type)}</span>
                   </div>
                   {vd.seats && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Seats</span>
-                      <span className="detail-spec__value">{vd.seats}</span>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Seats</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{vd.seats}</span>
                     </div>
                   )}
                   {vd.mileage !== null && vd.mileage !== undefined && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Mileage</span>
-                      <span className="detail-spec__value">{vd.mileage.toLocaleString()} km</span>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Mileage</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{vd.mileage.toLocaleString()} km</span>
                     </div>
                   )}
                   {vd.color && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Color</span>
-                      <span className="detail-spec__value">{vd.color}</span>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Color</span>
+                      <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{vd.color}</span>
                     </div>
                   )}
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Condition</span>
-                    <span className="detail-spec__value">{formatEnum(vd.condition)}</span>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontSize: "0.75rem", textTransform: "uppercase", color: "var(--color-text-muted)", fontWeight: 600 }}>Condition</span>
+                    <span style={{ fontWeight: 500, color: "var(--color-text-heading)" }}>{formatEnum(vd.condition)}</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Pickup & Delivery */}
+            {/* Pickup & Delivery Card */}
             {rt && (
-              <div className="detail-section">
-                <h2 className="detail-section__title">Pickup &amp; Delivery</h2>
-                <div className="detail-specs-grid">
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Pickup</span>
-                    <span className="detail-spec__value">{rt.pickup_available ? "✅ Available" : "❌ Not available"}</span>
+              <div style={{ backgroundColor: "#fff", padding: "1.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--color-border)" }}>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Pickup & Delivery</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ color: "var(--color-text-heading)", fontWeight: 500 }}>Pickup Available</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>{rt.pickup_available ? "Yes" : "No"}</span>
                   </div>
-                  <div className="detail-spec">
-                    <span className="detail-spec__label">Delivery</span>
-                    <span className="detail-spec__value">{rt.delivery_available ? "✅ Available" : "❌ Not available"}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ color: "var(--color-text-heading)", fontWeight: 500 }}>Delivery Available</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>{rt.delivery_available ? "Yes" : "No"}</span>
                   </div>
-                  {rt.delivery_available && rt.delivery_fee !== null && rt.delivery_fee !== undefined && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Delivery Fee</span>
-                      <span className="detail-spec__value">{rt.delivery_fee.toLocaleString()} Birr</span>
-                    </div>
-                  )}
                   {rt.delivery_available && rt.estimated_delivery_time && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Est. Delivery</span>
-                      <span className="detail-spec__value">{formatDeliveryTime(rt.estimated_delivery_time)}</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--color-text-heading)", fontWeight: 500 }}>Est. Delivery Time</span>
+                      <span style={{ color: "var(--color-text-muted)" }}>{formatDeliveryTime(rt.estimated_delivery_time)}</span>
                     </div>
                   )}
                   {rt.minimum_rental_days > 1 && (
-                    <div className="detail-spec">
-                      <span className="detail-spec__label">Min. Rental</span>
-                      <span className="detail-spec__value">{rt.minimum_rental_days} days</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--color-text-heading)", fontWeight: 500 }}>Min. Rental Days</span>
+                      <span style={{ color: "var(--color-text-muted)" }}>{rt.minimum_rental_days} days</span>
                     </div>
                   )}
                 </div>
 
                 {rt.rental_notes && (
-                  <div className="detail-notes">
-                    <span className="detail-spec__label">Notes from owner</span>
-                    <p className="detail-section__text" style={{ marginTop: "0.25rem" }}>{rt.rental_notes}</p>
+                  <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--color-border-light)" }}>
+                    <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)" }}>Notes from Owner</span>
+                    <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginTop: "0.5rem" }}>{rt.rental_notes}</p>
                   </div>
                 )}
               </div>
             )}
+            
+            {/* Owner Trust Card (Mobile typically stacks below description, but here it's part of the main column flow for simplicity, or it can be grouped with pricing) */}
+            <div className="mobile-only-trust-card" style={{ display: "block" }}>
+              <OwnerTrustCard
+                isVerified={isVerified}
+                ownerRating={ownerRating}
+                ownerReviewCount={ownerReviewCount}
+                ownerType={ownerProfile?.owner_type}
+                businessName={ownerProfile?.business_name}
+              />
+            </div>
+            
           </div>
 
           {/* Right: pricing sidebar */}
-          <aside className="detail-sidebar">
-            <div className="detail-price-card">
-              {/* Rental Price */}
-              <div className="detail-price-hero">
-                {rt?.daily_price ? (
-                  <>
-                    <span className="detail-price-amount">
-                      {rt.daily_price.toLocaleString()}
-                    </span>
-                    <span className="detail-price-currency"> Birr</span>
-                    <span className="detail-price-unit"> / day</span>
-                  </>
-                ) : (
-                  <span className="detail-price-unit" style={{ fontSize: "1rem" }}>
-                    Contact for price
-                  </span>
-                )}
-              </div>
-
-              {/* Weekly / Monthly pricing */}
-              {(rt?.weekly_price || rt?.monthly_price) && (
-                <div className="detail-price-alt">
-                  {rt?.weekly_price && (
-                    <div className="detail-price-alt__row">
-                      <span>Weekly</span>
-                      <span>{rt.weekly_price.toLocaleString()} Birr</span>
-                    </div>
-                  )}
-                  {rt?.monthly_price && (
-                    <div className="detail-price-alt__row">
-                      <span>Monthly</span>
-                      <span>{rt.monthly_price.toLocaleString()} Birr</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Driver fee — separate section */}
-              {rt?.available_with_driver && rt.daily_driver_fee && (
-                <div className="detail-fee-section">
-                  <h4 className="detail-fee-title">Driver Fee</h4>
-                  <p className="detail-fee-note">Paid separately to the owner. Not included in rental price.</p>
-                  <div className="detail-price-alt">
-                    <div className="detail-price-alt__row">
-                      <span>Daily</span>
-                      <span>{rt.daily_driver_fee.toLocaleString()} Birr</span>
-                    </div>
-                    {rt.weekly_driver_fee && (
-                      <div className="detail-price-alt__row">
-                        <span>Weekly</span>
-                        <span>{rt.weekly_driver_fee.toLocaleString()} Birr</span>
-                      </div>
-                    )}
-                    {rt.monthly_driver_fee && (
-                      <div className="detail-price-alt__row">
-                        <span>Monthly</span>
-                        <span>{rt.monthly_driver_fee.toLocaleString()} Birr</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Security deposit */}
-              {rt && rt.security_deposit_amount > 0 && (
-                <div className="detail-fee-section">
-                  <h4 className="detail-fee-title">Security Deposit</h4>
-                  <p className="detail-fee-note">Refundable. Collected before handover.</p>
-                  <div className="detail-price-alt">
-                    <div className="detail-price-alt__row">
-                      <span>Deposit</span>
-                      <span style={{ fontWeight: 600 }}>{rt.security_deposit_amount.toLocaleString()} Birr</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* CTA Form */}
-              <RentalRequestForm
-                listingId={listing.id}
-                availableWithDriver={!!rt?.available_with_driver}
-                deliveryAvailable={!!rt?.delivery_available}
+          <aside className="detail-sidebar" style={{ width: "100%" }}>
+            <div className="desktop-only-trust-card" style={{ display: "none" }}>
+              <OwnerTrustCard
+                isVerified={isVerified}
+                ownerRating={ownerRating}
+                ownerReviewCount={ownerReviewCount}
+                ownerType={ownerProfile?.owner_type}
+                businessName={ownerProfile?.business_name}
               />
             </div>
+
+            <PriceSummaryCard
+              listingId={listing.id}
+              dailyPrice={rt?.daily_price}
+              weeklyPrice={rt?.weekly_price}
+              monthlyPrice={rt?.monthly_price}
+              availableWithDriver={!!rt?.available_with_driver}
+              availableWithoutDriver={!!rt?.available_without_driver}
+              dailyDriverFee={rt?.daily_driver_fee}
+              securityDeposit={rt?.security_deposit_amount}
+              deliveryAvailable={!!rt?.delivery_available}
+              deliveryFee={rt?.delivery_fee}
+            />
           </aside>
         </div>
+
+        {/* Similar Cars Section */}
+        <SimilarCars 
+          currentListingId={listing.id} 
+          location={listing.location} 
+          listingType={listing.listing_type} 
+        />
       </div>
     </main>
   );
