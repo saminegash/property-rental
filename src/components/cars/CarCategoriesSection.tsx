@@ -45,6 +45,20 @@ export function CarCategoriesSection() {
       color: "bg-teal-50 text-teal-600",
       link: "delivery=true",
     },
+    {
+      title: "Electric Cars",
+      description: "Eco-friendly driving",
+      icon: "⚡",
+      color: "bg-green-50 text-green-600",
+      link: "electric",
+    },
+    {
+      title: "Minibus / Van",
+      description: "Perfect for large groups",
+      icon: "🚐",
+      color: "bg-indigo-50 text-indigo-600",
+      link: "minibus",
+    },
   ];
 
   return (
