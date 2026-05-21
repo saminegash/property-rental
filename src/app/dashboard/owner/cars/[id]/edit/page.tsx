@@ -72,6 +72,12 @@ export default async function EditCarPage({
     .eq("listing_id", id)
     .order("sort_order", { ascending: true });
 
+  const { data: pendingPriceChange } = await supabase
+    .from("pending_price_changes")
+    .select("status, admin_feedback")
+    .eq("listing_id", id)
+    .single();
+
   // Determine if pricing has been set
   const hasPricing = !!(rentalTerms?.daily_price && rentalTerms.daily_price > 0);
 
@@ -99,6 +105,7 @@ export default async function EditCarPage({
               }
             : null
         }
+        pendingPriceChange={pendingPriceChange || null}
       />
 
       {/* Section 3: Driver Options */}

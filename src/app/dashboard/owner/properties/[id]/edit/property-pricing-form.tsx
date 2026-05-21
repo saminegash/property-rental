@@ -14,9 +14,13 @@ type Props = {
   listingId: string;
   listingType: "rent" | "sale";
   existingTerms: PricingTerms | null;
+  pendingPriceChange?: {
+    status: string;
+    admin_feedback: string | null;
+  } | null;
 };
 
-export default function PropertyPricingForm({ listingId, listingType, existingTerms }: Props) {
+export default function PropertyPricingForm({ listingId, listingType, existingTerms, pendingPriceChange }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,9 +47,37 @@ export default function PropertyPricingForm({ listingId, listingType, existingTe
 
   return (
     <div className="dashboard-card" style={{ maxWidth: "640px", margin: "2rem auto" }}>
-      <h2 className="dashboard-title" style={{ fontSize: "1.25rem" }}>
+      <h2 className="dashboard-title" style={{ fontSize: "1.25rem", marginBottom: "1rem" }}>
         {listingType === "rent" ? "Rental Terms" : "Sale Terms"}
       </h2>
+      
+      {pendingPriceChange && pendingPriceChange.status === "pending" && (
+        <div style={{
+          padding: "0.75rem 1rem",
+          marginBottom: "1.5rem",
+          backgroundColor: "#e0f2fe",
+          borderLeft: "4px solid var(--color-primary)",
+          borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
+          fontSize: "0.875rem",
+          color: "#0369a1",
+        }}>
+          <strong>Pending Approval:</strong> You have submitted a price change that is awaiting admin review. You can overwrite it by submitting this form again.
+        </div>
+      )}
+      
+      {pendingPriceChange && pendingPriceChange.status === "rejected" && (
+        <div style={{
+          padding: "0.75rem 1rem",
+          marginBottom: "1.5rem",
+          backgroundColor: "#fef2f2",
+          borderLeft: "4px solid var(--color-error)",
+          borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
+          fontSize: "0.875rem",
+          color: "#991b1b",
+        }}>
+          <strong>Price Change Rejected:</strong> {pendingPriceChange.admin_feedback || "The admin rejected your recent price change proposal."}
+        </div>
+      )}
       
       <form action={handleSubmit} className="auth-form">
         <input type="hidden" name="listing_id" value={listingId} />

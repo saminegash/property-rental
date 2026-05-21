@@ -177,7 +177,7 @@ export async function saveRentalPricing(formData: FormData) {
   // Verify listing ownership (RLS + defense-in-depth)
   const { data: listing, error: listingError } = await supabase
     .from("listings")
-    .select("id, owner_id")
+    .select("id, owner_id, status")
     .eq("id", listingId)
     .single();
 
@@ -207,40 +207,67 @@ export async function saveRentalPricing(formData: FormData) {
 
   const data = parseResult.data;
 
-  // Check if rental_terms already exist for this listing (upsert)
-  const { data: existing } = await supabase
-    .from("rental_terms")
-    .select("id")
-    .eq("listing_id", data.listing_id)
-    .single();
+  if (listing.status === "published") {
+    // Upsert to pending_price_changes
+    const { data: existingPending } = await supabase
+      .from("pending_price_changes")
+      .select("id")
+      .eq("listing_id", data.listing_id)
+      .single();
 
-  if (existing) {
-    const { error } = await supabase
+    if (existingPending) {
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .update({ proposed_terms: data, status: 'pending' })
+        .eq("id", existingPending.id);
+      if (error) return { error: "Failed to update pending price: " + error.message };
+    } else {
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .insert({
+          listing_id: data.listing_id,
+          owner_id: user.id,
+          listing_type: 'rent',
+          proposed_terms: data,
+        });
+      if (error) return { error: "Failed to submit price change: " + error.message };
+    }
+  } else {
+    // Normal save
+    const { data: existing } = await supabase
       .from("rental_terms")
-      .update({
+      .select("id")
+      .eq("listing_id", data.listing_id)
+      .single();
+
+    if (existing) {
+      const { error } = await supabase
+        .from("rental_terms")
+        .update({
+          daily_price: data.daily_price,
+          weekly_price: data.weekly_price,
+          monthly_price: data.monthly_price,
+          security_deposit_amount: data.security_deposit_amount,
+          minimum_rental_days: data.minimum_rental_days,
+        })
+        .eq("listing_id", data.listing_id);
+
+      if (error) {
+        return { error: "Failed to update pricing: " + error.message };
+      }
+    } else {
+      const { error } = await supabase.from("rental_terms").insert({
+        listing_id: data.listing_id,
         daily_price: data.daily_price,
         weekly_price: data.weekly_price,
         monthly_price: data.monthly_price,
         security_deposit_amount: data.security_deposit_amount,
         minimum_rental_days: data.minimum_rental_days,
-      })
-      .eq("listing_id", data.listing_id);
+      });
 
-    if (error) {
-      return { error: "Failed to update pricing: " + error.message };
-    }
-  } else {
-    const { error } = await supabase.from("rental_terms").insert({
-      listing_id: data.listing_id,
-      daily_price: data.daily_price,
-      weekly_price: data.weekly_price,
-      monthly_price: data.monthly_price,
-      security_deposit_amount: data.security_deposit_amount,
-      minimum_rental_days: data.minimum_rental_days,
-    });
-
-    if (error) {
-      return { error: "Failed to save pricing: " + error.message };
+      if (error) {
+        return { error: "Failed to save pricing: " + error.message };
+      }
     }
   }
 
@@ -284,7 +311,7 @@ export async function saveDriverOptions(formData: FormData) {
   // Verify listing ownership (RLS + defense-in-depth)
   const { data: listing, error: listingError } = await supabase
     .from("listings")
-    .select("id, owner_id")
+    .select("id, owner_id, status")
     .eq("id", listingId)
     .single();
 
@@ -329,36 +356,77 @@ export async function saveDriverOptions(formData: FormData) {
         monthly_driver_fee: null,
       };
 
-  // Check if rental_terms already exist for this listing (upsert)
-  const { data: existing } = await supabase
-    .from("rental_terms")
-    .select("id")
-    .eq("listing_id", data.listing_id)
-    .single();
+  if (listing.status === "published") {
+    // Upsert to pending_price_changes
+    const { data: existingPending } = await supabase
+      .from("pending_price_changes")
+      .select("id, proposed_terms")
+      .eq("listing_id", data.listing_id)
+      .single();
 
-  if (existing) {
-    const { error } = await supabase
-      .from("rental_terms")
-      .update({
+    if (existingPending) {
+      const mergedTerms = {
+        ...(existingPending.proposed_terms as Record<string, unknown>),
         available_with_driver: data.available_with_driver,
         available_without_driver: data.available_without_driver,
         ...driverFees,
-      })
-      .eq("listing_id", data.listing_id);
-
-    if (error) {
-      return { error: "Failed to update driver options: " + error.message };
+      };
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .update({ proposed_terms: mergedTerms, status: 'pending' })
+        .eq("id", existingPending.id);
+      if (error) return { error: "Failed to update pending driver options: " + error.message };
+    } else {
+      // Create new pending price change with current active rental terms + new driver options
+      const { data: currentTerms } = await supabase.from("rental_terms").select("*").eq("listing_id", data.listing_id).single();
+      const mergedTerms = {
+        ...(currentTerms || {}),
+        available_with_driver: data.available_with_driver,
+        available_without_driver: data.available_without_driver,
+        ...driverFees,
+      };
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .insert({
+          listing_id: data.listing_id,
+          owner_id: user.id,
+          listing_type: 'rent',
+          proposed_terms: mergedTerms,
+        });
+      if (error) return { error: "Failed to submit driver options change: " + error.message };
     }
   } else {
-    const { error } = await supabase.from("rental_terms").insert({
-      listing_id: data.listing_id,
-      available_with_driver: data.available_with_driver,
-      available_without_driver: data.available_without_driver,
-      ...driverFees,
-    });
+    // Normal save
+    const { data: existing } = await supabase
+      .from("rental_terms")
+      .select("id")
+      .eq("listing_id", data.listing_id)
+      .single();
 
-    if (error) {
-      return { error: "Failed to save driver options: " + error.message };
+    if (existing) {
+      const { error } = await supabase
+        .from("rental_terms")
+        .update({
+          available_with_driver: data.available_with_driver,
+          available_without_driver: data.available_without_driver,
+          ...driverFees,
+        })
+        .eq("listing_id", data.listing_id);
+
+      if (error) {
+        return { error: "Failed to update driver options: " + error.message };
+      }
+    } else {
+      const { error } = await supabase.from("rental_terms").insert({
+        listing_id: data.listing_id,
+        available_with_driver: data.available_with_driver,
+        available_without_driver: data.available_without_driver,
+        ...driverFees,
+      });
+
+      if (error) {
+        return { error: "Failed to save driver options: " + error.message };
+      }
     }
   }
 
@@ -402,7 +470,7 @@ export async function savePickupDelivery(formData: FormData) {
   // Verify listing ownership (RLS + defense-in-depth)
   const { data: listing, error: listingError } = await supabase
     .from("listings")
-    .select("id, owner_id")
+    .select("id, owner_id, status")
     .eq("id", listingId)
     .single();
 
@@ -450,41 +518,85 @@ export async function savePickupDelivery(formData: FormData) {
       };
 
   // Check if rental_terms already exist for this listing (upsert)
-  const { data: existing } = await supabase
-    .from("rental_terms")
-    .select("id")
-    .eq("listing_id", data.listing_id)
-    .single();
+  if (listing.status === "published") {
+    // Upsert to pending_price_changes
+    const { data: existingPending } = await supabase
+      .from("pending_price_changes")
+      .select("id, proposed_terms")
+      .eq("listing_id", data.listing_id)
+      .single();
 
-  if (existing) {
-    const { error } = await supabase
-      .from("rental_terms")
-      .update({
+    if (existingPending) {
+      const mergedTerms = {
+        ...(existingPending.proposed_terms as Record<string, unknown>),
         pickup_available: data.pickup_available,
         delivery_available: data.delivery_available,
         ...deliveryFields,
         rental_notes: data.rental_notes || null,
-      })
-      .eq("listing_id", data.listing_id);
-
-    if (error) {
-      return {
-        error: "Failed to update pickup & delivery options: " + error.message,
       };
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .update({ proposed_terms: mergedTerms, status: 'pending' })
+        .eq("id", existingPending.id);
+      if (error) return { error: "Failed to update pending pickup options: " + error.message };
+    } else {
+      // Create new pending price change with current active rental terms + new pickup options
+      const { data: currentTerms } = await supabase.from("rental_terms").select("*").eq("listing_id", data.listing_id).single();
+      const mergedTerms = {
+        ...(currentTerms || {}),
+        pickup_available: data.pickup_available,
+        delivery_available: data.delivery_available,
+        ...deliveryFields,
+        rental_notes: data.rental_notes || null,
+      };
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .insert({
+          listing_id: data.listing_id,
+          owner_id: user.id,
+          listing_type: 'rent',
+          proposed_terms: mergedTerms,
+        });
+      if (error) return { error: "Failed to submit pickup change: " + error.message };
     }
   } else {
-    const { error } = await supabase.from("rental_terms").insert({
-      listing_id: data.listing_id,
-      pickup_available: data.pickup_available,
-      delivery_available: data.delivery_available,
-      ...deliveryFields,
-      rental_notes: data.rental_notes || null,
-    });
+    // Normal save
+    const { data: existing } = await supabase
+      .from("rental_terms")
+      .select("id")
+      .eq("listing_id", data.listing_id)
+      .single();
 
-    if (error) {
-      return {
-        error: "Failed to save pickup & delivery options: " + error.message,
-      };
+    if (existing) {
+      const { error } = await supabase
+        .from("rental_terms")
+        .update({
+          pickup_available: data.pickup_available,
+          delivery_available: data.delivery_available,
+          ...deliveryFields,
+          rental_notes: data.rental_notes || null,
+        })
+        .eq("listing_id", data.listing_id);
+
+      if (error) {
+        return {
+          error: "Failed to update pickup & delivery options: " + error.message,
+        };
+      }
+    } else {
+      const { error } = await supabase.from("rental_terms").insert({
+        listing_id: data.listing_id,
+        pickup_available: data.pickup_available,
+        delivery_available: data.delivery_available,
+        ...deliveryFields,
+        rental_notes: data.rental_notes || null,
+      });
+
+      if (error) {
+        return {
+          error: "Failed to save pickup & delivery options: " + error.message,
+        };
+      }
     }
   }
 

@@ -56,6 +56,12 @@ export default async function EditPropertyPage({
     .eq("listing_id", id)
     .order("sort_order", { ascending: true });
 
+  const { data: pendingPriceChange } = await supabase
+    .from("pending_price_changes")
+    .select("status, admin_feedback")
+    .eq("listing_id", id)
+    .single();
+
   const hasPricing = !!pricingTerms && (listing.listing_type === "rent" ? !!pricingTerms.monthly_price : !!pricingTerms.sale_price);
 
   return (
@@ -70,6 +76,7 @@ export default async function EditPropertyPage({
         listingId={listing.id}
         listingType={listing.listing_type as "rent" | "sale"}
         existingTerms={pricingTerms || null}
+        pendingPriceChange={pendingPriceChange || null}
       />
 
       <ImageUploadForm

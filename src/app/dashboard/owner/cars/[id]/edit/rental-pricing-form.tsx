@@ -14,11 +14,16 @@ type RentalPricingData = {
 type Props = {
   listingId: string;
   existingPricing: RentalPricingData;
+  pendingPriceChange?: {
+    status: string;
+    admin_feedback: string | null;
+  } | null;
 };
 
 export default function RentalPricingForm({
   listingId,
   existingPricing,
+  pendingPriceChange,
 }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -51,6 +56,34 @@ export default function RentalPricingForm({
         Set your rental rates. Daily price is required. Weekly and monthly rates
         are optional discounts for longer rentals.
       </p>
+
+      {pendingPriceChange && pendingPriceChange.status === "pending" && (
+        <div style={{
+          padding: "0.75rem 1rem",
+          marginBottom: "1.5rem",
+          backgroundColor: "#e0f2fe",
+          borderLeft: "4px solid var(--color-primary)",
+          borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
+          fontSize: "0.875rem",
+          color: "#0369a1",
+        }}>
+          <strong>Pending Approval:</strong> You have submitted a price change that is awaiting admin review. You can overwrite it by submitting this form again.
+        </div>
+      )}
+      
+      {pendingPriceChange && pendingPriceChange.status === "rejected" && (
+        <div style={{
+          padding: "0.75rem 1rem",
+          marginBottom: "1.5rem",
+          backgroundColor: "#fef2f2",
+          borderLeft: "4px solid var(--color-error)",
+          borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
+          fontSize: "0.875rem",
+          color: "#991b1b",
+        }}>
+          <strong>Price Change Rejected:</strong> {pendingPriceChange.admin_feedback || "The admin rejected your recent price change proposal."}
+        </div>
+      )}
 
       {error && (
         <div className="auth-error" role="alert">

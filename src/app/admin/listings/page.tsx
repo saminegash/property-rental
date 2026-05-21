@@ -6,12 +6,26 @@ export const dynamic = "force-dynamic";
 export default async function AdminListingsPage() {
   const adminClient = createAdminClient();
 
-  // Fetch all pending_review listings with owner_id
-  const { data: listings, error: listingsError } = await adminClient
+  // Fetch pending price changes
+  const { data: pendingPriceChanges, error: priceChangesError } = await adminClient
+    .from("pending_price_changes")
+    .select("id, listing_id, proposed_terms, status, created_at")
+    .eq("status", "pending");
+
+  const pendingPriceChangeListingIds = pendingPriceChanges?.map((p) => p.listing_id) || [];
+
+  // Fetch all pending_review listings OR listings with pending price changes
+  let query = adminClient
     .from("listings")
-    .select("id, title, description, location, category, listing_type, status, owner_id, admin_notes, admin_rejection_reason, created_at")
-    .eq("status", "pending_review")
-    .order("created_at", { ascending: true });
+    .select("id, title, description, location, category, listing_type, status, owner_id, admin_notes, admin_rejection_reason, created_at");
+    
+  if (pendingPriceChangeListingIds.length > 0) {
+    query = query.or(`status.eq.pending_review,id.in.(${pendingPriceChangeListingIds.join(",")})`);
+  } else {
+    query = query.eq("status", "pending_review");
+  }
+
+  const { data: listings, error: listingsError } = await query.order("created_at", { ascending: true });
 
   if (listingsError || !listings) {
     return (
@@ -112,6 +126,7 @@ export default async function AdminListingsPage() {
 
     const rt = rentalTerms?.find((r) => r.listing_id === listing.id);
     const st = saleTerms?.find((s) => s.listing_id === listing.id);
+    const pendingChange = pendingPriceChanges?.find((p) => p.listing_id === listing.id);
 
     const listingImages = (images || []).filter(
       (img) => img.listing_id === listing.id
@@ -124,9 +139,17 @@ export default async function AdminListingsPage() {
       location: listing.location,
       category: listing.category,
       listing_type: listing.listing_type,
+      status: listing.status,
       admin_notes: listing.admin_notes,
       created_at: listing.created_at,
       owner: profile,
+      pending_price_change: pendingChange
+        ? {
+            id: pendingChange.id,
+            proposed_terms: pendingChange.proposed_terms,
+            created_at: pendingChange.created_at,
+          }
+        : null,
       vehicle_details: vd
         ? {
             make: vd.make,

@@ -89,14 +89,51 @@ export async function saveRentPricing(formData: FormData) {
   if (!parseResult.success) return { error: parseResult.error.issues[0].message };
   const data = parseResult.data;
 
-  const { data: existing } = await supabase.from("rental_terms").select("id").eq("listing_id", data.listing_id).single();
+  // Check listing status
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("status")
+    .eq("id", data.listing_id)
+    .single();
 
-  if (existing) {
-    const { error } = await supabase.from("rental_terms").update(data).eq("listing_id", data.listing_id);
-    if (error) return { error: error.message };
+  if (listingError || !listing) return { error: "Listing not found" };
+
+  if (listing.status === "published") {
+    // Upsert to pending_price_changes
+    const { data: existingPending } = await supabase
+      .from("pending_price_changes")
+      .select("id")
+      .eq("listing_id", data.listing_id)
+      .single();
+
+    if (existingPending) {
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .update({ proposed_terms: data, status: 'pending' })
+        .eq("id", existingPending.id);
+      if (error) return { error: error.message };
+    } else {
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .insert({
+          listing_id: data.listing_id,
+          owner_id: user.id,
+          listing_type: 'rent',
+          proposed_terms: data,
+        });
+      if (error) return { error: error.message };
+    }
   } else {
-    const { error } = await supabase.from("rental_terms").insert(data);
-    if (error) return { error: error.message };
+    // Normal save
+    const { data: existing } = await supabase.from("rental_terms").select("id").eq("listing_id", data.listing_id).single();
+
+    if (existing) {
+      const { error } = await supabase.from("rental_terms").update(data).eq("listing_id", data.listing_id);
+      if (error) return { error: error.message };
+    } else {
+      const { error } = await supabase.from("rental_terms").insert(data);
+      if (error) return { error: error.message };
+    }
   }
 
   revalidatePath(`/dashboard/owner/properties/${data.listing_id}/edit`);
@@ -117,14 +154,51 @@ export async function saveSalePricing(formData: FormData) {
   if (!parseResult.success) return { error: parseResult.error.issues[0].message };
   const data = parseResult.data;
 
-  const { data: existing } = await supabase.from("sale_terms").select("id").eq("listing_id", data.listing_id).single();
+  // Check listing status
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("status")
+    .eq("id", data.listing_id)
+    .single();
 
-  if (existing) {
-    const { error } = await supabase.from("sale_terms").update(data).eq("listing_id", data.listing_id);
-    if (error) return { error: error.message };
+  if (listingError || !listing) return { error: "Listing not found" };
+
+  if (listing.status === "published") {
+    // Upsert to pending_price_changes
+    const { data: existingPending } = await supabase
+      .from("pending_price_changes")
+      .select("id")
+      .eq("listing_id", data.listing_id)
+      .single();
+
+    if (existingPending) {
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .update({ proposed_terms: data, status: 'pending' })
+        .eq("id", existingPending.id);
+      if (error) return { error: error.message };
+    } else {
+      const { error } = await supabase
+        .from("pending_price_changes")
+        .insert({
+          listing_id: data.listing_id,
+          owner_id: user.id,
+          listing_type: 'sale',
+          proposed_terms: data,
+        });
+      if (error) return { error: error.message };
+    }
   } else {
-    const { error } = await supabase.from("sale_terms").insert(data);
-    if (error) return { error: error.message };
+    // Normal save
+    const { data: existing } = await supabase.from("sale_terms").select("id").eq("listing_id", data.listing_id).single();
+
+    if (existing) {
+      const { error } = await supabase.from("sale_terms").update(data).eq("listing_id", data.listing_id);
+      if (error) return { error: error.message };
+    } else {
+      const { error } = await supabase.from("sale_terms").insert(data);
+      if (error) return { error: error.message };
+    }
   }
 
   revalidatePath(`/dashboard/owner/properties/${data.listing_id}/edit`);

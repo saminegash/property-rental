@@ -147,3 +147,57 @@ export async function saveAdminNotes(listingId: string, notes: string) {
   revalidatePath("/admin/listings");
   return { success: true };
 }
+
+export async function approvePriceChange(pendingChangeId: string, listingId: string, listingType: string, proposedTerms: Record<string, unknown>) {
+  await ensureAdmin();
+  const adminClient = createAdminClient();
+
+  const table = listingType === "rent" ? "rental_terms" : "sale_terms";
+  
+  // 1. Update active terms
+  const { error: updateError } = await adminClient
+    .from(table)
+    .update(proposedTerms)
+    .eq("listing_id", listingId);
+
+  if (updateError) {
+    return { error: `Failed to update active ${table}: ` + updateError.message };
+  }
+
+  // 2. Mark pending change as approved
+  const { error: statusError } = await adminClient
+    .from("pending_price_changes")
+    .update({ status: "approved" })
+    .eq("id", pendingChangeId);
+
+  if (statusError) {
+    return { error: "Failed to update pending change status: " + statusError.message };
+  }
+
+  revalidatePath("/admin/listings");
+  revalidatePath("/");
+  revalidatePath(`/cars/${listingId}`);
+  revalidatePath(`/properties/${listingId}`);
+  return { success: true };
+}
+
+export async function rejectPriceChange(pendingChangeId: string, reason: string) {
+  await ensureAdmin();
+  const adminClient = createAdminClient();
+
+  if (!reason || reason.trim().length === 0) {
+    return { error: "A rejection reason is required" };
+  }
+
+  const { error } = await adminClient
+    .from("pending_price_changes")
+    .update({ status: "rejected", admin_feedback: reason.trim() })
+    .eq("id", pendingChangeId);
+
+  if (error) {
+    return { error: "Failed to reject price change: " + error.message };
+  }
+
+  revalidatePath("/admin/listings");
+  return { success: true, reason };
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { approveListing, rejectListing, suspendListing, saveAdminNotes } from "./actions";
+import { approveListing, rejectListing, suspendListing, saveAdminNotes, approvePriceChange, rejectPriceChange } from "./actions";
 import ListingGallery from "@/components/shared/ListingGallery";
 
 type VehicleDetails = {
@@ -60,6 +60,12 @@ type ListingImage = {
   is_primary: boolean;
 };
 
+type PendingPriceChange = {
+  id: string;
+  proposed_terms: Partial<RentalTerms & SaleTerms>;
+  created_at: string;
+};
+
 type PendingListing = {
   id: string;
   title: string;
@@ -67,6 +73,7 @@ type PendingListing = {
   location: string | null;
   category: string;
   listing_type: string;
+  status: string;
   admin_notes: string | null;
   created_at: string;
   owner: {
@@ -79,6 +86,7 @@ type PendingListing = {
   property_details: PropertyDetails | null;
   rental_terms: RentalTerms | null;
   sale_terms: SaleTerms | null;
+  pending_price_change: PendingPriceChange | null;
   images: ListingImage[];
 };
 
@@ -176,6 +184,45 @@ export default function ListingReviewCard({ listing }: Props) {
     }
   }
 
+  async function handleApprovePrice() {
+    if (!listing.pending_price_change) return;
+    setError(null);
+    setLoading(true);
+
+    const result = await approvePriceChange(
+      listing.pending_price_change.id,
+      listing.id,
+      listing.listing_type,
+      listing.pending_price_change.proposed_terms
+    );
+
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setStatus("approved");
+    }
+    setLoading(false);
+  }
+
+  async function handleRejectPrice() {
+    if (!listing.pending_price_change) return;
+    if (!rejectReason.trim()) {
+      setError("Please provide a rejection reason");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+    const result = await rejectPriceChange(listing.pending_price_change.id, rejectReason);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setStatus("rejected");
+    }
+    setLoading(false);
+  }
+
   // Post-action states
   if (status === "approved") {
     return (
@@ -216,8 +263,45 @@ export default function ListingReviewCard({ listing }: Props) {
     );
   }
 
+  const pt = listing.pending_price_change?.proposed_terms;
+
   return (
     <div className="dashboard-card" style={{ marginBottom: "1.5rem" }}>
+      {listing.pending_price_change && (
+        <div style={{
+          padding: "1rem",
+          marginBottom: "1.5rem",
+          backgroundColor: "#e0f2fe",
+          border: "1px solid #bae6fd",
+          borderRadius: "var(--radius-md)",
+        }}>
+          <h3 style={{ fontSize: "1rem", color: "#0369a1", marginBottom: "0.5rem" }}>⚠️ Price Change Pending Approval</h3>
+          <p style={{ fontSize: "0.875rem", color: "#0c4a6e", marginBottom: "1rem" }}>
+            The owner has submitted a price update for this published listing.
+          </p>
+          <div style={{ backgroundColor: "#f0f9ff", padding: "0.75rem", borderRadius: "var(--radius-sm)", fontSize: "0.875rem", color: "#0369a1" }}>
+            <strong>Proposed Terms:</strong>
+            <ul style={{ margin: "0.5rem 0 0 1.25rem", padding: 0 }}>
+              {listing.listing_type === "rent" ? (
+                <>
+                  {pt?.daily_price && <li>Daily Price: {pt.daily_price} ETB</li>}
+                  {pt?.weekly_price && <li>Weekly Price: {pt.weekly_price} ETB</li>}
+                  {pt?.monthly_price && <li>Monthly Price: {pt.monthly_price} ETB</li>}
+                  {pt?.security_deposit_amount !== undefined && <li>Security Deposit: {pt.security_deposit_amount} ETB</li>}
+                  {pt?.daily_driver_fee && <li>Daily Driver Fee: {pt.daily_driver_fee} ETB</li>}
+                  {pt?.delivery_fee !== undefined && <li>Delivery Fee: {pt.delivery_fee} ETB</li>}
+                </>
+              ) : (
+                <>
+                  {pt?.sale_price && <li>Sale Price: {pt.sale_price} ETB</li>}
+                  {pt?.is_negotiable !== undefined && <li>Negotiable: {pt.is_negotiable ? "Yes" : "No"}</li>}
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
         {/* Cover image */}
@@ -519,7 +603,68 @@ export default function ListingReviewCard({ listing }: Props) {
       )}
 
       {/* Action buttons */}
-      {!showRejectForm && !showSuspendForm ? (
+      {listing.pending_price_change ? (
+        !showRejectForm ? (
+          <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="auth-button"
+              style={{ flex: "1 1 auto", backgroundColor: "#059669" }}
+              onClick={handleApprovePrice}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "✓ Approve Price Change"}
+            </button>
+            <button
+              type="button"
+              className="auth-button"
+              style={{ flex: "1 1 auto", backgroundColor: "transparent", border: "1px solid var(--color-error-border)", color: "var(--color-error-text)" }}
+              onClick={() => setShowRejectForm(true)}
+              disabled={loading}
+            >
+              ✕ Reject Price Change
+            </button>
+          </div>
+        ) : (
+          <div style={{ marginTop: "1rem" }}>
+            <label className="form-label" style={{ marginBottom: "0.5rem", display: "block" }}>
+              Rejection reason <span style={{ fontWeight: 400, color: "var(--color-text-muted)" }}>(visible to owner)</span>
+            </label>
+            <textarea
+              className="form-input"
+              rows={3}
+              style={{ resize: "vertical", minHeight: "80px", width: "100%", marginBottom: "0.75rem" }}
+              placeholder="Explain why this price change is being rejected..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                type="button"
+                className="auth-button auth-button--secondary"
+                style={{ flex: 1 }}
+                onClick={() => {
+                  setShowRejectForm(false);
+                  setRejectReason("");
+                  setError(null);
+                }}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="auth-button"
+                style={{ flex: 1, backgroundColor: "#dc2626" }}
+                onClick={handleRejectPrice}
+                disabled={loading || !rejectReason.trim()}
+              >
+                {loading ? "Rejecting..." : "Confirm Rejection"}
+              </button>
+            </div>
+          </div>
+        )
+      ) : !showRejectForm && !showSuspendForm ? (
         <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem", flexWrap: "wrap" }}>
           <button
             type="button"
