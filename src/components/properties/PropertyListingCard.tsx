@@ -7,6 +7,7 @@ export interface PropertyListingCardProps {
   image: string;
   price: number;
   type: "rent" | "sale";
+  propertyType?: string;
   beds: number;
   baths: number;
   area: number;
@@ -31,6 +32,7 @@ export function PropertyListingCard({
   image,
   price,
   type,
+  propertyType = "Property",
   beds,
   baths,
   area,
@@ -78,7 +80,7 @@ export function PropertyListingCard({
 
         {/* Status Badge — bottom-left */}
         <div className="property-listing-card__status-badge">
-          For {type === "rent" ? "Rent" : "Sale"}
+          {propertyType} For {type === "rent" ? "Rent" : "Sale"}
         </div>
       </div>
 
