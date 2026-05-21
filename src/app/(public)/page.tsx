@@ -1,5 +1,6 @@
-import { CarHeroSection } from "@/components/cars/CarHeroSection";
+import { MarketplaceHeroSection } from "@/components/shared/MarketplaceHeroSection";
 import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
+import { FeaturedPropertiesSection } from "@/components/properties/FeaturedPropertiesSection";
 import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
 import { TrustFeaturesSection } from "@/components/cars/TrustFeaturesSection";
 import { HowItWorksSection } from "@/components/cars/HowItWorksSection";
@@ -11,20 +12,23 @@ import { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "MyProperties - Rent verified cars with or without a driver",
-  description: "Find trusted cars, request rentals, and get your car delivered within hours or days. Verified owners. Transparent pricing.",
+  title: "MyEthioProperties — Rent, Buy & Sell Cars and Properties with Trust",
+  description: "Ethiopia's verified marketplace for cars and properties. Transparent pricing, admin-reviewed listings, and secure transactions.",
 };
 
 export default function HomePage() {
   return (
     <>
-      {/* Car Hero Section */}
-      <CarHeroSection />
+      {/* Generic Marketplace Hero */}
+      <MarketplaceHeroSection />
 
       {/* Featured Cars */}
       <FeaturedCarsSection />
 
-      {/* Browse by Category */}
+      {/* Featured Properties */}
+      <FeaturedPropertiesSection />
+
+      {/* Browse by Car Category */}
       <CarCategoriesSection />
 
       {/* Trust Features */}
@@ -44,5 +48,3 @@ export default function HomePage() {
     </>
   );
 }
-
-

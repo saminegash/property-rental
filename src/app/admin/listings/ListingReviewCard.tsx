@@ -17,6 +17,22 @@ type VehicleDetails = {
   vehicle_type: { name: string } | null;
 };
 
+type PropertyDetails = {
+  property_type: { name: string } | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area_sqm: number | null;
+  floor: number | null;
+  total_floors: number | null;
+  furnished_status: string | null;
+  parking_available: boolean;
+  compound_available: boolean;
+  water_available: boolean;
+  electricity_available: boolean;
+  internet_available: boolean;
+  property_condition: string | null;
+};
+
 type RentalTerms = {
   daily_price: number | null;
   weekly_price: number | null;
@@ -55,6 +71,7 @@ type PendingListing = {
     city: string | null;
   };
   vehicle_details: VehicleDetails | null;
+  property_details: PropertyDetails | null;
   rental_terms: RentalTerms | null;
   images: ListingImage[];
 };
@@ -85,6 +102,7 @@ export default function ListingReviewCard({ listing }: Props) {
 
   const primaryImage = listing.images.find((img) => img.is_primary);
   const vd = listing.vehicle_details;
+  const pd = listing.property_details;
   const rt = listing.rental_terms;
 
   function toggleSection(section: string) {
@@ -291,16 +309,69 @@ export default function ListingReviewCard({ listing }: Props) {
           </div>
           {expandedSection === "vehicle" && (
             <div className="review-section__body">
-              <div className="review-grid">
-                <div><span className="review-label">Type</span><span className="review-value">{vd.vehicle_type?.name || "—"}</span></div>
-                <div><span className="review-label">Make / Model</span><span className="review-value">{vd.make} {vd.model}</span></div>
-                <div><span className="review-label">Year</span><span className="review-value">{vd.year}</span></div>
-                <div><span className="review-label">Transmission</span><span className="review-value">{formatEnum(vd.transmission)}</span></div>
-                <div><span className="review-label">Fuel</span><span className="review-value">{formatEnum(vd.fuel_type)}</span></div>
-                <div><span className="review-label">Seats</span><span className="review-value">{vd.seats ?? "—"}</span></div>
-                <div><span className="review-label">Mileage</span><span className="review-value">{vd.mileage ? `${vd.mileage.toLocaleString()} km` : "—"}</span></div>
-                <div><span className="review-label">Color</span><span className="review-value">{vd.color || "—"}</span></div>
-                <div><span className="review-label">Condition</span><span className="review-value">{formatEnum(vd.condition)}</span></div>
+              <div className="dashboard-card" style={{ padding: "1.25rem", gridColumn: "1 / -1" }}>
+                <h4 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem" }}>
+                  {listing.category === "vehicle" ? "Vehicle Specifications" : "Property Details"}
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem" }}>
+                  {listing.category === "vehicle" && vd && (
+                    <>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Make & Model</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.make} {vd.model}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Year</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.year}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Type</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.vehicle_type?.name || "-"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Transmission</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.transmission)}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Fuel</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.fuel_type)}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Condition</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.condition)}</div>
+                      </div>
+                    </>
+                  )}
+
+                  {listing.category === "property" && pd && (
+                    <>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Property Type</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.property_type?.name || "-"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Bedrooms</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.bedrooms || "-"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Bathrooms</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.bathrooms || "-"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Area</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.area_sqm ? `${pd.area_sqm} m²` : "-"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Furnished Status</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.furnished_status ? formatEnum(pd.furnished_status) : "-"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Condition</div>
+                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.property_condition ? formatEnum(pd.property_condition) : "-"}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}

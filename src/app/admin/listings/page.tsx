@@ -66,6 +66,13 @@ export default async function AdminListingsPage() {
     )
     .in("listing_id", listingIds);
 
+  const { data: propertyDetails } = await adminClient
+    .from("property_details")
+    .select(
+      "listing_id, property_type_id, property_types(name), bedrooms, bathrooms, area_sqm, floor, total_floors, furnished_status, parking_available, compound_available, water_available, electricity_available, internet_available, property_condition"
+    )
+    .in("listing_id", listingIds);
+
   // Fetch rental terms (pricing + driver options + delivery) for all listings
   const { data: rentalTerms } = await adminClient
     .from("rental_terms")
@@ -92,6 +99,10 @@ export default async function AdminListingsPage() {
 
     const vd = vehicleDetails?.find(
       (v) => v.listing_id === listing.id
+    );
+
+    const pd = propertyDetails?.find(
+      (p) => p.listing_id === listing.id
     );
 
     const rt = rentalTerms?.find((r) => r.listing_id === listing.id);
@@ -141,6 +152,25 @@ export default async function AdminListingsPage() {
             pickup_available: rt.pickup_available,
             delivery_available: rt.delivery_available,
             delivery_fee: rt.delivery_fee,
+          }
+        : null,
+      property_details: pd
+        ? {
+            property_type: Array.isArray(pd.property_types)
+              ? (pd.property_types[0] as { name: string } | undefined) ?? null
+              : (pd.property_types as { name: string } | null),
+            bedrooms: pd.bedrooms,
+            bathrooms: pd.bathrooms,
+            area_sqm: pd.area_sqm,
+            floor: pd.floor,
+            total_floors: pd.total_floors,
+            furnished_status: pd.furnished_status,
+            parking_available: pd.parking_available,
+            compound_available: pd.compound_available,
+            water_available: pd.water_available,
+            electricity_available: pd.electricity_available,
+            internet_available: pd.internet_available,
+            property_condition: pd.property_condition,
           }
         : null,
       images: listingImages.map((img) => ({

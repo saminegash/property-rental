@@ -7,7 +7,8 @@ import { useState } from "react";
 
 const NAV_LINKS = [
   { href: "/cars", label: "Browse Cars" },
-  { href: "/dashboard/owner/cars/new", label: "List Your Car" },
+  { href: "/properties", label: "Browse Properties" },
+  { href: "/dashboard/become-owner", label: "List with Us" },
   { href: "/#how-it-works", label: "How It Works" },
   { href: "/safety", label: "Safety" },
 ] as const;
@@ -108,8 +109,8 @@ export default function Header() {
           <Link href="/dashboard" className="text-text-heading hover:text-primary p-2 hidden sm:block font-medium text-sm" aria-label="My Dashboard">
             Dashboard
           </Link>
-          <Link href="/dashboard/owner/cars/new" className="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-sm whitespace-nowrap hidden lg:flex items-center gap-1 text-[0.875rem]">
-            List Your Car <span className="text-[1.125rem] leading-none font-normal">+</span>
+          <Link href="/dashboard/become-owner" className="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-sm whitespace-nowrap hidden lg:flex items-center gap-1 text-[0.875rem]">
+            List Now <span className="text-[1.125rem] leading-none font-normal">+</span>
           </Link>
 
           {/* Mobile hamburger */}

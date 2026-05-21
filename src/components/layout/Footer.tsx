@@ -5,8 +5,9 @@ const FOOTER_LINKS = {
   company: [
     { href: "/about", label: "About Us" },
     { href: "/#how-it-works", label: "How It Works" },
-    { href: "/dashboard/owner/listings/new", label: "List Your Car" },
-    { href: "/blog", label: "Blog" },
+    { href: "/cars", label: "Browse Cars" },
+    { href: "/properties", label: "Browse Properties" },
+    { href: "/dashboard/become-owner", label: "List with Us" },
   ],
   support: [
     { href: "/#help", label: "Help Center" },
