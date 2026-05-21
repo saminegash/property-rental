@@ -1,7 +1,15 @@
 import Link from "next/link";
 import React from "react";
 
-export function PopularLocationsSection() {
+interface PopularLocationsSectionProps {
+  baseRoute?: string;
+  subtitle?: string;
+}
+
+export function PopularLocationsSection({ 
+  baseRoute = "/cars",
+  subtitle = "Find the perfect car exactly where you need it."
+}: PopularLocationsSectionProps = {}) {
   const locations = [
     "Addis Ababa",
     "Bole",
@@ -18,14 +26,14 @@ export function PopularLocationsSection() {
       <div className="popular-locations__inner">
         <div className="popular-locations__header">
           <h2 className="popular-locations__title">Popular Locations</h2>
-          <p className="popular-locations__subtitle">Find the perfect car exactly where you need it.</p>
+          <p className="popular-locations__subtitle">{subtitle}</p>
         </div>
 
         <div className="popular-locations__grid">
           {locations.map((loc) => (
             <Link 
               key={loc} 
-              href={`/cars?location=${encodeURIComponent(loc)}`}
+              href={`${baseRoute}?location=${encodeURIComponent(loc)}`}
               className="popular-location-chip"
             >
               <svg className="popular-location-chip__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
