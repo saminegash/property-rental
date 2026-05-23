@@ -101,7 +101,22 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
 
   async function handleStatusChange(newStatus: string) {
     setIsUpdating(true);
-    await updateRequestStatus(request.id, newStatus);
+    const result = await updateRequestStatus(request.id, newStatus);
+    
+    if (result?.requiresOverride) {
+      const reason = window.prompt(
+        `${result.error}\n\nThis is an invalid transition. If you are sure you want to proceed, please provide an override reason below:`
+      );
+      if (reason) {
+        const overrideResult = await updateRequestStatus(request.id, newStatus, reason);
+        if (overrideResult?.error) {
+          alert(overrideResult.error);
+        }
+      }
+    } else if (result?.error) {
+      alert(result.error);
+    }
+    
     setIsUpdating(false);
   }
 

@@ -21,14 +21,70 @@ async function ensureAdmin() {
   }
 }
 
-export async function updateRequestStatus(requestId: string, newStatus: string) {
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  "new_request": ["admin_reviewing"],
+  "admin_reviewing": ["owner_contacted", "rejected"],
+  "owner_contacted": ["owner_available", "owner_unavailable"],
+  "owner_available": ["renter_contacted"],
+  "renter_contacted": ["awaiting_payment", "cancelled"],
+  "awaiting_payment": ["confirmed"],
+  "confirmed": ["active"],
+  "active": ["completed", "disputed"],
+  "disputed": ["completed", "cancelled"],
+  "rejected": [],
+  "owner_unavailable": [],
+  "cancelled": [],
+  "completed": [],
+};
+
+export async function updateRequestStatus(requestId: string, newStatus: string, overrideReason?: string) {
   await ensureAdmin();
 
   const adminClient = createAdminClient();
 
+  // 1. Fetch current status
+  const { data: request, error: fetchError } = await adminClient
+    .from("rental_requests")
+    .select("status, admin_notes")
+    .eq("id", requestId)
+    .single();
+
+  if (fetchError || !request) {
+    return { error: "Failed to fetch rental request" };
+  }
+
+  const currentStatus = request.status;
+  
+  // 2. Validate transition
+  const validNextStatuses = VALID_TRANSITIONS[currentStatus] || [];
+  const isValidTransition = validNextStatuses.includes(newStatus);
+
+  if (!isValidTransition && currentStatus !== newStatus) {
+    if (!overrideReason) {
+      return { 
+        error: `Invalid transition from '${currentStatus}' to '${newStatus}'.`,
+        requiresOverride: true 
+      };
+    }
+  }
+
+  // 3. Prepare updates
+  const updates: { status: string; admin_notes?: string } = { status: newStatus };
+  
+  // If it was an override, log the reason in admin_notes
+  if (!isValidTransition && currentStatus !== newStatus && overrideReason) {
+    const timestamp = new Date().toISOString();
+    const overrideNote = `[${timestamp}] SYSTEM - Status Override (${currentStatus} → ${newStatus}): ${overrideReason}`;
+    updates.admin_notes = request.admin_notes 
+      ? `${request.admin_notes}\n\n${overrideNote}`
+      : overrideNote;
+  }
+  
+  // TODO: If a status_history table is created later, insert the transition record here.
+
   const { error } = await adminClient
     .from("rental_requests")
-    .update({ status: newStatus })
+    .update(updates)
     .eq("id", requestId);
 
   if (error) {
