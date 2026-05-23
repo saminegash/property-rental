@@ -21,7 +21,13 @@ export default async function AdminListingsPage({
 
   // 1. Fetch pending price changes if needed
   let pendingPriceChangeListingIds: string[] = [];
-  let pendingPriceChanges: any[] = [];
+  let pendingPriceChanges: {
+    id: string;
+    listing_id: string;
+    proposed_terms: Record<string, unknown>;
+    status: string;
+    created_at: string;
+  }[] = [];
   
   if (reviewType === "all" || reviewType === "price_change" || status === "pending_review") {
     const { data: ppc } = await adminClient
