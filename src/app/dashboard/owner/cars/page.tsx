@@ -25,6 +25,9 @@ export default async function OwnerMyCarsPage() {
         make,
         model,
         year
+      ),
+      pending_price_changes (
+        status
       )
     `)
     .eq("owner_id", user.id)
@@ -69,6 +72,11 @@ export default async function OwnerMyCarsPage() {
               ? listing.vehicle_details[0] 
               : listing.vehicle_details;
 
+            const pendingChanges = Array.isArray(listing.pending_price_changes) 
+              ? listing.pending_price_changes 
+              : [];
+            const hasPendingPriceChange = pendingChanges.some((c: { status: string }) => c.status === "pending");
+
             return (
               <div 
                 key={listing.id} 
@@ -84,9 +92,14 @@ export default async function OwnerMyCarsPage() {
                   <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
                     {listing.title || "Untitled Listing"}
                   </h3>
-                  <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>
                     {details ? `${details.year} ${details.make} ${details.model}` : "No vehicle details added"}
                   </p>
+                  {hasPendingPriceChange && (
+                    <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", display: "inline-block" }}>
+                      ⚠️ Price Edit Pending Review
+                    </span>
+                  )}
                 </div>
                 
                 <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>

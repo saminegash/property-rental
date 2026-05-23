@@ -23,6 +23,9 @@ export default async function OwnerMyPropertiesPage() {
         bathrooms,
         area_sqm,
         property_types ( name )
+      ),
+      pending_price_changes (
+        status
       )
     `)
     .eq("owner_id", user.id)
@@ -61,12 +64,17 @@ export default async function OwnerMyPropertiesPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {listings.map((listing: any) => {
+          {listings.map((listing: { id: string; title: string | null; status: string; created_at: string; property_details: unknown; pending_price_changes: unknown }) => {
             const pdRaw = listing.property_details;
-            const pd = Array.isArray(pdRaw) ? pdRaw[0] : pdRaw;
+            const pd = Array.isArray(pdRaw) ? pdRaw[0] : (pdRaw as Record<string, unknown>);
             const propertyTypeName = Array.isArray(pd?.property_types) 
               ? pd?.property_types[0]?.name 
               : pd?.property_types?.name;
+
+            const pendingChanges = Array.isArray(listing.pending_price_changes) 
+              ? listing.pending_price_changes 
+              : [];
+            const hasPendingPriceChange = pendingChanges.some((c: { status: string }) => c.status === "pending");
 
             return (
               <div 
@@ -83,11 +91,16 @@ export default async function OwnerMyPropertiesPage() {
                   <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
                     {listing.title || "Untitled Property"}
                   </h3>
-                  <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>
                     {propertyTypeName ? propertyTypeName : "Property"}
                     {pd?.bedrooms ? ` · ${pd.bedrooms} Beds` : ""}
                     {pd?.area_sqm ? ` · ${pd.area_sqm} m²` : ""}
                   </p>
+                  {hasPendingPriceChange && (
+                    <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", display: "inline-block" }}>
+                      ⚠️ Price Edit Pending Review
+                    </span>
+                  )}
                 </div>
                 
                 <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>

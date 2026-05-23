@@ -122,6 +122,7 @@ export default async function EditCarPage({
               }
             : null
         }
+        pendingPriceChange={pendingPriceChange || null}
       />
 
       {/* Section 4: Pickup & Delivery */}
@@ -138,6 +139,7 @@ export default async function EditCarPage({
               }
             : null
         }
+        pendingPriceChange={pendingPriceChange || null}
       />
 
       {/* Section 5: Photo Gallery (5-10 required) */}

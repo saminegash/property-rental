@@ -38,7 +38,7 @@ export default async function OwnerOverviewPage() {
   // 3. Fetch Recent Activity (Limit 3)
   const { data: recentActivity } = await supabase
     .from("listings")
-    .select("id, title, category, status, created_at")
+    .select("id, title, category, status, created_at, pending_price_changes(status)")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
     .limit(3);
@@ -109,44 +109,56 @@ export default async function OwnerOverviewPage() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {recentActivity.map((listing) => (
-                <div key={listing.id} className="dashboard-card" style={{ padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
-                      <span style={{ fontSize: "0.625rem", textTransform: "uppercase", fontWeight: 700, padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: listing.category === "vehicle" ? "var(--color-primary-light)" : "var(--color-surface-hover)", color: listing.category === "vehicle" ? "var(--color-primary)" : "var(--color-text-heading)" }}>
-                        {listing.category}
-                      </span>
-                      <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--color-text-heading)" }}>
-                        {listing.title || "Untitled"}
-                      </h3>
+              {recentActivity.map((listing: { id: string; title: string | null; category: string; status: string; created_at: string; pending_price_changes: unknown }) => {
+                const pendingChanges = Array.isArray(listing.pending_price_changes) 
+                  ? listing.pending_price_changes 
+                  : [];
+                const hasPendingPriceChange = pendingChanges.some((c: { status: string }) => c.status === "pending");
+                
+                return (
+                  <div key={listing.id} className="dashboard-card" style={{ padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
+                        <span style={{ fontSize: "0.625rem", textTransform: "uppercase", fontWeight: 700, padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: listing.category === "vehicle" ? "var(--color-primary-light)" : "var(--color-surface-hover)", color: listing.category === "vehicle" ? "var(--color-primary)" : "var(--color-text-heading)" }}>
+                          {listing.category}
+                        </span>
+                        <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--color-text-heading)" }}>
+                          {listing.title || "Untitled"}
+                        </h3>
+                      </div>
+                      <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>
+                        Added {new Date(listing.created_at).toLocaleDateString()}
+                      </p>
+                      {hasPendingPriceChange && (
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", display: "inline-block" }}>
+                          ⚠️ Price Edit Pending Review
+                        </span>
+                      )}
                     </div>
-                    <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
-                      Added {new Date(listing.created_at).toLocaleDateString()}
-                    </p>
+                    
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                      <span style={{ 
+                        fontSize: "0.75rem", 
+                        fontWeight: 600, 
+                        textTransform: "uppercase", 
+                        padding: "0.25rem 0.5rem", 
+                        borderRadius: "9999px",
+                        backgroundColor: listing.status === 'published' ? 'var(--color-success-bg)' : 'var(--color-surface-hover)',
+                        color: listing.status === 'published' ? 'var(--color-success-text)' : 'var(--color-text-muted)'
+                      }}>
+                        {listing.status.replace('_', ' ')}
+                      </span>
+                      <Link 
+                        href={`/dashboard/owner/${listing.category === "vehicle" ? "cars" : "properties"}/${listing.id}/edit`}
+                        className="auth-button auth-button--secondary"
+                        style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem" }}
+                      >
+                        Edit
+                      </Link>
+                    </div>
                   </div>
-                  
-                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                    <span style={{ 
-                      fontSize: "0.75rem", 
-                      fontWeight: 600, 
-                      textTransform: "uppercase", 
-                      padding: "0.25rem 0.5rem", 
-                      borderRadius: "9999px",
-                      backgroundColor: listing.status === 'published' ? 'var(--color-success-bg)' : 'var(--color-surface-hover)',
-                      color: listing.status === 'published' ? 'var(--color-success-text)' : 'var(--color-text-muted)'
-                    }}>
-                      {listing.status.replace('_', ' ')}
-                    </span>
-                    <Link 
-                      href={`/dashboard/owner/${listing.category === "vehicle" ? "cars" : "properties"}/${listing.id}/edit`}
-                      className="auth-button auth-button--secondary"
-                      style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem" }}
-                    >
-                      Edit
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

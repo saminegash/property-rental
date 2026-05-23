@@ -14,6 +14,7 @@ type PickupDeliveryData = {
 type Props = {
   listingId: string;
   existingData: PickupDeliveryData;
+  pendingPriceChange?: { status: string; admin_feedback?: string } | null;
 };
 
 const DELIVERY_TIME_OPTIONS = [
@@ -26,6 +27,7 @@ const DELIVERY_TIME_OPTIONS = [
 export default function PickupDeliveryForm({
   listingId,
   existingData,
+  pendingPriceChange,
 }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -65,6 +67,18 @@ export default function PickupDeliveryForm({
         </strong>
         .
       </p>
+
+      {pendingPriceChange?.status === "pending" && (
+        <div style={{ padding: "0.75rem", marginBottom: "1.5rem", backgroundColor: "#fffbeb", border: "1px solid #fde68a", borderRadius: "var(--radius-sm)", fontSize: "0.875rem", color: "#92400e" }}>
+          <strong>⚠️ Pending Admin Approval:</strong> You have submitted a price modification. Your changes will not appear publicly until approved. Submitting this form again will overwrite your pending request.
+        </div>
+      )}
+      
+      {pendingPriceChange?.status === "rejected" && (
+        <div style={{ padding: "0.75rem", marginBottom: "1.5rem", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "var(--radius-sm)", fontSize: "0.875rem", color: "#991b1b" }}>
+          <strong>❌ Price Edit Rejected:</strong> {pendingPriceChange.admin_feedback || "No reason provided."} Please adjust your pricing and try again.
+        </div>
+      )}
 
       {error && (
         <div className="auth-error" role="alert">
