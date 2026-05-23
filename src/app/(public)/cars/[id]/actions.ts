@@ -49,3 +49,53 @@ export async function submitRentalRequest(formData: FormData) {
   revalidatePath(`/cars/${listing_id}`);
   return { success: true };
 }
+
+export async function submitCarSaleInquiry(formData: FormData) {
+  const supabase = await createClient();
+
+  const listing_id = formData.get("listing_id") as string;
+  const requester_name = formData.get("requester_name") as string;
+  const requester_phone = formData.get("requester_phone") as string;
+  const requester_email = formData.get("requester_email") as string;
+  const message = formData.get("message") as string;
+  const preferred_date = formData.get("preferred_date") as string;
+  const budget = formData.get("budget") as string;
+
+  if (!listing_id || !requester_name || !requester_phone) {
+    return { error: "Missing required fields" };
+  }
+
+  let finalMessage = message || "";
+  if (preferred_date || budget) {
+    const details = [];
+    if (preferred_date) details.push(`Preferred viewing date: ${preferred_date}`);
+    if (budget) details.push(`Budget: ${budget} ETB`);
+    finalMessage = `${details.join("\n")}\n\n${finalMessage}`.trim();
+  }
+
+  // Get current user if logged in
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase.from("listing_requests").insert({
+    listing_id,
+    requester_id: user?.id || null, // nullable for public users
+    requester_name,
+    requester_phone,
+    requester_email: requester_email || null,
+    request_type: "sale_inquiry",
+    message: finalMessage || null,
+    preferred_viewing_date: preferred_date || null,
+    budget_amount: budget ? parseFloat(budget) : null,
+    status: "new_request",
+  });
+
+  if (error) {
+    console.error("Error submitting car sale inquiry:", error);
+    return { error: error.message };
+  }
+
+  revalidatePath(`/cars/${listing_id}`);
+  return { success: true };
+}

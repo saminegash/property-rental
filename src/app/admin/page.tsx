@@ -16,6 +16,7 @@ export default async function AdminPage() {
     { count: publishedListings },
     { count: pendingPriceChanges },
     { count: newRentalRequests },
+    { count: newListingRequests },
     { count: activeDeals },
     { count: disputedRequests },
     { count: pendingOwnerVerifications },
@@ -29,6 +30,7 @@ export default async function AdminPage() {
     adminClient.from("listings").select("id", { count: "exact", head: true }).eq("status", "published"),
     adminClient.from("pending_price_changes").select("id", { count: "exact", head: true }).eq("status", "pending"),
     adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "new_request"),
+    adminClient.from("listing_requests").select("id", { count: "exact", head: true }).eq("status", "new_request"),
     adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "active"),
     adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "disputed"),
     adminClient.from("owner_profiles").select("id", { count: "exact", head: true }).eq("verification_status", "pending"),
@@ -64,6 +66,7 @@ export default async function AdminPage() {
         <MetricCard title="Pending Price Changes" count={pendingPriceChanges || 0} icon="💰" highlight={!!pendingPriceChanges} />
         
         <MetricCard title="New Rental Requests" count={newRentalRequests || 0} icon="📫" highlight={!!newRentalRequests} />
+        <MetricCard title="New General Inquiries" count={newListingRequests || 0} icon="💬" highlight={!!newListingRequests} />
         <MetricCard title="Active Rentals" count={activeDeals || 0} icon="🚀" />
         <MetricCard title="Disputed Requests" count={disputedRequests || 0} icon="🚨" highlight={!!disputedRequests} error />
         
@@ -86,6 +89,11 @@ export default async function AdminPage() {
           href="/admin/requests" 
           title="Manage Rental Requests" 
           description="Review new bookings, active rentals, disputes, and manage platform flow."
+        />
+        <ActionCard 
+          href="#" 
+          title="General Inquiries (TODO)" 
+          description="Review property sale and viewing inquiries."
         />
         <ActionCard 
           href="/admin/owners" 

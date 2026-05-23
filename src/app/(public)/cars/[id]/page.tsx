@@ -273,6 +273,7 @@ export default async function CarDetailPage({
 
             <PriceSummaryCard
               listingId={listing.id}
+              listingType={listing.listing_type}
               dailyPrice={rt?.daily_price}
               weeklyPrice={rt?.weekly_price}
               monthlyPrice={rt?.monthly_price}
