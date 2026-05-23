@@ -8,7 +8,8 @@ import {
   generateCommission,
   updateCommissionStatus,
   generateSecurityDeposit,
-  updateSecurityDeposit
+  updateSecurityDeposit,
+  getRequestHistory
 } from "./actions";
 
 type RequestProfile = {
@@ -93,6 +94,9 @@ function formatStatus(status: string) {
 export default function RequestReviewCard({ request }: { request: EnrichedRequest }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [history, setHistory] = useState<any[] | null>(null);
+  
   const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
   const [ownerNotes, setOwnerNotes] = useState(request.owner_response_notes || "");
   
@@ -129,6 +133,17 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
       await updateRequestOwnerNotes(request.id, ownerNotes);
     }
     setIsUpdating(false);
+  }
+
+  async function loadHistory() {
+    setHistoryLoading(true);
+    const { data, error } = await getRequestHistory(request.id);
+    if (error) {
+      alert("Error loading history: " + error);
+    } else {
+      setHistory(data || []);
+    }
+    setHistoryLoading(false);
   }
 
   return (
@@ -537,6 +552,68 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
               </div>
             </div>
 
+          </div>
+          
+          {/* Status Timeline Section */}
+          <div style={{ marginTop: "2rem", paddingTop: "2rem", borderTop: "1px solid var(--color-border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h4 style={{ fontSize: "1rem", color: "var(--color-text-heading)", margin: 0 }}>
+                Status History & Audit Log
+              </h4>
+              <button 
+                onClick={loadHistory} 
+                disabled={historyLoading}
+                className="auth-button auth-button--secondary"
+                style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem", width: "auto" }}
+              >
+                {historyLoading ? "Loading..." : "Load History"}
+              </button>
+            </div>
+            
+            {history !== null && (
+              <div style={{ backgroundColor: "var(--color-surface-hover)", padding: "1.5rem", borderRadius: "var(--radius-md)" }}>
+                {history.length === 0 ? (
+                  <p style={{ color: "var(--color-text-muted)", fontSize: "0.875rem", margin: 0 }}>
+                    No status history recorded.
+                  </p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {history.map((event) => (
+                      <div key={event.id} style={{ display: "flex", gap: "1rem", borderLeft: "2px solid var(--color-border)", paddingLeft: "1rem", position: "relative" }}>
+                        <div style={{ position: "absolute", left: "-5px", top: "4px", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: event.is_admin_override ? "var(--color-error)" : "var(--color-primary)" }} />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.25rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                              <span style={{ fontWeight: 600, fontSize: "0.875rem" }}>
+                                {formatStatus(event.old_status || "Unknown")} → {formatStatus(event.new_status)}
+                              </span>
+                              {event.is_admin_override && (
+                                <span style={{ fontSize: "0.7rem", backgroundColor: "rgba(255,0,0,0.1)", color: "var(--color-error)", padding: "0.125rem 0.375rem", borderRadius: "var(--radius-sm)", fontWeight: "bold" }}>
+                                  OVERRIDE
+                                </span>
+                              )}
+                            </div>
+                            <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+                              {new Date(event.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          
+                          <div style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>
+                            Changed by: {event.changed_by_profile ? `${event.changed_by_profile.full_name} (${event.changed_by_profile.email})` : "System/Unknown"}
+                          </div>
+                          
+                          {event.note && (
+                            <div style={{ marginTop: "0.5rem", padding: "0.5rem", backgroundColor: "rgba(0,0,0,0.03)", borderRadius: "var(--radius-sm)", fontSize: "0.8125rem", fontStyle: "italic", borderLeft: "2px solid var(--color-error)" }}>
+                              "{event.note}"
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

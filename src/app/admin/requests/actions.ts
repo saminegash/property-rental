@@ -19,6 +19,8 @@ async function ensureAdmin() {
   if (!isAdmin) {
     throw new Error("Unauthorized: Admin access required");
   }
+  
+  return user.id;
 }
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -38,7 +40,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 };
 
 export async function updateRequestStatus(requestId: string, newStatus: string, overrideReason?: string) {
-  await ensureAdmin();
+  const adminId = await ensureAdmin();
 
   const adminClient = createAdminClient();
 
@@ -80,7 +82,24 @@ export async function updateRequestStatus(requestId: string, newStatus: string, 
       : overrideNote;
   }
   
-  // TODO: If a status_history table is created later, insert the transition record here.
+  if (currentStatus !== newStatus) {
+    const { error: historyError } = await adminClient
+      .from("request_status_history")
+      .insert({
+        request_id: requestId,
+        request_table: "rental_requests",
+        old_status: currentStatus,
+        new_status: newStatus,
+        changed_by: adminId,
+        note: overrideReason || null,
+        is_admin_override: !isValidTransition,
+      });
+      
+    if (historyError) {
+      console.error("Failed to insert status history:", historyError);
+      // We log it but do not block the status update if history insertion fails
+    }
+  }
 
   const { error } = await adminClient
     .from("rental_requests")
@@ -298,4 +317,47 @@ export async function updateSecurityDeposit(depositId: string, updates: { deposi
 
   revalidatePath("/admin/requests");
   return { success: true };
+}
+
+export async function getRequestHistory(requestId: string) {
+  const adminClient = createAdminClient();
+  
+  const { data, error } = await adminClient
+    .from("request_status_history")
+    .select(`
+      id,
+      old_status,
+      new_status,
+      note,
+      is_admin_override,
+      created_at,
+      changed_by
+    `)
+    .eq("request_id", requestId)
+    .order("created_at", { ascending: false });
+    
+  if (error) {
+    return { error: error.message };
+  }
+  
+  // We fetch admin emails to display nicely in the timeline
+  if (data && data.length > 0) {
+    const userIds = [...new Set(data.map((h) => h.changed_by).filter(Boolean))];
+    if (userIds.length > 0) {
+      const { data: profiles } = await adminClient
+        .from("profiles")
+        .select("user_id, full_name, email")
+        .in("user_id", userIds);
+        
+      const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) || []);
+      
+      const enrichedData = data.map((h) => ({
+        ...h,
+        changed_by_profile: h.changed_by ? profileMap.get(h.changed_by) : null
+      }));
+      return { data: enrichedData };
+    }
+  }
+  
+  return { data };
 }
