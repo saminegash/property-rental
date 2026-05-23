@@ -91,11 +91,24 @@ function formatStatus(status: string) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+type HistoryEvent = {
+  id: string;
+  old_status: string | null;
+  new_status: string;
+  is_admin_override: boolean;
+  created_at: string;
+  note: string | null;
+  changed_by_profile?: {
+    full_name: string | null;
+    email: string | null;
+  } | null;
+};
+
 export default function RequestReviewCard({ request }: { request: EnrichedRequest }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [history, setHistory] = useState<any[] | null>(null);
+  const [history, setHistory] = useState<HistoryEvent[] | null>(null);
   
   const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
   const [ownerNotes, setOwnerNotes] = useState(request.owner_response_notes || "");
@@ -604,7 +617,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                           
                           {event.note && (
                             <div style={{ marginTop: "0.5rem", padding: "0.5rem", backgroundColor: "rgba(0,0,0,0.03)", borderRadius: "var(--radius-sm)", fontSize: "0.8125rem", fontStyle: "italic", borderLeft: "2px solid var(--color-error)" }}>
-                              "{event.note}"
+                              &quot;{event.note}&quot;
                             </div>
                           )}
                         </div>
