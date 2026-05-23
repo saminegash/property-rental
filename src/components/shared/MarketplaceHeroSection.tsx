@@ -10,9 +10,9 @@ export async function MarketplaceHeroSection() {
   const { data: carData } = await supabase
     .from("listings")
     .select(`
-      id, title, location, listing_type,
-      vehicle_details ( driver_fee, security_deposit_amount, delivery_available, with_driver, without_driver ),
-      rental_terms ( daily_price, security_deposit_amount, delivery_available, available_with_driver, available_without_driver ),
+      id, title, location, listing_type, owner_id,
+      vehicle_details ( make, model, year, seats, transmission, fuel_type, mileage, condition ),
+      rental_terms ( daily_price, security_deposit_amount, delivery_available, available_with_driver, available_without_driver, daily_driver_fee ),
       listing_images ( image_url, is_primary )
     `)
     .eq("category", "vehicle")
@@ -23,10 +23,19 @@ export async function MarketplaceHeroSection() {
 
   let featuredCar: CarListingCardProps | null = null;
   if (carData) {
-    const vd = Array.isArray(carData.vehicle_details) ? carData.vehicle_details[0] : carData.vehicle_details;
     const rt = Array.isArray(carData.rental_terms) ? carData.rental_terms[0] : carData.rental_terms;
     const images = Array.isArray(carData.listing_images) ? carData.listing_images : [];
-    const primaryImage = images.find((img: any) => img.is_primary)?.image_url || images[0]?.image_url || "/placeholder-car.jpg";
+    const primaryImage = images.find((img: { is_primary: boolean; image_url: string }) => img.is_primary)?.image_url || images[0]?.image_url || "/placeholder-car.jpg";
+
+    let isVerifiedOwner = false;
+    if (carData.owner_id) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("verification_status")
+        .eq("user_id", carData.owner_id)
+        .single();
+      isVerifiedOwner = profile?.verification_status === "verified";
+    }
 
     featuredCar = {
       id: carData.id,
@@ -34,12 +43,13 @@ export async function MarketplaceHeroSection() {
       location: carData.location,
       image: primaryImage,
       dailyPrice: rt?.daily_price || null,
-      driverFee: vd?.driver_fee || 0,
+      driverFee: rt?.daily_driver_fee || 0,
       securityDeposit: rt?.security_deposit_amount || 0,
       deliveryAvailable: rt?.delivery_available || false,
       withDriver: rt?.available_with_driver || false,
       withoutDriver: rt?.available_without_driver || false,
       isFeatured: true,
+      isVerifiedOwner,
       href: `/cars/${carData.id}`,
     };
   }
@@ -48,7 +58,7 @@ export async function MarketplaceHeroSection() {
   const { data: propData } = await supabase
     .from("listings")
     .select(`
-      id, title, location, listing_type,
+      id, title, location, listing_type, owner_id,
       property_details ( bedrooms, bathrooms, area_sqm ),
       rental_terms ( monthly_price, daily_price ),
       listing_images ( image_url, is_primary )
@@ -64,11 +74,21 @@ export async function MarketplaceHeroSection() {
     const pd = Array.isArray(propData.property_details) ? propData.property_details[0] : propData.property_details;
     const rt = Array.isArray(propData.rental_terms) ? propData.rental_terms[0] : propData.rental_terms;
     const images = Array.isArray(propData.listing_images) ? propData.listing_images : [];
-    const primaryImage = images.find((img: any) => img.is_primary)?.image_url || images[0]?.image_url || "/placeholder-property.jpg";
+    const primaryImage = images.find((img: { is_primary: boolean; image_url: string }) => img.is_primary)?.image_url || images[0]?.image_url || "/placeholder-property.jpg";
     
     // For sale properties, we might not have rental terms. In a real app we'd have a sale price field.
     // For now we'll just fall back to 0 or derive from a future field.
     const price = rt?.monthly_price || rt?.daily_price || 0;
+
+    let isVerified = false;
+    if (propData.owner_id) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("verification_status")
+        .eq("user_id", propData.owner_id)
+        .single();
+      isVerified = profile?.verification_status === "verified";
+    }
 
     featuredProperty = {
       id: propData.id,
@@ -81,6 +101,7 @@ export async function MarketplaceHeroSection() {
       baths: pd?.bathrooms || 0,
       area: pd?.area_sqm || 0,
       isFeatured: true,
+      isVerified,
       href: `/properties/${propData.id}`,
     };
   }
