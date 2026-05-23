@@ -79,36 +79,64 @@ export default function PropertyRequestForm({
       )}
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <div style={{ flex: 1 }}>
-            <label className="form-label" htmlFor="start_date">
-              Start Date
-            </label>
-            <input
-              type="date"
-              id="start_date"
-              name="start_date"
-              className="form-input"
-              required
-            />
+        {type === "rent" ? (
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <div style={{ flex: 1 }}>
+              <label className="form-label" htmlFor="start_date">
+                Start Date
+              </label>
+              <input
+                type="date"
+                id="start_date"
+                name="start_date"
+                className="form-input"
+                required
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="form-label" htmlFor="end_date">
+                End Date
+              </label>
+              <input
+                type="date"
+                id="end_date"
+                name="end_date"
+                className="form-input"
+                required
+              />
+            </div>
           </div>
-          <div style={{ flex: 1 }}>
-            <label className="form-label" htmlFor="end_date">
-              End Date
-            </label>
-            <input
-              type="date"
-              id="end_date"
-              name="end_date"
-              className="form-input"
-              required
-            />
+        ) : (
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <div style={{ flex: 1 }}>
+              <label className="form-label" htmlFor="preferred_date">
+                Preferred Viewing Date (Optional)
+              </label>
+              <input
+                type="date"
+                id="preferred_date"
+                name="preferred_date"
+                className="form-input"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="form-label" htmlFor="budget">
+                Budget ETB (Optional)
+              </label>
+              <input
+                type="number"
+                id="budget"
+                name="budget"
+                className="form-input"
+                placeholder="e.g. 5000000"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <label className="form-label" htmlFor="renter_name">
-            Full Name
+            {type === "sale" ? "Full Name" : "Full Name"}
           </label>
           <input
             type="text"
@@ -150,14 +178,14 @@ export default function PropertyRequestForm({
 
         <div>
           <label className="form-label" htmlFor="message">
-            Message to Admin (Optional)
+            Message (Optional)
           </label>
           <textarea
             id="message"
             name="message"
             className="form-input"
             rows={3}
-            placeholder="Any special requests or questions..."
+            placeholder={type === "sale" ? "I am interested in buying this property..." : "Any special requests or questions..."}
           ></textarea>
         </div>
 
