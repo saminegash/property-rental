@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { trackListingEvent } from "@/lib/analytics";
 
 export async function submitPropertyRequest(formData: FormData) {
   const supabase = await createClient();
@@ -23,6 +24,9 @@ export async function submitPropertyRequest(formData: FormData) {
   if (!listing_id || !renter_name || !renter_phone) {
     return { error: "Missing required fields" };
   }
+
+  // Fire and forget tracking
+  trackListingEvent(listing_id, "request_click");
 
   // Get current user if logged in
   const {

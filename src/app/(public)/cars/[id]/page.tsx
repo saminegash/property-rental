@@ -6,6 +6,7 @@ import { OwnerTrustCard } from "@/components/cars/OwnerTrustCard";
 import { PriceSummaryCard } from "@/components/cars/PriceSummaryCard";
 import { SimilarCars } from "@/components/cars/SimilarCars";
 import type { Metadata } from "next";
+import { trackListingEvent } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,10 @@ export default async function CarDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  
+  // Fire and forget view tracking event
+  trackListingEvent(id, "view");
+
   const supabase = await createClient();
 
   // RLS ensures only published listings are returned for public users

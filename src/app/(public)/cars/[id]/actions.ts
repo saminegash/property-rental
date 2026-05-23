@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { trackListingEvent } from "@/lib/analytics";
 
 export async function submitRentalRequest(formData: FormData) {
   const supabase = await createClient();
@@ -20,6 +21,9 @@ export async function submitRentalRequest(formData: FormData) {
   if (!listing_id || !renter_name || !renter_phone || !start_date || !end_date) {
     return { error: "Missing required fields" };
   }
+
+  // Fire and forget tracking
+  trackListingEvent(listing_id, "request_click");
 
   // Get current user if logged in
   const {
@@ -64,6 +68,9 @@ export async function submitCarSaleInquiry(formData: FormData) {
   if (!listing_id || !requester_name || !requester_phone) {
     return { error: "Missing required fields" };
   }
+
+  // Fire and forget tracking
+  trackListingEvent(listing_id, "request_click");
 
   let finalMessage = message || "";
   if (preferred_date || budget) {

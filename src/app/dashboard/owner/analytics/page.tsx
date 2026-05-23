@@ -65,6 +65,16 @@ export default async function OwnerAnalyticsPage() {
 
   const pendingPriceChangesCount = pendingPriceChanges?.length || 0;
 
+  // 4.5 Fetch Listing Events (Views)
+  const { data: listingEvents } = await supabase
+    .from("listing_events")
+    .select("id, event_type")
+    .in("listing_id", listingIds)
+    .eq("event_type", "view");
+
+  const totalViews = listingEvents?.length || 0;
+  const conversionRate = totalViews > 0 ? ((totalRequests / totalViews) * 100).toFixed(1) : "0";
+
   // 5. Find Top Performing Listing
   let topListingId: string | null = null;
   let topListingRequestCount = 0;
@@ -115,10 +125,26 @@ export default async function OwnerAnalyticsPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
         
         <div className="dashboard-card" style={{ padding: "1.5rem" }}>
+          <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Listing Views</h3>
+          <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{totalViews}</p>
+          <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+            Total page views across all listings.
+          </div>
+        </div>
+
+        <div className="dashboard-card" style={{ padding: "1.5rem" }}>
           <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Total Inquiries</h3>
           <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{totalRequests}</p>
           <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
             Combines rentals, sales, and general inquiries.
+          </div>
+        </div>
+
+        <div className="dashboard-card" style={{ padding: "1.5rem" }}>
+          <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Conversion Rate</h3>
+          <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-primary)", lineHeight: 1 }}>{conversionRate}%</p>
+          <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+            Inquiries per listing view.
           </div>
         </div>
 
@@ -175,23 +201,10 @@ export default async function OwnerAnalyticsPage() {
         Future Tracking & Insights
       </h2>
       <p style={{ color: "var(--color-text-muted)", fontSize: "0.875rem", marginBottom: "1.5rem" }}>
-        These advanced analytics features are on our roadmap. We plan to introduce a dedicated `page_views` and `user_interactions` tracking table to support these metrics securely.
+        We are continually expanding our analytics capabilities. The following metrics are on our roadmap.
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
-        {/* Planned Data: Listing Views */}
-        <FutureMetricCard 
-          title="Listing Views" 
-          description="Total times your listings appeared in search results or detail pages."
-        />
-
-        {/* Planned Data: Conversion Summary */}
-        <FutureMetricCard 
-          title="Conversion Rate" 
-          description="Percentage of views that turn into inquiries."
-          unit="%"
-        />
-
         {/* Planned Data: Favorite Count */}
         <FutureMetricCard 
           title="Favorite Saves" 
