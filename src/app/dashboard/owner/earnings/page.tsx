@@ -25,8 +25,9 @@ export default async function OwnerEarningsPage() {
   // 2. Fetch Rental Requests for those listings
   const { data: rentalRequests } = await supabase
     .from("rental_requests")
-    .select("id, status, listing_id")
-    .in("listing_id", listingIds);
+    .select("id, status, listing_id, start_date, end_date")
+    .in("listing_id", listingIds)
+    .order("end_date", { ascending: false });
 
   const requestIds = rentalRequests?.map((r) => r.id) || [];
 
@@ -37,19 +38,59 @@ export default async function OwnerEarningsPage() {
     .in("rental_request_id", requestIds)
     .order("created_at", { ascending: false });
 
-  // 4. Calculate Earnings Metrics
+  // 4. Fetch Security Deposits for those requests
+  const { data: securityDeposits } = await supabase
+    .from("security_deposits")
+    .select("id, rental_request_id, deposit_amount, deposit_status")
+    .in("rental_request_id", requestIds);
+
+  // 5. Calculate Metrics
   const completedRequests = rentalRequests?.filter(r => r.status === "completed") || [];
+  const confirmedRequests = rentalRequests?.filter(r => r.status === "confirmed" || r.status === "active") || [];
+  
   const completedRequestIds = completedRequests.map(r => r.id);
 
-  // We consider "Gross Earnings" as the sum of commission_base_amount for completed rentals
-  // Platform Commission is the sum of commission_amount for completed rentals
+  // We rely on 'commission_base_amount' to ensure we never fake data and align with admin billing
   const completedCommissions = commissions?.filter(c => completedRequestIds.includes(c.rental_request_id)) || [];
   
   const totalGrossEarnings = completedCommissions.reduce((sum, c) => sum + (c.commission_base_amount || 0), 0);
   const totalPlatformCommission = completedCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
   const netEarnings = totalGrossEarnings - totalPlatformCommission;
   
-  const totalCompletedDeals = completedRequests.length;
+  const pendingCommissionsAmount = commissions?.filter(c => c.commission_status === "pending").reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0;
+  const collectedCommissionsAmount = commissions?.filter(c => c.commission_status === "paid" || c.commission_status === "collected").reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0;
+
+  const totalSecurityDepositsHeld = securityDeposits?.filter(d => d.deposit_status === "held").reduce((sum, d) => sum + (d.deposit_amount || 0), 0) || 0;
+  const totalSecurityDepositsWithheld = securityDeposits?.filter(d => d.deposit_status === "withheld").reduce((sum, d) => sum + (d.deposit_amount || 0), 0) || 0;
+
+  // Earnings by Listing
+  const earningsByListing = listings?.map(listing => {
+    const reqs = completedRequests.filter(r => r.listing_id === listing.id).map(r => r.id);
+    const comms = completedCommissions.filter(c => reqs.includes(c.rental_request_id));
+    const gross = comms.reduce((sum, c) => sum + (c.commission_base_amount || 0), 0);
+    const comm = comms.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
+    return {
+      id: listing.id,
+      title: listing.title,
+      deals: reqs.length,
+      gross,
+      net: gross - comm
+    };
+  }).filter(l => l.deals > 0).sort((a, b) => b.net - a.net) || [];
+
+  // Recent Completed Deals
+  const recentDeals = completedRequests.slice(0, 5).map(req => {
+    const comm = completedCommissions.find(c => c.rental_request_id === req.id);
+    const listing = listings?.find(l => l.id === req.listing_id);
+    return {
+      id: req.id,
+      listingTitle: listing?.title || "Unknown Listing",
+      endDate: req.end_date,
+      gross: comm?.commission_base_amount || 0,
+      commission: comm?.commission_amount || 0,
+      net: (comm?.commission_base_amount || 0) - (comm?.commission_amount || 0)
+    };
+  });
 
   const pendingCommissions = commissions?.filter(c => c.commission_status === "pending") || [];
   
@@ -75,7 +116,7 @@ export default async function OwnerEarningsPage() {
           <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Net Earnings</h3>
           <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-success-text)", lineHeight: 1 }}>{formatCurrency(netEarnings)}</p>
           <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
-            Your finalized take-home pay.
+            Total Gross minus Platform Commission
           </div>
         </div>
 
@@ -83,34 +124,81 @@ export default async function OwnerEarningsPage() {
           <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Gross Earnings</h3>
           <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{formatCurrency(totalGrossEarnings)}</p>
           <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
-            Total revenue from completed deals.
+            Base rental revenue (excludes fees)
           </div>
         </div>
 
         <div className="dashboard-card" style={{ padding: "1.5rem" }}>
-          <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Platform Commission</h3>
-          <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{formatCurrency(totalPlatformCommission)}</p>
-          <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
-            5% deducted from gross rental price.
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Platform Commission</h3>
+              <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{formatCurrency(totalPlatformCommission)}</p>
+            </div>
+          </div>
+          <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)", display: "flex", justifyContent: "space-between" }}>
+            <span>Pending: {formatCurrency(pendingCommissionsAmount)}</span>
+            <span>Collected: {formatCurrency(collectedCommissionsAmount)}</span>
           </div>
         </div>
 
         <div className="dashboard-card" style={{ padding: "1.5rem" }}>
-          <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Completed Deals</h3>
-          <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{totalCompletedDeals}</p>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Deals</h3>
+              <p style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1 }}>{completedRequests.length}</p>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <h3 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>Active</h3>
+              <p style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-primary)", lineHeight: 1 }}>{confirmedRequests.length}</p>
+            </div>
+          </div>
           <div style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
-            Successfully finalized rentals.
+            Completed vs currently active/confirmed.
           </div>
         </div>
       </div>
 
-      {/* Pending Transactions Section */}
-      <div>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1.5rem" }}>Pending Commission & Payouts</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "3rem" }}>
+        {/* Security Deposits Summary */}
+        <div className="dashboard-card" style={{ padding: "1.5rem" }}>
+          <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Security Deposits</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "0.5rem", borderBottom: "1px solid var(--color-border-light)" }}>
+              <span style={{ color: "var(--color-text-muted)" }}>Currently Held by Admin</span>
+              <span style={{ fontWeight: 600 }}>{formatCurrency(totalSecurityDepositsHeld)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "var(--color-text-muted)" }}>Withheld for Damages (Payouts)</span>
+              <span style={{ fontWeight: 600, color: "var(--color-primary)" }}>{formatCurrency(totalSecurityDepositsWithheld)}</span>
+            </div>
+          </div>
+        </div>
         
-        {pendingCommissions.length === 0 ? (
+        {/* Earnings By Listing */}
+        <div className="dashboard-card" style={{ padding: "1.5rem" }}>
+          <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1rem" }}>Top Earning Listings</h2>
+          {earningsByListing.length === 0 ? (
+            <p style={{ color: "var(--color-text-muted)", fontSize: "0.875rem" }}>No completed deals yet.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {earningsByListing.slice(0, 3).map(listing => (
+                <div key={listing.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ color: "var(--color-text-heading)", fontSize: "0.875rem", fontWeight: 500 }}>{listing.title} ({listing.deals})</span>
+                  <span style={{ fontWeight: 600, fontSize: "0.875rem" }}>{formatCurrency(listing.net)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Deals Table */}
+      <div style={{ marginBottom: "3rem" }}>
+        <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)", marginBottom: "1.5rem" }}>Recent Completed Deals</h2>
+        
+        {recentDeals.length === 0 ? (
           <div className="dashboard-card" style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
-            <p className="dashboard-hint">You have no pending commissions or unfinalized payouts. Great job!</p>
+            <p className="dashboard-hint">You have no recently completed deals.</p>
           </div>
         ) : (
           <div className="dashboard-card" style={{ padding: "0" }}>
@@ -118,34 +206,30 @@ export default async function OwnerEarningsPage() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--color-border)", backgroundColor: "var(--color-surface)" }}>
-                    <th style={{ padding: "1rem", textAlign: "left", fontWeight: 600, color: "var(--color-text-muted)" }}>Date</th>
-                    <th style={{ padding: "1rem", textAlign: "left", fontWeight: 600, color: "var(--color-text-muted)" }}>Request ID</th>
-                    <th style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-text-muted)" }}>Base Amount</th>
-                    <th style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-text-muted)" }}>Commission (5%)</th>
-                    <th style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-text-muted)" }}>Status</th>
+                    <th style={{ padding: "1rem", textAlign: "left", fontWeight: 600, color: "var(--color-text-muted)" }}>End Date</th>
+                    <th style={{ padding: "1rem", textAlign: "left", fontWeight: 600, color: "var(--color-text-muted)" }}>Listing</th>
+                    <th style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-text-muted)" }}>Gross</th>
+                    <th style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-text-muted)" }}>Comm. (5%)</th>
+                    <th style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-text-heading)" }}>Net</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pendingCommissions.map((c) => (
-                    <tr key={c.id} style={{ borderBottom: "1px solid var(--color-surface-hover)" }}>
+                  {recentDeals.map((deal) => (
+                    <tr key={deal.id} style={{ borderBottom: "1px solid var(--color-surface-hover)" }}>
                       <td style={{ padding: "1rem", color: "var(--color-text)" }}>
-                        {new Date(c.created_at).toLocaleDateString()}
+                        {new Date(deal.endDate).toLocaleDateString()}
                       </td>
-                      <td style={{ padding: "1rem", color: "var(--color-text)" }}>
-                        <Link href={`/dashboard/owner/requests`} className="text-primary hover:underline">
-                          {c.rental_request_id.split('-')[0]}...
-                        </Link>
+                      <td style={{ padding: "1rem", color: "var(--color-text)", fontWeight: 500 }}>
+                        {deal.listingTitle}
                       </td>
                       <td style={{ padding: "1rem", textAlign: "right", color: "var(--color-text)" }}>
-                        {formatCurrency(c.commission_base_amount)}
+                        {formatCurrency(deal.gross)}
                       </td>
                       <td style={{ padding: "1rem", textAlign: "right", color: "var(--color-text)" }}>
-                        {formatCurrency(c.commission_amount)}
+                        {formatCurrency(deal.commission)}
                       </td>
-                      <td style={{ padding: "1rem", textAlign: "right" }}>
-                        <span style={{ color: "#d97706", backgroundColor: "#fef3c7", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-full)", fontSize: "0.75rem", fontWeight: 500 }}>
-                          Pending
-                        </span>
+                      <td style={{ padding: "1rem", textAlign: "right", fontWeight: 600, color: "var(--color-success-text)" }}>
+                        {formatCurrency(deal.net)}
                       </td>
                     </tr>
                   ))}
@@ -156,6 +240,9 @@ export default async function OwnerEarningsPage() {
         )}
       </div>
 
+      <div style={{ padding: "1rem", backgroundColor: "var(--color-surface)", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border-light)", fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+        <strong>Calculation Note:</strong> Driver fees, delivery fees, and security deposits are explicitly excluded from the base rental revenue subject to commission. Platform commission strictly applies to the base daily/weekly/monthly rate. Revenue amounts only populate after an administrator finalizes a request and generates a commission statement.
+      </div>
     </div>
   );
 }
