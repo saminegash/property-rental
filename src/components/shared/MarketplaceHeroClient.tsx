@@ -30,8 +30,8 @@ export function MarketplaceHeroClient({
     const listingType = formData.get("listing_type") as string;
     if (listingType) searchParams.set("listing_type", listingType);
 
-    const driverOption = formData.get("driver_option") as string;
-    if (driverOption && listingType !== "sale") searchParams.set("driver_option", driverOption);
+    const driver = formData.get("driver") as string;
+    if (driver && listingType !== "sale") searchParams.set("driver", driver);
 
     router.push(`/cars?${searchParams.toString()}`);
   }
@@ -115,10 +115,10 @@ export function MarketplaceHeroClient({
                 <div className="hero-search-row">
                   <div>
                     <label className="form-label" style={{ fontSize: "0.75rem", marginBottom: "0.25rem" }}>Driver Option (Rentals)</label>
-                    <select name="driver_option" className="form-input">
+                    <select name="driver" className="form-input">
                       <option value="">Any</option>
-                      <option value="with_driver">With Driver</option>
-                      <option value="without_driver">Without Driver</option>
+                      <option value="with">With Driver</option>
+                      <option value="without">Without Driver</option>
                     </select>
                   </div>
                 </div>

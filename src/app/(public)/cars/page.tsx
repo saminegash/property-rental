@@ -27,6 +27,7 @@ type SearchParams = {
   start?: string;
   end?: string;
   driver?: "with" | "without" | string;
+  driver_option?: string;
   delivery?: "true" | string;
   category?: string;
   min_price?: string;
@@ -90,6 +91,12 @@ export default async function BrowseCarsPage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
+
+  // Backwards compatibility for old driver_option params
+  if (!params.driver && params.driver_option) {
+    if (params.driver_option === "with_driver") params.driver = "with";
+    else if (params.driver_option === "without_driver") params.driver = "without";
+  }
 
   // Active filter summary
   const hasFilters = !!(params.forceFilters || params.listing_type || params.location || params.driver || params.delivery || params.min_price || params.max_price);
