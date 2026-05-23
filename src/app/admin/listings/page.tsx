@@ -1,42 +1,124 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import ListingReviewCard from "./ListingReviewCard";
+import ListingFilters from "./ListingFilters";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminListingsPage() {
+export default async function AdminListingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const adminClient = createAdminClient();
+  const params = await searchParams;
 
-  // Fetch pending price changes
-  const { data: pendingPriceChanges, error: priceChangesError } = await adminClient
-    .from("pending_price_changes")
-    .select("id, listing_id, proposed_terms, status, created_at")
-    .eq("status", "pending");
+  const status = typeof params.status === "string" ? params.status : "pending_review";
+  const category = typeof params.category === "string" ? params.category : "all";
+  const listingType = typeof params.listing_type === "string" ? params.listing_type : "all";
+  const reviewType = typeof params.review_type === "string" ? params.review_type : "all";
+  const location = typeof params.location === "string" ? params.location : "";
+  const owner = typeof params.owner === "string" ? params.owner : "";
 
-  const pendingPriceChangeListingIds = pendingPriceChanges?.map((p) => p.listing_id) || [];
+  // 1. Fetch pending price changes if needed
+  let pendingPriceChangeListingIds: string[] = [];
+  let pendingPriceChanges: any[] = [];
+  
+  if (reviewType === "all" || reviewType === "price_change" || status === "pending_review") {
+    const { data: ppc } = await adminClient
+      .from("pending_price_changes")
+      .select("id, listing_id, proposed_terms, status, created_at")
+      .eq("status", "pending");
+      
+    pendingPriceChanges = ppc || [];
+    pendingPriceChangeListingIds = pendingPriceChanges.map((p) => p.listing_id);
+  }
 
-  // Fetch all pending_review listings OR listings with pending price changes
+  // 2. Resolve owner search if provided
+  let ownerIdsFilter: string[] | null = null;
+  if (owner) {
+    const { data: matchingProfiles } = await adminClient
+      .from("profiles")
+      .select("user_id")
+      .or(`full_name.ilike.%${owner}%,email.ilike.%${owner}%`);
+      
+    if (matchingProfiles && matchingProfiles.length > 0) {
+      ownerIdsFilter = matchingProfiles.map((p) => p.user_id);
+    } else {
+      // Owner search matched nobody
+      ownerIdsFilter = [];
+    }
+  }
+
+  // 3. Build main listings query
   let query = adminClient
     .from("listings")
     .select("id, title, description, location, category, listing_type, status, owner_id, admin_notes, admin_rejection_reason, created_at");
-    
-  if (pendingPriceChangeListingIds.length > 0) {
-    query = query.or(`status.eq.pending_review,id.in.(${pendingPriceChangeListingIds.join(",")})`);
-  } else {
+
+  // Apply status / review type complex logic
+  if (reviewType === "price_change") {
+    // ONLY show listings that have pending price changes
+    if (pendingPriceChangeListingIds.length > 0) {
+      query = query.in("id", pendingPriceChangeListingIds);
+    } else {
+      // Force empty result
+      query = query.eq("id", "00000000-0000-0000-0000-000000000000");
+    }
+  } else if (reviewType === "new_listing") {
     query = query.eq("status", "pending_review");
+    if (pendingPriceChangeListingIds.length > 0) {
+      query = query.not("id", "in", `(${pendingPriceChangeListingIds.join(",")})`);
+    }
+  } else {
+    // Normal status filtering
+    if (status !== "all") {
+      if (status === "pending_review" && pendingPriceChangeListingIds.length > 0) {
+        query = query.or(`status.eq.pending_review,id.in.(${pendingPriceChangeListingIds.join(",")})`);
+      } else {
+        query = query.eq("status", status);
+      }
+    }
   }
 
-  const { data: listings, error: listingsError } = await query.order("created_at", { ascending: true });
+  // Apply other filters
+  if (category !== "all") {
+    query = query.eq("category", category);
+  }
+  
+  if (listingType !== "all") {
+    query = query.eq("listing_type", listingType);
+  }
+  
+  if (location) {
+    query = query.ilike("location", `%${location}%`);
+  }
+  
+  if (ownerIdsFilter !== null) {
+    if (ownerIdsFilter.length > 0) {
+      query = query.in("owner_id", ownerIdsFilter);
+    } else {
+      query = query.eq("owner_id", "00000000-0000-0000-0000-000000000000"); // Force empty
+    }
+  }
+
+  const { data: listings, error: listingsError } = await query.order("created_at", { ascending: false });
 
   if (listingsError || !listings) {
     return (
       <div className="dashboard-card">
-        <h1 className="dashboard-title">Pending Listings</h1>
+        <h1 className="dashboard-title">Listings Management</h1>
         <div className="auth-error">
           Error loading listings: {listingsError?.message}
         </div>
       </div>
     );
   }
+
+  let title = "Listings Management";
+  if (status === "pending_review") title = "Pending Listings";
+  if (status === "published") title = "Published Listings";
+  if (status === "rejected") title = "Rejected Listings";
+  if (status === "archived") title = "Archived Listings";
+  if (status === "suspended") title = "Suspended Listings";
 
   if (listings.length === 0) {
     return (
@@ -50,12 +132,15 @@ export default async function AdminListingsPage() {
           }}
         >
           <h1 className="dashboard-title" style={{ marginBottom: 0 }}>
-            Pending Listings
+            {title}
           </h1>
         </div>
+        
+        <ListingFilters />
+        
         <div className="dashboard-card">
           <p className="dashboard-hint">
-            🎉 No listings pending review. All caught up!
+            🎉 No listings found matching your filters.
           </p>
         </div>
       </div>
@@ -227,12 +312,14 @@ export default async function AdminListingsPage() {
         }}
       >
         <h1 className="dashboard-title" style={{ marginBottom: 0 }}>
-          Pending Listings
+          {title}
         </h1>
         <span className="status-badge status-badge--pending">
-          {listings.length} pending
+          {listings.length} results
         </span>
       </div>
+
+      <ListingFilters />
 
       {enrichedListings.map((listing) => (
         <ListingReviewCard key={listing.id} listing={listing} />
