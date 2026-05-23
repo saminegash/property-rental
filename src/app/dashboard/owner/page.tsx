@@ -19,7 +19,7 @@ export default async function OwnerOverviewPage() {
 
   const totalListings = listings?.length || 0;
   const publishedListings = listings?.filter(l => l.status === "published").length || 0;
-  const pendingListings = listings?.filter(l => l.status === "pending").length || 0;
+  const pendingListings = listings?.filter(l => l.status === "pending_review").length || 0;
   const rejectedListings = listings?.filter(l => l.status === "rejected").length || 0;
 
   // 2. Fetch Requests Data

@@ -243,7 +243,7 @@ export async function submitPropertyForReview(listingId: string) {
   // Update status
   const { error: updateError } = await supabase
     .from("listings")
-    .update({ status: "pending" }) // pending review
+    .update({ status: "pending_review" }) // pending review
     .eq("id", listingId);
 
   if (updateError) return { error: updateError.message };
