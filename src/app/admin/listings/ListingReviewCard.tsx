@@ -100,6 +100,209 @@ function formatEnum(value: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function WarningBanner({ message }: { message: string }) {
+  return (
+    <div style={{
+      padding: "0.75rem",
+      marginBottom: "1rem",
+      backgroundColor: "#fef2f2",
+      border: "1px solid #f87171",
+      borderRadius: "var(--radius-sm)",
+      fontSize: "0.875rem",
+      color: "#991b1b",
+    }}>
+      ⚠️ {message}
+    </div>
+  );
+}
+
+function VehicleReviewSection({ vd, expanded, onToggle }: { vd: VehicleDetails | null, expanded: boolean, onToggle: () => void }) {
+  if (!vd) return <WarningBanner message="Vehicle details are missing for this vehicle listing." />;
+  return (
+    <div className="review-section" style={{ cursor: "pointer" }} onClick={onToggle}>
+      <div className="review-section__header">
+        <span>🚗 Vehicle Details</span>
+        <span style={{ fontSize: "0.75rem" }}>{expanded ? "▲" : "▼"}</span>
+      </div>
+      {expanded && (
+        <div className="review-section__body">
+          <div className="dashboard-card" style={{ padding: "1.25rem" }}>
+            <h4 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem" }}>
+              Vehicle Specifications
+            </h4>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem" }}>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Make & Model</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.make} {vd.model}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Year</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.year}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Type</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.vehicle_type?.name || "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Transmission</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.transmission)}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Fuel</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.fuel_type)}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Seats</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.seats || "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Mileage</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.mileage ? `${vd.mileage} km` : "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Condition</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.condition)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PropertyReviewSection({ pd, expanded, onToggle }: { pd: PropertyDetails | null, expanded: boolean, onToggle: () => void }) {
+  if (!pd) return <WarningBanner message="Property details are missing for this property listing." />;
+  return (
+    <div className="review-section" style={{ cursor: "pointer" }} onClick={onToggle}>
+      <div className="review-section__header">
+        <span>🏢 Property Details</span>
+        <span style={{ fontSize: "0.75rem" }}>{expanded ? "▲" : "▼"}</span>
+      </div>
+      {expanded && (
+        <div className="review-section__body">
+          <div className="dashboard-card" style={{ padding: "1.25rem" }}>
+            <h4 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem" }}>
+              Property Details
+            </h4>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem" }}>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Property Type</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.property_type?.name || "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Bedrooms</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.bedrooms || "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Bathrooms</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.bathrooms || "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Area</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.area_sqm ? `${pd.area_sqm} m²` : "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Floor</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.floor !== null ? pd.floor : "-"} {pd.total_floors ? `/ ${pd.total_floors}` : ""}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Furnished Status</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.furnished_status ? formatEnum(pd.furnished_status) : "-"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Utilities & Features</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500, display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  {pd.parking_available && <span title="Parking">🅿️</span>}
+                  {pd.compound_available && <span title="Compound">🏡</span>}
+                  {pd.water_available && <span title="Water">💧</span>}
+                  {pd.electricity_available && <span title="Electricity">⚡</span>}
+                  {pd.internet_available && <span title="Internet">🌐</span>}
+                  {(!pd.parking_available && !pd.compound_available && !pd.water_available && !pd.electricity_available && !pd.internet_available) && "-"}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Condition</div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.property_condition ? formatEnum(pd.property_condition) : "-"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RentalTermsReviewSection({ rt, listingCategory, expanded, onToggle }: { rt: RentalTerms | null, listingCategory: string, expanded: boolean, onToggle: () => void }) {
+  if (!rt) return <WarningBanner message="Rental terms are missing for this rental listing." />;
+  return (
+    <div className="review-section" style={{ cursor: "pointer" }} onClick={onToggle}>
+      <div className="review-section__header">
+        <span>💰 Rental Terms</span>
+        <span style={{ fontSize: "0.75rem" }}>{expanded ? "▲" : "▼"}</span>
+      </div>
+      {expanded && (
+        <div className="review-section__body">
+          <div className="review-grid">
+            <div><span className="review-label">Daily price</span><span className="review-value">{rt.daily_price ? `${rt.daily_price.toLocaleString()} ETB` : "—"}</span></div>
+            <div><span className="review-label">Weekly price</span><span className="review-value">{rt.weekly_price ? `${rt.weekly_price.toLocaleString()} ETB` : "—"}</span></div>
+            <div><span className="review-label">Monthly price</span><span className="review-value">{rt.monthly_price ? `${rt.monthly_price.toLocaleString()} ETB` : "—"}</span></div>
+            <div><span className="review-label">Security deposit</span><span className="review-value">{rt.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()} ETB` : "0"}</span></div>
+            <div><span className="review-label">Min rental days</span><span className="review-value">{rt.minimum_rental_days}</span></div>
+            {rt.daily_price && (
+              <div><span className="review-label">Commission (5%)</span><span className="review-value">{`${Math.round(rt.daily_price * 0.05).toLocaleString()} ETB/day`}</span></div>
+            )}
+          </div>
+
+          {listingCategory === "vehicle" && (
+            <>
+              <h4 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)", marginTop: "1.5rem", marginBottom: "1rem" }}>
+                Driver & Delivery
+              </h4>
+              <div className="review-grid">
+                <div><span className="review-label">Self-drive</span><span className="review-value">{rt.available_without_driver ? "✅ Yes" : "❌ No"}</span></div>
+                <div><span className="review-label">With driver</span><span className="review-value">{rt.available_with_driver ? "✅ Yes" : "❌ No"}</span></div>
+                {rt.available_with_driver && (
+                  <>
+                    <div><span className="review-label">Daily driver fee</span><span className="review-value">{rt.daily_driver_fee ? `${rt.daily_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Weekly driver fee</span><span className="review-value">{rt.weekly_driver_fee ? `${rt.weekly_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
+                    <div><span className="review-label">Monthly driver fee</span><span className="review-value">{rt.monthly_driver_fee ? `${rt.monthly_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
+                  </>
+                )}
+                <div><span className="review-label">Pickup</span><span className="review-value">{rt.pickup_available ? "✅ Yes" : "❌ No"}</span></div>
+                <div><span className="review-label">Delivery</span><span className="review-value">{rt.delivery_available ? "✅ Yes" : "❌ No"}</span></div>
+                {rt.delivery_available && rt.delivery_fee !== null && (
+                  <div><span className="review-label">Delivery fee</span><span className="review-value">{rt.delivery_fee.toLocaleString()} ETB</span></div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SaleTermsReviewSection({ st, expanded, onToggle }: { st: SaleTerms | null, expanded: boolean, onToggle: () => void }) {
+  if (!st) return <WarningBanner message="Sale terms are missing for this sale listing." />;
+  return (
+    <div className="review-section" style={{ cursor: "pointer" }} onClick={onToggle}>
+      <div className="review-section__header">
+        <span>💰 Sale Terms</span>
+        <span style={{ fontSize: "0.75rem" }}>{expanded ? "▲" : "▼"}</span>
+      </div>
+      {expanded && (
+        <div className="review-section__body">
+          <div className="review-grid">
+            <div><span className="review-label">Sale Price</span><span className="review-value">{st.sale_price ? `${st.sale_price.toLocaleString()} ETB` : "—"}</span></div>
+            <div><span className="review-label">Negotiable</span><span className="review-value">{st.is_negotiable ? "✅ Yes" : "❌ No"}</span></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ListingReviewCard({ listing }: Props) {
   const [status, setStatus] = useState<
     "pending" | "approved" | "rejected" | "suspended"
@@ -387,158 +590,37 @@ export default function ListingReviewCard({ listing }: Props) {
         )}
       </div>
 
-      {/* Vehicle Details */}
-      {vd && (
-        <div
-          className="review-section"
-          style={{ cursor: "pointer" }}
-          onClick={() => toggleSection("vehicle")}
-        >
-          <div className="review-section__header">
-            <span>🚗 Vehicle Details</span>
-            <span style={{ fontSize: "0.75rem" }}>{expandedSection === "vehicle" ? "▲" : "▼"}</span>
-          </div>
-          {expandedSection === "vehicle" && (
-            <div className="review-section__body">
-              <div className="dashboard-card" style={{ padding: "1.25rem", gridColumn: "1 / -1" }}>
-                <h4 style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem" }}>
-                  {listing.category === "vehicle" ? "Vehicle Specifications" : "Property Details"}
-                </h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem" }}>
-                  {listing.category === "vehicle" && vd && (
-                    <>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Make & Model</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.make} {vd.model}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Year</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.year}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Type</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{vd.vehicle_type?.name || "-"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Transmission</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.transmission)}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Fuel</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.fuel_type)}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Condition</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{formatEnum(vd.condition)}</div>
-                      </div>
-                    </>
-                  )}
-
-                  {listing.category === "property" && pd && (
-                    <>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Property Type</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.property_type?.name || "-"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Bedrooms</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.bedrooms || "-"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Bathrooms</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.bathrooms || "-"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Area</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.area_sqm ? `${pd.area_sqm} m²` : "-"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Furnished Status</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.furnished_status ? formatEnum(pd.furnished_status) : "-"}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Condition</div>
-                        <div style={{ fontSize: "0.875rem", fontWeight: 500 }}>{pd.property_condition ? formatEnum(pd.property_condition) : "-"}</div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Category Details */}
+      {listing.category === "vehicle" && (
+        <VehicleReviewSection
+          vd={vd}
+          expanded={expandedSection === "vehicle"}
+          onToggle={() => toggleSection("vehicle")}
+        />
+      )}
+      {listing.category === "property" && (
+        <PropertyReviewSection
+          pd={pd}
+          expanded={expandedSection === "property"}
+          onToggle={() => toggleSection("property")}
+        />
       )}
 
-      {/* Pricing & Terms */}
-      {(rt || st) && (
-        <div
-          className="review-section"
-          style={{ cursor: "pointer" }}
-          onClick={() => toggleSection("pricing")}
-        >
-          <div className="review-section__header">
-            <span>💰 Pricing & Terms</span>
-            <span style={{ fontSize: "0.75rem" }}>{expandedSection === "pricing" ? "▲" : "▼"}</span>
-          </div>
-          {expandedSection === "pricing" && (
-            <div className="review-section__body">
-              <div className="review-grid">
-                {listing.listing_type === "rent" && rt && (
-                  <>
-                    <div><span className="review-label">Daily price</span><span className="review-value">{rt.daily_price ? `${rt.daily_price.toLocaleString()} ETB` : "—"}</span></div>
-                    <div><span className="review-label">Weekly price</span><span className="review-value">{rt.weekly_price ? `${rt.weekly_price.toLocaleString()} ETB` : "—"}</span></div>
-                    <div><span className="review-label">Monthly price</span><span className="review-value">{rt.monthly_price ? `${rt.monthly_price.toLocaleString()} ETB` : "—"}</span></div>
-                    <div><span className="review-label">Security deposit</span><span className="review-value">{rt.security_deposit_amount ? `${rt.security_deposit_amount.toLocaleString()} ETB` : "0"}</span></div>
-                    <div><span className="review-label">Min rental days</span><span className="review-value">{rt.minimum_rental_days}</span></div>
-                    {rt.daily_price && (
-                      <div><span className="review-label">Commission (5%)</span><span className="review-value">{`${Math.round(rt.daily_price * 0.05).toLocaleString()} ETB/day`}</span></div>
-                    )}
-                  </>
-                )}
-                {listing.listing_type === "sale" && st && (
-                  <>
-                    <div><span className="review-label">Sale Price</span><span className="review-value">{st.sale_price ? `${st.sale_price.toLocaleString()} ETB` : "—"}</span></div>
-                    <div><span className="review-label">Negotiable</span><span className="review-value">{st.is_negotiable ? "✅ Yes" : "❌ No"}</span></div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Listing Terms */}
+      {listing.listing_type === "rent" && (
+        <RentalTermsReviewSection
+          rt={rt}
+          listingCategory={listing.category}
+          expanded={expandedSection === "pricing"}
+          onToggle={() => toggleSection("pricing")}
+        />
       )}
-
-      {/* Driver & Delivery (Only for vehicles for rent) */}
-      {listing.category === "vehicle" && listing.listing_type === "rent" && rt && (
-        <div
-          className="review-section"
-          style={{ cursor: "pointer" }}
-          onClick={() => toggleSection("rental")}
-        >
-          <div className="review-section__header">
-            <span>📋 Driver & Delivery</span>
-            <span style={{ fontSize: "0.75rem" }}>{expandedSection === "rental" ? "▲" : "▼"}</span>
-          </div>
-          {expandedSection === "rental" && (
-            <div className="review-section__body">
-              <div className="review-grid">
-                <div><span className="review-label">Self-drive</span><span className="review-value">{rt.available_without_driver ? "✅ Yes" : "❌ No"}</span></div>
-                <div><span className="review-label">With driver</span><span className="review-value">{rt.available_with_driver ? "✅ Yes" : "❌ No"}</span></div>
-                {rt.available_with_driver && (
-                  <>
-                    <div><span className="review-label">Daily driver fee</span><span className="review-value">{rt.daily_driver_fee ? `${rt.daily_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
-                    <div><span className="review-label">Weekly driver fee</span><span className="review-value">{rt.weekly_driver_fee ? `${rt.weekly_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
-                    <div><span className="review-label">Monthly driver fee</span><span className="review-value">{rt.monthly_driver_fee ? `${rt.monthly_driver_fee.toLocaleString()} ETB` : "—"}</span></div>
-                  </>
-                )}
-                <div><span className="review-label">Pickup</span><span className="review-value">{rt.pickup_available ? "✅ Yes" : "❌ No"}</span></div>
-                <div><span className="review-label">Delivery</span><span className="review-value">{rt.delivery_available ? "✅ Yes" : "❌ No"}</span></div>
-                {rt.delivery_available && rt.delivery_fee !== null && (
-                  <div><span className="review-label">Delivery fee</span><span className="review-value">{rt.delivery_fee.toLocaleString()} ETB</span></div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+      {listing.listing_type === "sale" && (
+        <SaleTermsReviewSection
+          st={st}
+          expanded={expandedSection === "pricing"}
+          onToggle={() => toggleSection("pricing")}
+        />
       )}
 
       {/* Images */}
