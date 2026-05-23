@@ -22,24 +22,88 @@ async function ensureAdmin() {
   return user;
 }
 
-export async function approveListing(listingId: string) {
-  await ensureAdmin();
+async function validateListingForApproval(listingId: string) {
   const adminClient = createAdminClient();
 
-  // Verify listing exists and is pending_review
+  // 1 & 2 & 9 & 10: Fetch listing details
   const { data: listing, error: fetchError } = await adminClient
     .from("listings")
-    .select("id, status")
+    .select("id, status, title, description, location, owner_id, category, listing_type")
     .eq("id", listingId)
     .single();
 
   if (fetchError || !listing) {
-    return { error: "Listing not found" };
+    return { error: "Listing not found." };
   }
 
   if (listing.status !== "pending_review") {
-    return { error: "Only pending listings can be approved" };
+    return { error: "Only pending listings can be approved." };
   }
+
+  if (!listing.owner_id) {
+    return { error: "Listing owner is missing." };
+  }
+
+  if (!listing.title?.trim() || !listing.description?.trim() || !listing.location?.trim()) {
+    return { error: "Listing is missing required details (title, description, or location)." };
+  }
+
+  // 3 & 4: Images
+  const { count: imageCount, error: imagesError } = await adminClient
+    .from("listing_images")
+    .select("id", { count: "exact", head: true })
+    .eq("listing_id", listingId);
+
+  if (imagesError) return { error: "Failed to validate listing images." };
+  if (imageCount === null || imageCount < 5) return { error: "Listing must have at least 5 photos." };
+  if (imageCount > 10) return { error: "Listing cannot have more than 10 photos." };
+
+  // 5 & 6: Category details
+  if (listing.category === "vehicle") {
+    const { data: vd } = await adminClient
+      .from("vehicle_details")
+      .select("listing_id")
+      .eq("listing_id", listingId)
+      .maybeSingle();
+    if (!vd) return { error: "Vehicle listings must include vehicle details." };
+  } else if (listing.category === "property") {
+    const { data: pd } = await adminClient
+      .from("property_details")
+      .select("listing_id")
+      .eq("listing_id", listingId)
+      .maybeSingle();
+    if (!pd) return { error: "Property listings must include property details." };
+  }
+
+  // 7 & 8: Listing type terms
+  if (listing.listing_type === "rent") {
+    const { data: rt } = await adminClient
+      .from("rental_terms")
+      .select("listing_id")
+      .eq("listing_id", listingId)
+      .maybeSingle();
+    if (!rt) return { error: "Rental listings must include rental terms." };
+  } else if (listing.listing_type === "sale") {
+    const { data: st } = await adminClient
+      .from("sale_terms")
+      .select("listing_id")
+      .eq("listing_id", listingId)
+      .maybeSingle();
+    if (!st) return { error: "Sale listings must include sale terms." };
+  }
+
+  return { success: true };
+}
+
+export async function approveListing(listingId: string) {
+  await ensureAdmin();
+  
+  const validation = await validateListingForApproval(listingId);
+  if (validation.error) {
+    return { error: validation.error };
+  }
+
+  const adminClient = createAdminClient();
 
   const { error } = await adminClient
     .from("listings")
