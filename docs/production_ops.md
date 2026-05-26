@@ -38,7 +38,7 @@ Ensure all schema files inside `/supabase/migrations` are applied to the product
 The application requires a public storage bucket to host listing images.
 1. Navigate to the **Storage** section in the Supabase Dashboard.
 2. Click **New Bucket**.
-3. Set Name to `listings`.
+3. Set Name to `listing-images`.
 4. Enable **Public Bucket** (so images are accessible publicly via CDN).
 5. Apply the following storage policies under **Policies**:
    - **SELECT**: Allowed for all users (public read access).
@@ -57,7 +57,6 @@ Ensure that `rowsecurity` is `true` for all main tables:
 - `listing_requests`
 - `profiles`
 - `listing_events`
-- `admin_notes`
 
 ### 2.4 Auth Site URL & Redirect URLs
 Supabase Auth requires strict whitelisting of the production domain for callbacks:
@@ -77,11 +76,18 @@ To perform admin tasks (listing verification checklist, view dashboard audits), 
 1. Sign up on your production site using your email.
 2. Run this SQL query in the Supabase **SQL Editor** to grant your account absolute administrative rights:
 ```sql
--- Find your user ID in the auth.users table, then update/insert profile:
-INSERT INTO public.profiles (user_id, role, full_name, is_verified)
-VALUES ('your-user-uuid-from-auth-users', 'admin', 'Lead Administrator', true)
-ON CONFLICT (user_id) 
-DO UPDATE SET role = 'admin', is_verified = true;
+-- 1. Ensure user profile exists
+INSERT INTO public.profiles (user_id, email, full_name)
+VALUES ('your-user-uuid-from-auth-users', 'admin@myethioproperties.com', 'Lead Administrator')
+ON CONFLICT (user_id) DO NOTHING;
+
+-- 2. Associate the user with the 'admin' role inside public.user_roles
+INSERT INTO public.user_roles (user_id, role_id)
+VALUES (
+  'your-user-uuid-from-auth-users',
+  (SELECT id FROM public.roles WHERE role_name = 'admin')
+)
+ON CONFLICT (user_id, role_id) DO NOTHING;
 ```
 
 ### 2.6 Enable Automatic Backups

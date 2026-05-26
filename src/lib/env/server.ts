@@ -18,6 +18,37 @@ const serverOnlySchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z
     .string()
     .min(1, { message: "SUPABASE_SERVICE_ROLE_KEY must not be empty" }),
+  ANALYTICS_SALT: z.string().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  ADMIN_NOTIFICATION_EMAIL: z.string().email({ message: "Invalid email format" }).optional(),
+  ADMIN_NOTIFICATION_PHONE: z.string().optional(),
+  TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_AUTH_TOKEN: z.string().optional(),
+  TWILIO_FROM_NUMBER: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (process.env.NODE_ENV === "production") {
+    if (!data.ANALYTICS_SALT) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "ANALYTICS_SALT is mandatory in production",
+        path: ["ANALYTICS_SALT"]
+      });
+    }
+    if (!data.RESEND_API_KEY) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "RESEND_API_KEY is mandatory in production",
+        path: ["RESEND_API_KEY"]
+      });
+    }
+    if (!data.ADMIN_NOTIFICATION_EMAIL) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "ADMIN_NOTIFICATION_EMAIL is mandatory in production",
+        path: ["ADMIN_NOTIFICATION_EMAIL"]
+      });
+    }
+  }
 });
 
 const serverEnvSchema = clientEnvSchema.merge(serverOnlySchema);
@@ -51,6 +82,13 @@ export function serverEnv(): ServerEnv {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    ANALYTICS_SALT: process.env.ANALYTICS_SALT,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    ADMIN_NOTIFICATION_EMAIL: process.env.ADMIN_NOTIFICATION_EMAIL,
+    ADMIN_NOTIFICATION_PHONE: process.env.ADMIN_NOTIFICATION_PHONE,
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
+    TWILIO_FROM_NUMBER: process.env.TWILIO_FROM_NUMBER,
   });
 
   if (!parsed.success) {
