@@ -47,7 +47,7 @@ export default async function PropertyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  
+
   // Fire and forget view tracking event
   trackListingEvent(id, "view");
 
@@ -109,11 +109,11 @@ export default async function PropertyDetailPage({
     .eq("reviewee_id", listing.owner_id)
     .eq("reviewee_role", "owner");
 
-  const ownerRating = reviews && reviews.length > 0 
-    ? (reviews.reduce((acc, r) => acc + r.overall_rating, 0) / reviews.length).toFixed(1) 
+  const ownerRating = reviews && reviews.length > 0
+    ? (reviews.reduce((acc, r) => acc + r.overall_rating, 0) / reviews.length).toFixed(1)
     : "New";
   const ownerReviewCount = reviews?.length || 0;
-  
+
   const propertyTypeRaw = pd?.property_types as unknown;
   const propertyTypeName = Array.isArray(propertyTypeRaw)
     ? (propertyTypeRaw[0] as { name: string } | undefined)?.name
@@ -129,10 +129,10 @@ export default async function PropertyDetailPage({
 
         {/* Content columns */}
         <div className="detail-content" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2rem" }}>
-          
+
           {/* Left: details */}
           <div className="detail-main" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            
+
             {/* Title + basic info */}
             <div>
               <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -144,9 +144,11 @@ export default async function PropertyDetailPage({
                     {propertyTypeName}
                   </span>
                 )}
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-success-text, #065f46)", backgroundColor: "var(--color-success-light, #d1fae5)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", gap: "0.25rem" }} title="This listing has been manually reviewed and verified by our Trust & Safety team.">
-                  🛡️ Admin Verified
-                </span>
+                {isVerified && (
+                  <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-success-text, #065f46)", backgroundColor: "var(--color-success-light, #d1fae5)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", gap: "0.25rem" }} title="This listing's owner has been verified by our Trust & Safety team.">
+                    🛡️ Admin Verified
+                  </span>
+                )}
               </div>
               <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1.2, marginBottom: "0.5rem" }}>
                 {listing.title}
@@ -243,7 +245,7 @@ export default async function PropertyDetailPage({
                 <p style={{ color: "var(--color-text-muted)", lineHeight: 1.6, whiteSpace: "pre-line" }}>{rt.rental_notes}</p>
               </div>
             )}
-            
+
             {/* Owner Trust Card (Mobile stacked) */}
             <div className="mobile-only-trust-card" style={{ display: "block" }}>
               <OwnerTrustCard
@@ -254,7 +256,7 @@ export default async function PropertyDetailPage({
                 businessName={ownerProfile?.business_name}
               />
             </div>
-            
+
             <div style={{ marginTop: "1rem", padding: "1.5rem", backgroundColor: "var(--color-surface-hover)", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)", textAlign: "center" }}>
               <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "0.5rem" }}>
                 Notice an issue with this listing?
@@ -262,7 +264,7 @@ export default async function PropertyDetailPage({
               <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "1rem" }}>
                 We manually review all listings, but if you believe this violates our trust & safety policies, please let us know.
               </p>
-              <a 
+              <a
                 href={`mailto:support@myethioproperties.com?subject=Reporting Listing [${listing.id}] - ${listing.title}`}
                 className="auth-button auth-button--secondary"
                 style={{ display: "inline-flex", width: "auto", padding: "0.5rem 1rem", fontSize: "0.875rem", textDecoration: "none", alignItems: "center", gap: "0.5rem", color: "var(--color-error-text)", border: "1px solid var(--color-error-border)", backgroundColor: "transparent" }}
@@ -297,10 +299,10 @@ export default async function PropertyDetailPage({
         </div>
 
         {/* Similar Properties Section */}
-        <SimilarProperties 
-          currentListingId={listing.id} 
-          location={listing.location} 
-          listingType={listing.listing_type} 
+        <SimilarProperties
+          currentListingId={listing.id}
+          location={listing.location}
+          listingType={listing.listing_type}
           propertyTypeId={pd?.property_type_id}
         />
       </div>

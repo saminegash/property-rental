@@ -341,6 +341,11 @@ export default function ListingReviewCard({ listing }: Props) {
     setError(null);
     setLoading(true);
 
+    const checklistString = `[Admin Verified Checklist Completed: Identity, Ownership, Location, Photos, Price, Contact]`;
+    const newNotes = adminNotes ? `${adminNotes}\n${checklistString}` : checklistString;    
+    // Save notes with checklist audit trail before approving
+    await saveAdminNotes(listing.id, newNotes);
+    
     const result = await approveListing(listing.id);
     if (result.error) {
       setError(result.error);
@@ -770,9 +775,9 @@ export default function ListingReviewCard({ listing }: Props) {
                 { key: 'contact', label: 'Phone/contact verified' }
               ].map(({ key, label }) => (
                 <label key={key} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8125rem", cursor: "pointer" }}>
-                  <input 
-                    type="checkbox" 
-                    checked={checklist[key as keyof typeof checklist]} 
+                  <input
+                    type="checkbox"
+                    checked={checklist[key as keyof typeof checklist]}
                     onChange={(e) => setChecklist({ ...checklist, [key]: e.target.checked })}
                     style={{ cursor: "pointer" }}
                   />

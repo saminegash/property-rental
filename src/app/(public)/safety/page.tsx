@@ -23,7 +23,7 @@ export default function SafetyRulesPage() {
             <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span>🛡️</span> 1. The Admin Verification Process
             </h2>
-            
+
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
               At MyEthioProperties, your safety is our highest priority. To build a trusted marketplace, <strong>every single listing is manually reviewed and verified</strong> by our Trust & Safety team before it becomes public.
             </p>
@@ -45,7 +45,7 @@ export default function SafetyRulesPage() {
             <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem" }}>
               2. The Rental & Buying Process
             </h2>
-            
+
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Admin-Mediated Inquiries</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
               To protect both renters/buyers and owners, all inquiries are first routed to our administrative team. We conduct an initial screening to prevent spam and ensure the request is legitimate before connecting you with the owner.
@@ -61,7 +61,7 @@ export default function SafetyRulesPage() {
             <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem" }}>
               2. Fees and Payments
             </h2>
-            
+
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Commission Explanation</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
               MyEthioProperties charges a fixed commission based on the base rental or sale price. This fee helps us maintain the platform and provide support. Our commission does not apply to driver fees, security deposits, or delivery charges.
@@ -82,7 +82,7 @@ export default function SafetyRulesPage() {
             <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem" }}>
               3. Responsibilities
             </h2>
-            
+
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Renter Responsibilities</h3>
             <ul style={{ listStyleType: "disc", paddingLeft: "1.5rem", color: "var(--color-text-muted)", lineHeight: 1.6, marginBottom: "1rem" }}>
               <li>Return the property or vehicle on time and in the exact condition it was received.</li>
@@ -105,7 +105,7 @@ export default function SafetyRulesPage() {
               4. Damage & Dispute Guidance
             </h2>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              In the unlikely event of damage, an accident, or a disagreement, both parties should document the situation immediately with photos and written notes. 
+              In the unlikely event of damage, an accident, or a disagreement, both parties should document the situation immediately with photos and written notes.
             </p>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
               We strongly advise users to conduct a joint inspection of the property or vehicle before handover and upon return. Any disputes regarding the security deposit or condition should be communicated respectfully. The MyEthioProperties administrative team can offer guidance to help mediate disputes, but direct resolution between the owner and renter/buyer is strongly encouraged.

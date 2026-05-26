@@ -83,7 +83,7 @@ export default async function OwnerProfilePage() {
   return (
     <div>
       <h1 className="dashboard-title">Profile & Verification</h1>
-      
+
       <div className="dashboard-card" style={{ marginBottom: "2rem" }}>
         <h2 style={{ fontSize: "1.25rem", color: "var(--color-text-heading)", marginBottom: "1rem" }}>
           Trust & Safety

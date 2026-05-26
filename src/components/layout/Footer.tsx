@@ -11,13 +11,13 @@ const FOOTER_LINKS = {
   support: [
     { href: "/#help", label: "Help Center" },
     { href: "/safety", label: "Safety Rules" },
-    { href: "/contact", label: "Contact Us" },
+    { href: "mailto:support@myethioproperties.com", label: "Contact Us" },
     { href: "mailto:support@myethioproperties.com", label: "Report a Problem" },
   ],
   legal: [
-    { href: "/terms", label: "Terms of Service" },
-    { href: "/privacy", label: "Privacy Policy" },
-    { href: "/refund", label: "Refund & Deposit Policy" },
+    { href: "/safety", label: "Terms of Service" },
+    { href: "/safety", label: "Privacy Policy" },
+    { href: "/safety", label: "Refund & Deposit Policy" },
   ],
 } as const;
 

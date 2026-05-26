@@ -15,7 +15,7 @@ export async function requestOwnerVerification() {
 
   const { error } = await adminClient
     .from("owner_profiles")
-    .update({ verification_status: "pending" })
+    .upsert({ user_id: user.id, verification_status: "pending" })
     .eq("user_id", user.id);
 
   if (error) {
