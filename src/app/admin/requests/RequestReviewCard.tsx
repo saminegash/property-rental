@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { 
   updateRequestStatus, 
   updateRequestAdminNotes, 
@@ -112,6 +113,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
   
   const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
   const [ownerNotes, setOwnerNotes] = useState(request.owner_response_notes || "");
+  const router = useRouter();
   
   const [depositPaymentMethod, setDepositPaymentMethod] = useState(request.securityDeposit?.payment_method || "");
   const [depositNotes, setDepositNotes] = useState(request.securityDeposit?.admin_notes || "");
@@ -132,6 +134,8 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
       }
     } else if (result?.error) {
       alert(result.error);
+    } else {
+      router.refresh();
     }
     
     setIsUpdating(false);
@@ -145,6 +149,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
     if (ownerNotes !== (request.owner_response_notes || "")) {
       await updateRequestOwnerNotes(request.id, ownerNotes);
     }
+    router.refresh();
     setIsUpdating(false);
   }
 
@@ -235,6 +240,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                       onClick={async () => {
                         setIsUpdating(true);
                         await generateCommission(request.id);
+                        router.refresh();
                         setIsUpdating(false);
                       }}
                       disabled={isUpdating}
@@ -271,6 +277,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                         onChange={async (e) => {
                           setIsUpdating(true);
                           await updateCommissionStatus(request.commission!.id, e.target.value);
+                          router.refresh();
                           setIsUpdating(false);
                         }}
                         disabled={isUpdating}
@@ -303,6 +310,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                       onClick={async () => {
                         setIsUpdating(true);
                         await generateSecurityDeposit(request.id);
+                        router.refresh();
                         setIsUpdating(false);
                       }}
                       disabled={isUpdating}
@@ -328,6 +336,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                         onChange={async (e) => {
                           setIsUpdating(true);
                           await updateSecurityDeposit(request.securityDeposit!.id, { deposit_status: e.target.value });
+                          router.refresh();
                           setIsUpdating(false);
                         }}
                         disabled={isUpdating}
@@ -374,6 +383,7 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
                           payment_method: depositPaymentMethod,
                           admin_notes: depositNotes 
                         });
+                        router.refresh();
                         setIsUpdating(false);
                       }}
                       disabled={isUpdating || (depositPaymentMethod === (request.securityDeposit.payment_method || "") && depositNotes === (request.securityDeposit.admin_notes || ""))}

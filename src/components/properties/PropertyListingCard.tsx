@@ -100,9 +100,15 @@ export function PropertyListingCard({
 
         {/* Price */}
         <div className="property-listing-card__price">
-          {price.toLocaleString()} ETB
-          {type === "rent" && (
-            <span className="property-listing-card__price-period">/month</span>
+          {type === "sale" && (!price || price === 0) ? (
+            <span style={{ fontSize: "1.1rem" }}>Price on Request</span>
+          ) : (
+            <>
+              {price.toLocaleString()} ETB
+              {type === "rent" && (
+                <span className="property-listing-card__price-period">/month</span>
+              )}
+            </>
           )}
         </div>
 

@@ -92,11 +92,9 @@ export function PropertyPriceSummaryCard({
       )}
 
       {/* Commission Note */}
-      {listingType === "rent" && (
-        <div style={{ padding: "0.75rem", backgroundColor: "var(--color-surface-hover)", borderRadius: "var(--radius-md)", fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "1.5rem", textAlign: "center" }}>
-          <strong>Note:</strong> A 5% platform commission applies to the base rental price.
-        </div>
-      )}
+      <div style={{ padding: "0.75rem", backgroundColor: "var(--color-surface-hover)", borderRadius: "var(--radius-md)", fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "1.5rem", textAlign: "center" }}>
+        <strong>Note:</strong> A small fixed commission applies to the base listing price.
+      </div>
 
       {/* CTA Form */}
       <PropertyRequestForm

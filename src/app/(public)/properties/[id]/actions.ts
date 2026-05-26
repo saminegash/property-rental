@@ -33,7 +33,17 @@ export async function submitPropertyRequest(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (start_date && end_date) {
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("listing_type")
+    .eq("id", listing_id)
+    .single();
+
+  if (listingError || !listing) {
+    return { error: "Listing not found" };
+  }
+
+  if (listing.listing_type === "rent") {
     // Rental request
     const { error } = await supabase.from("rental_requests").insert({
       listing_id,
@@ -41,8 +51,8 @@ export async function submitPropertyRequest(formData: FormData) {
       renter_name,
       renter_phone,
       renter_email: renter_email || null,
-      start_date,
-      end_date,
+      start_date: start_date || new Date().toISOString(), // Fallback if missing
+      end_date: end_date || new Date().toISOString(),
       needs_driver: false,
       needs_delivery: false,
       message: message || null,

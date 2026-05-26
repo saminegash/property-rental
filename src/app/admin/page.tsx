@@ -18,7 +18,8 @@ export default async function AdminPage() {
     { count: newRentalRequests },
     { count: newListingRequests },
     { count: activeDeals },
-    { count: disputedRequests },
+    { count: disputedRentalRequests },
+    { count: disputedListingRequests },
     { count: pendingOwnerVerifications },
     { count: pendingCommissions },
     { count: pendingSecurityDeposits },
@@ -33,10 +34,13 @@ export default async function AdminPage() {
     adminClient.from("listing_requests").select("id", { count: "exact", head: true }).eq("status", "new_request"),
     adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "active"),
     adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "disputed"),
+    adminClient.from("listing_requests").select("id", { count: "exact", head: true }).eq("status", "disputed"),
     adminClient.from("owner_profiles").select("id", { count: "exact", head: true }).eq("verification_status", "pending"),
     adminClient.from("commissions").select("id", { count: "exact", head: true }).eq("commission_status", "pending"),
     adminClient.from("security_deposits").select("id", { count: "exact", head: true }).eq("deposit_status", "pending"),
   ]);
+
+  const totalDisputed = (disputedRentalRequests || 0) + (disputedListingRequests || 0);
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -50,26 +54,26 @@ export default async function AdminPage() {
       <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem" }}>
         Platform Metrics
       </h2>
-      
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
         gap: "1rem",
-        marginBottom: "3rem" 
+        marginBottom: "3rem"
       }}>
         <MetricCard title="Total Listings" count={totalListings || 0} icon="📊" />
         <MetricCard title="Published Listings" count={publishedListings || 0} icon="✅" />
-        
+
         <MetricCard title="Pending Listings" count={pendingListings || 0} icon="⏳" highlight={!!pendingListings} />
         <MetricCard title="Pending Cars" count={pendingCars || 0} icon="🚗" highlight={!!pendingCars} />
         <MetricCard title="Pending Properties" count={pendingProperties || 0} icon="🏢" highlight={!!pendingProperties} />
         <MetricCard title="Pending Price Changes" count={pendingPriceChanges || 0} icon="💰" highlight={!!pendingPriceChanges} />
-        
+
         <MetricCard title="New Rental Requests" count={newRentalRequests || 0} icon="📫" highlight={!!newRentalRequests} />
         <MetricCard title="New General Inquiries" count={newListingRequests || 0} icon="💬" highlight={!!newListingRequests} />
         <MetricCard title="Active Rentals" count={activeDeals || 0} icon="🚀" />
-        <MetricCard title="Disputed Requests" count={disputedRequests || 0} icon="🚨" highlight={!!disputedRequests} error />
-        
+        <MetricCard title="Disputed Requests" count={totalDisputed} icon="🚨" highlight={totalDisputed > 0} error />
+
         <MetricCard title="Pending Owners" count={pendingOwnerVerifications || 0} icon="👤" highlight={!!pendingOwnerVerifications} />
         <MetricCard title="Pending Commissions" count={pendingCommissions || 0} icon="💵" highlight={!!pendingCommissions} />
         <MetricCard title="Pending Deposits" count={pendingSecurityDeposits || 0} icon="🛡️" highlight={!!pendingSecurityDeposits} />
@@ -78,26 +82,26 @@ export default async function AdminPage() {
       <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem" }}>
         Quick Actions
       </h2>
-      
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
-        <ActionCard 
-          href="/admin/listings" 
-          title="Review Pending Listings & Pricing" 
+        <ActionCard
+          href="/admin/listings"
+          title="Review Pending Listings & Pricing"
           description="Approve new car and property listings, and review price updates."
         />
-        <ActionCard 
-          href="/admin/requests" 
-          title="Manage Rental Requests" 
+        <ActionCard
+          href="/admin/requests"
+          title="Manage Rental Requests"
           description="Review new bookings, active rentals, disputes, and manage platform flow."
         />
-        <ActionCard 
-          href="/admin/inquiries" 
-          title="General Inquiries & Sales" 
+        <ActionCard
+          href="/admin/inquiries"
+          title="General Inquiries & Sales"
           description="Review property sale and viewing inquiries."
         />
-        <ActionCard 
-          href="/admin/owners" 
-          title="Owner Management" 
+        <ActionCard
+          href="/admin/owners"
+          title="Owner Management"
           description="Review, approve, or suspend car and property owner profiles."
         />
       </div>
@@ -105,29 +109,29 @@ export default async function AdminPage() {
   );
 }
 
-function MetricCard({ 
-  title, 
-  count, 
-  icon, 
+function MetricCard({
+  title,
+  count,
+  icon,
   highlight = false,
-  error = false 
-}: { 
-  title: string; 
-  count: number; 
-  icon: string; 
+  error = false
+}: {
+  title: string;
+  count: number;
+  icon: string;
   highlight?: boolean;
   error?: boolean;
 }) {
-  const bgColor = error && count > 0 
-    ? "#fef2f2" 
-    : highlight && count > 0 
-      ? "#fffbeb" 
+  const bgColor = error && count > 0
+    ? "#fef2f2"
+    : highlight && count > 0
+      ? "#fffbeb"
       : "var(--color-bg)";
-      
-  const borderColor = error && count > 0 
-    ? "#f87171" 
-    : highlight && count > 0 
-      ? "#fcd34d" 
+
+  const borderColor = error && count > 0
+    ? "#f87171"
+    : highlight && count > 0
+      ? "#fcd34d"
       : "var(--color-border)";
 
   return (
@@ -158,12 +162,12 @@ function MetricCard({
 
 function ActionCard({ href, title, description }: { href: string; title: string; description: string }) {
   return (
-    <Link 
-      href={href} 
-      style={{ 
-        display: "block", 
-        padding: "1.5rem", 
-        border: "1px solid var(--color-border)", 
+    <Link
+      href={href}
+      style={{
+        display: "block",
+        padding: "1.5rem",
+        border: "1px solid var(--color-border)",
         borderRadius: "var(--radius-md)",
         textDecoration: "none",
         backgroundColor: "var(--color-surface)",

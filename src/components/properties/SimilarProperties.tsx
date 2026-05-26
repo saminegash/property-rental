@@ -28,6 +28,10 @@ type SupabaseRentalTerm = {
   monthly_price: number | null;
 };
 
+type SupabaseSaleTerm = {
+  sale_price: number | null;
+};
+
 type SimilarPropertyResult = {
   id: string;
   title: string;
@@ -37,6 +41,7 @@ type SimilarPropertyResult = {
   is_featured: boolean;
   property_details?: SupabasePropertyDetails | SupabasePropertyDetails[] | null;
   rental_terms?: SupabaseRentalTerm[] | null;
+  sale_terms?: SupabaseSaleTerm[] | null;
   listing_images?: SupabaseListingImage[] | null;
 };
 
@@ -49,6 +54,7 @@ export async function SimilarProperties({ currentListingId, location, listingTyp
       id, title, location, owner_id, listing_type, is_featured,
       property_details!inner ( bedrooms, bathrooms, area_sqm, property_types ( name ) ),
       rental_terms ( daily_price, monthly_price ),
+      sale_terms ( sale_price ),
       listing_images ( image_url, is_primary )
     `)
     .eq("category", "property")
@@ -104,7 +110,10 @@ export async function SimilarProperties({ currentListingId, location, listingTyp
             : (pd?.property_types as SupabasePropertyType | undefined)?.name;
 
           const rt = prop.rental_terms?.[0];
-          const price = rt?.monthly_price || rt?.daily_price || 0;
+          const st = prop.sale_terms?.[0];
+          const price = prop.listing_type === "sale"
+            ? (st?.sale_price || 0)
+            : (rt?.monthly_price || rt?.daily_price || 0);
 
           const coverImage =
             prop.listing_images?.find((img) => img.is_primary)?.image_url ||

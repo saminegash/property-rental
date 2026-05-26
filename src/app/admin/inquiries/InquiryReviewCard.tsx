@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { 
   updateInquiryStatus, 
   updateInquiryAdminNotes, 
@@ -81,6 +82,7 @@ export default function InquiryReviewCard({ request }: { request: EnrichedInquir
   
   const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
   const [ownerNotes, setOwnerNotes] = useState(request.owner_response_notes || "");
+  const router = useRouter();
   
   async function handleStatusChange(newStatus: string) {
     setIsUpdating(true);
@@ -98,6 +100,8 @@ export default function InquiryReviewCard({ request }: { request: EnrichedInquir
       }
     } else if (result?.error) {
       alert(result.error);
+    } else {
+      router.refresh();
     }
     
     setIsUpdating(false);
@@ -111,6 +115,7 @@ export default function InquiryReviewCard({ request }: { request: EnrichedInquir
     if (ownerNotes !== (request.owner_response_notes || "")) {
       await updateInquiryOwnerNotes(request.id, ownerNotes);
     }
+    router.refresh();
     setIsUpdating(false);
   }
 

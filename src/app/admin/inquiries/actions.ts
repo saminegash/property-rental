@@ -145,6 +145,7 @@ export async function updateInquiryOwnerNotes(requestId: string, notes: string) 
 }
 
 export async function getInquiryHistory(requestId: string) {
+  await ensureAdmin();
   const adminClient = createAdminClient();
   
   const { data, error } = await adminClient

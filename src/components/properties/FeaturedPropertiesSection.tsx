@@ -21,6 +21,9 @@ interface FeaturedPropertyListing {
     daily_price: number | null;
     monthly_price: number | null;
   }[];
+  sale_terms: {
+    sale_price: number | null;
+  }[];
   listing_images: {
     image_url: string;
     is_primary: boolean;
@@ -37,6 +40,7 @@ export async function FeaturedPropertiesSection() {
       id, title, location, owner_id, listing_type, is_featured,
       property_details ( bedrooms, bathrooms, area_sqm, property_types ( name ) ),
       rental_terms ( daily_price, monthly_price ),
+      sale_terms ( sale_price ),
       listing_images ( image_url, is_primary )
     `)
     .eq("category", "property")
@@ -93,7 +97,10 @@ export async function FeaturedPropertiesSection() {
                 prop.listing_images?.[0]?.image_url ||
                 "";
 
-              const displayPrice = rt?.monthly_price || rt?.daily_price || 0;
+              const st = prop.sale_terms?.[0];
+              const displayPrice = prop.listing_type === "sale"
+                ? (st?.sale_price || 0)
+                : (rt?.monthly_price || rt?.daily_price || 0);
               const propertyTypeName = pd?.property_types?.name || "Property";
 
               return (

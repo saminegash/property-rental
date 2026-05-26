@@ -128,7 +128,7 @@ export default async function BrowsePropertiesPage({
         filtered = filtered.filter((l) => {
           const rt = l.rental_terms?.[0];
           const st = l.sale_terms?.[0];
-          const price = l.listing_type === "sale" 
+          const price = l.listing_type === "sale"
             ? (st?.sale_price || 0)
             : (rt?.monthly_price || rt?.daily_price || 0);
           return price >= minPrice;
@@ -142,7 +142,7 @@ export default async function BrowsePropertiesPage({
         filtered = filtered.filter((l) => {
           const rt = l.rental_terms?.[0];
           const st = l.sale_terms?.[0];
-          const price = l.listing_type === "sale" 
+          const price = l.listing_type === "sale"
             ? (st?.sale_price || 0)
             : (rt?.monthly_price || rt?.daily_price || 0);
           return price <= maxPrice;
@@ -316,11 +316,11 @@ export default async function BrowsePropertiesPage({
                       "";
 
                     const st = prop.sale_terms?.[0];
-                    const displayPrice = prop.listing_type === "sale" 
-                      ? (st?.sale_price || 0) 
+                    const displayPrice = prop.listing_type === "sale"
+                      ? (st?.sale_price || 0)
                       : (rt?.monthly_price || rt?.daily_price || 0);
-                    const propertyTypeName = Array.isArray(pd?.property_types) 
-                      ? pd?.property_types[0]?.name 
+                    const propertyTypeName = Array.isArray(pd?.property_types)
+                      ? pd?.property_types[0]?.name
                       : pd?.property_types?.name;
 
                     return (
@@ -391,12 +391,12 @@ export default async function BrowsePropertiesPage({
           />
 
           <PropertyCategoriesSection />
-          
+
           <PropertyHowItWorksSection />
-          
-          <PopularLocationsSection 
-            baseRoute="/properties" 
-            subtitle="Find properties in the most sought-after neighborhoods." 
+
+          <PopularLocationsSection
+            baseRoute="/properties"
+            subtitle="Find properties in the most sought-after neighborhoods."
           />
 
           <PropertyOwnerCTASection />
