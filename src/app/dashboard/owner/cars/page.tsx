@@ -58,7 +58,7 @@ export default async function OwnerMyCarsPage() {
             You haven&apos;t listed any cars yet
           </h2>
           <p className="dashboard-hint" style={{ marginBottom: "1.5rem" }}>
-            Start earning by listing your first vehicle on CarMarket.
+            Start earning by listing your first vehicle on MyEthioProperties.
           </p>
           <Link href="/dashboard/owner/cars/new" className="auth-button" style={{ textDecoration: "none" }}>
             Create First Listing

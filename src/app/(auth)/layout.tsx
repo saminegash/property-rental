@@ -7,8 +7,8 @@ export default function AuthLayout({
     <div className="auth-layout">
       <div className="auth-container">
         <div className="auth-header">
-          <h1 className="auth-logo">CarMarket</h1>
-          <p className="auth-tagline">Rental marketplace for Ethiopia</p>
+          <h1 className="auth-logo">MyEthioProperties</h1>
+          <p className="auth-tagline">Verified properties for rent & sale</p>
         </div>
         {children}
       </div>

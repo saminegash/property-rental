@@ -1,36 +1,28 @@
 import { MarketplaceHeroSection } from "@/components/shared/MarketplaceHeroSection";
-import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
 import { FeaturedPropertiesSection } from "@/components/properties/FeaturedPropertiesSection";
-import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
 import { PropertyCategoriesSection } from "@/components/properties/PropertyCategoriesSection";
-import { TrustFeaturesSection } from "@/components/cars/TrustFeaturesSection";
-import { HowItWorksSection } from "@/components/cars/HowItWorksSection";
-import { PricingTransparencySection } from "@/components/cars/PricingTransparencySection";
-import { OwnerCTASection } from "@/components/cars/OwnerCTASection";
-import { PopularLocationsSection } from "@/components/cars/PopularLocationsSection";
+import { TrustFeaturesSection } from "@/components/shared/TrustFeaturesSection";
+import { HowItWorksSection } from "@/components/shared/HowItWorksSection";
+import { PricingTransparencySection } from "@/components/shared/PricingTransparencySection";
+import { PropertyOwnerCTASection } from "@/components/properties/PropertyOwnerCTASection";
+import { PopularLocationsSection } from "@/components/shared/PopularLocationsSection";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "MyEthioProperties — Rent, Buy & Sell Cars and Properties with Trust",
-  description: "Ethiopia's verified marketplace for cars and properties. Transparent pricing, admin-reviewed listings, and secure transactions.",
+  title: "MyEthioProperties — Verified Properties for Rent & Sale",
+  description: "Ethiopia's trusted property marketplace. Find verified apartments, houses, villas, and land. Transparent pricing, admin-reviewed listings, and secure transactions.",
 };
 
 export default function HomePage() {
   return (
     <>
-      {/* Generic Marketplace Hero */}
+      {/* Property-first Marketplace Hero */}
       <MarketplaceHeroSection />
-
-      {/* Featured Cars */}
-      <FeaturedCarsSection />
 
       {/* Featured Properties */}
       <FeaturedPropertiesSection />
-
-      {/* Browse by Car Category */}
-      <CarCategoriesSection />
 
       {/* Browse by Property Category */}
       <PropertyCategoriesSection />
@@ -47,8 +39,8 @@ export default function HomePage() {
       {/* Popular Locations */}
       <PopularLocationsSection />
 
-      {/* Owner CTA */}
-      <OwnerCTASection />
+      {/* Property Owner CTA */}
+      <PropertyOwnerCTASection />
     </>
   );
 }

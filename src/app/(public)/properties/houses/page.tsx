@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import BrowsePropertiesPage from "../page";
 
 export const metadata: Metadata = {
-  title: "Houses for Rent and Sale in Ethiopia | MyProperties",
+  title: "Houses for Rent and Sale in Ethiopia | MyEthioProperties",
   description: "Browse verified houses in Ethiopia. Find the perfect home for your family from trusted owners.",
   alternates: { canonical: "https://myproperties.kodetechnologies.co/properties/houses" }
 };

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import BrowseCarsPage from "../page";
 
 export const metadata: Metadata = {
-  title: "Cars for Sale in Ethiopia | MyProperties",
+  title: "Cars for Sale in Ethiopia | MyEthioProperties",
   description: "Browse verified cars for sale in Ethiopia. Find your next vehicle from trusted sellers across the country.",
   alternates: { canonical: "https://myproperties.kodetechnologies.co/cars/sale" }
 };

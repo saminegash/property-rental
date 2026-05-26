@@ -35,7 +35,7 @@ export default async function RenterDashboardPage() {
       <div style={{ marginBottom: "2rem" }}>
         <h1 className="dashboard-title">Welcome back!</h1>
         <p className="dashboard-hint">
-          Browse available cars and manage your rental requests.
+          Browse available properties and manage your requests.
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export default async function RenterDashboardPage() {
         </Link>
 
         <Link
-          href="/cars"
+          href="/properties"
           style={{
             display: "block",
             padding: "1.5rem",
@@ -109,10 +109,10 @@ export default async function RenterDashboardPage() {
           }}
         >
           <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
-            Browse Cars
+            Browse Properties
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
-            Find and rent a car that fits your needs.
+            Find a property that fits your needs.
           </p>
         </Link>
 
@@ -130,10 +130,10 @@ export default async function RenterDashboardPage() {
           }}
         >
           <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
-            🚗 Become an Owner
+            🏠 Become an Owner
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
-            Have a car? List it on our platform and start earning.
+            Have a property? List it on our platform and start earning.
           </p>
         </Link>
       </div>

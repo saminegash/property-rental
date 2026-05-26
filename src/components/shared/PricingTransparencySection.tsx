@@ -3,36 +3,36 @@ import React from "react";
 export function PricingTransparencySection() {
   const pricingItems = [
     {
-      title: "Car Rental Price",
-      description: "The base daily rate for renting the vehicle. Set entirely by the car owner.",
-      icon: "🚗",
+      title: "Listing Price",
+      description: "The base price for renting or purchasing the property. Set entirely by the owner.",
+      icon: "🏠",
       color: "bg-blue-50 text-blue-600",
       highlight: false,
     },
     {
-      title: "Driver Fee",
-      description: "Optional daily fee if you choose to rent a vehicle with a professional driver.",
-      icon: "👨‍✈️",
+      title: "Admin Coordination",
+      description: "Our admin team reviews every request and coordinates between you and the owner at no extra cost.",
+      icon: "🤝",
       color: "bg-orange-50 text-orange-600",
       highlight: false,
     },
     {
       title: "Security Deposit",
-      description: "A fully refundable deposit held to cover potential damages. Returned after your trip.",
+      description: "A fully refundable deposit held to cover potential damages. Returned after your lease or rental ends.",
       icon: "🛡️",
       color: "bg-emerald-50 text-emerald-600",
       highlight: false,
     },
     {
-      title: "Delivery Fee",
-      description: "Optional fee set by the owner if you want the car delivered directly to your location.",
+      title: "Viewing & Delivery",
+      description: "Optional fee set by the owner if you want a viewing arranged or keys delivered to your location.",
       icon: "📍",
       color: "bg-purple-50 text-purple-600",
       highlight: false,
     },
     {
       title: "Platform Commission",
-      description: "We charge a fixed 5% commission only on the base rental price. Excludes all other fees.",
+      description: "A small fixed commission on the base listing price only. All other fees are fully excluded.",
       icon: "💎",
       color: "bg-primary text-white",
       highlight: true,
@@ -45,7 +45,7 @@ export function PricingTransparencySection() {
         <div className="pricing-transparency__header">
           <h2 className="pricing-transparency__title">Transparent Pricing</h2>
           <p className="pricing-transparency__subtitle">
-            No hidden fees. Understand exactly what makes up your total rental cost.
+            No hidden fees. Understand exactly what makes up your total cost.
           </p>
         </div>
 

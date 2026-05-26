@@ -29,7 +29,7 @@ export function PropertyHowItWorksSection() {
       <div className="how-it-works__inner">
         <div className="how-it-works__header">
           <h2 className="how-it-works__title">How It Works</h2>
-          <p className="how-it-works__subtitle">Renting or buying a property on MyProperties is safe, simple, and transparent.</p>
+          <p className="how-it-works__subtitle">Renting or buying a property on MyEthioProperties is safe, simple, and transparent.</p>
         </div>
 
         <div className="how-it-works__grid">

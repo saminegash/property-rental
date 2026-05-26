@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import BrowsePropertiesPage from "../page";
 
 export const metadata: Metadata = {
-  title: "Land for Sale in Ethiopia | MyProperties",
+  title: "Land for Sale in Ethiopia | MyEthioProperties",
   description: "Browse verified land plots for sale in Ethiopia. Find the perfect plot for your next construction project or investment.",
   alternates: { canonical: "https://myproperties.kodetechnologies.co/properties/land" }
 };

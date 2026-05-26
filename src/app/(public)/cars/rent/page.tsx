@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import BrowseCarsPage from "../page";
 
 export const metadata: Metadata = {
-  title: "Cars for Rent in Ethiopia | MyProperties",
+  title: "Cars for Rent in Ethiopia | MyEthioProperties",
   description: "Browse verified cars for rent in Ethiopia. Find the perfect rental car for your needs with flexible terms.",
   alternates: { canonical: "https://myproperties.kodetechnologies.co/cars/rent" }
 };

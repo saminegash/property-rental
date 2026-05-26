@@ -24,7 +24,7 @@ export default function BecomeOwnerPage() {
     <div className="dashboard-card" style={{ maxWidth: "600px", margin: "0 auto" }}>
       <h1 className="dashboard-title">Become an Owner</h1>
       <p className="dashboard-hint" style={{ marginBottom: "2rem" }}>
-        Complete your profile to start listing your vehicles on CarMarket.
+        Complete your profile to start listing your properties on MyEthioProperties.
       </p>
 
       {error && (
@@ -51,7 +51,7 @@ export default function BecomeOwnerPage() {
               />
               <span className="role-card">
                 <span className="role-name">Individual</span>
-                <span className="role-desc">Renting out your personal car</span>
+                <span className="role-desc">Listing your personal property or car</span>
               </span>
             </label>
 

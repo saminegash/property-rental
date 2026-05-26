@@ -1,9 +1,8 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Safety & Marketplace Rules — CarMarket",
-  description: "Learn about how CarMarket keeps you safe, our platform rules, and how the rental process works.",
+  title: "Safety & Marketplace Rules — MyEthioProperties",
+  description: "Learn about how MyEthioProperties keeps you safe, our platform rules, and how the rental or buying process works.",
 };
 
 export default function SafetyRulesPage() {
@@ -17,7 +16,7 @@ export default function SafetyRulesPage() {
             Safety & Marketplace Rules
           </h1>
           <p style={{ fontSize: "1.125rem", color: "var(--color-text-muted)", marginBottom: "3rem", textAlign: "center", lineHeight: 1.6 }}>
-            Welcome to CarMarket! We are dedicated to providing a secure and reliable platform for car rentals. Please read our community guidelines and safety protocols to understand how the platform operates.
+            Welcome to MyEthioProperties! We are dedicated to providing a secure and reliable platform for property and car rentals, as well as property sales. Please read our community guidelines and safety protocols to understand how the platform operates.
           </p>
 
           <div className="dashboard-card" style={{ marginBottom: "2rem", padding: "2rem" }}>
@@ -32,7 +31,7 @@ export default function SafetyRulesPage() {
 
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Verify Owner Before Payment</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              Payments for the rental, driver fees, and security deposits are handled directly between you and the owner (or through our verified admins). <strong>Never transfer money</strong> until you have verified the vehicle, met the owner or admin in person, and confirmed the booking status on your CarMarket dashboard.
+              Payments for rentals, sales, driver fees, and security deposits are handled directly between you and the owner (or through our verified admins). <strong>Never transfer money</strong> until you have verified the property or vehicle, met the owner or admin in person, and confirmed the booking status on your MyEthioProperties dashboard.
             </p>
           </div>
 
@@ -43,17 +42,17 @@ export default function SafetyRulesPage() {
             
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Commission Explanation</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              CarMarket charges a fixed 5% commission based strictly on the base rental price. This fee helps us maintain the platform and provide support. Our commission does not apply to driver fees, security deposits, or delivery charges.
+              MyEthioProperties charges a fixed commission based on the base rental or sale price. This fee helps us maintain the platform and provide support. Our commission does not apply to driver fees, security deposits, or delivery charges.
             </p>
 
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Driver Fee Explanation</h3>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Admin Review Fee</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              If you request a vehicle with a driver, the driver fee is calculated separately from the rental cost. This fee goes entirely to covering the cost of the professional driver and is paid directly along with the rental cost.
+              Our admin team reviews every request at no additional cost to you. This service ensures both parties are verified and that listings meet our quality standards before any transaction takes place.
             </p>
 
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Security Deposit Explanation</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              Many owners require a refundable security deposit before handing over the keys. This deposit acts as a safeguard against minor damages or late returns. Once the vehicle is returned in its original condition, the deposit is refunded to the renter. Our administrative team tracks the collection and refund status of these deposits to ensure transparency.
+              Many owners require a refundable security deposit before move-in or handing over the keys. This deposit acts as a safeguard against minor damages or late returns/move-outs. Once the property or vehicle is returned in its original condition, the deposit is refunded. Our administrative team tracks the collection and refund status of these deposits to ensure transparency.
             </p>
           </div>
 
@@ -64,17 +63,17 @@ export default function SafetyRulesPage() {
             
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Renter Responsibilities</h3>
             <ul style={{ listStyleType: "disc", paddingLeft: "1.5rem", color: "var(--color-text-muted)", lineHeight: 1.6, marginBottom: "1rem" }}>
-              <li>Return the vehicle on time and in the exact condition it was received.</li>
+              <li>Return the property or vehicle on time and in the exact condition it was received.</li>
               <li>Provide accurate contact information during the request process.</li>
               <li>Communicate clearly with the admin team and owner regarding pickup and drop-off.</li>
-              <li>Do not use the vehicle for unauthorized commercial activities unless permitted by the owner.</li>
+              <li>Do not use the property or vehicle for unauthorized commercial activities unless permitted by the owner.</li>
             </ul>
 
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Owner Responsibilities</h3>
             <ul style={{ listStyleType: "disc", paddingLeft: "1.5rem", color: "var(--color-text-muted)", lineHeight: 1.6, marginBottom: "1rem" }}>
-              <li>Ensure the vehicle is safe, clean, and mechanically sound before every trip.</li>
+              <li>Ensure the property or vehicle is safe, clean, and ready for use before every handover.</li>
               <li>Respond promptly to booking requests once verified by our admin team.</li>
-              <li>Clearly communicate any specific rules, quirks, or requirements regarding the vehicle.</li>
+              <li>Clearly communicate any specific rules, quirks, or requirements regarding the property or vehicle.</li>
               <li>Honor the agreed-upon rental prices and terms listed on the platform.</li>
             </ul>
           </div>
@@ -87,10 +86,10 @@ export default function SafetyRulesPage() {
               In the unlikely event of damage, an accident, or a disagreement, both parties should document the situation immediately with photos and written notes. 
             </p>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              We strongly advise renters and owners to conduct a joint walk-around inspection of the vehicle before departure and upon return. Any disputes regarding the security deposit or vehicle condition should be communicated respectfully. The CarMarket administrative team can offer guidance to help mediate disputes, but direct resolution between the owner and renter is strongly encouraged.
+              We strongly advise users to conduct a joint inspection of the property or vehicle before handover and upon return. Any disputes regarding the security deposit or condition should be communicated respectfully. The MyEthioProperties administrative team can offer guidance to help mediate disputes, but direct resolution between the owner and renter/buyer is strongly encouraged.
             </p>
             <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", fontStyle: "italic", marginTop: "1rem" }}>
-              Note: This document provides general guidance for using our platform and does not constitute a legally binding contract. All agreements are solely between the vehicle owner and the renter.
+              Note: This document provides general guidance for using our platform and does not constitute a legally binding contract. All agreements are solely between the owner and the renter/buyer.
             </p>
           </div>
 

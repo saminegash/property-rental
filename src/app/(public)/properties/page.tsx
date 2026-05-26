@@ -8,7 +8,7 @@ import { PropertyRowSection } from "@/components/properties/PropertyRowSection";
 import { PropertyCategoriesSection } from "@/components/properties/PropertyCategoriesSection";
 import { PropertyHowItWorksSection } from "@/components/properties/PropertyHowItWorksSection";
 import { PropertyOwnerCTASection } from "@/components/properties/PropertyOwnerCTASection";
-import { PopularLocationsSection } from "@/components/cars/PopularLocationsSection";
+import { PopularLocationsSection } from "@/components/shared/PopularLocationsSection";
 
 export const dynamic = "force-dynamic";
 

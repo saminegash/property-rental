@@ -5,7 +5,6 @@ const FOOTER_LINKS = {
   company: [
     { href: "/about", label: "About Us" },
     { href: "/#how-it-works", label: "How It Works" },
-    { href: "/cars", label: "Browse Cars" },
     { href: "/properties", label: "Browse Properties" },
     { href: "/dashboard/become-owner", label: "List with Us" },
   ],
@@ -35,18 +34,18 @@ export default function Footer() {
             <Link href="/" className="mp-footer__logo" id="footer-logo">
               <Image
                 src="/logo.webp"
-                alt="MyProperties Logo"
+                alt="MyEthioProperties Logo"
                 width={28}
                 height={28}
                 className="mp-footer__logo-image"
                 style={{ height: '28px', width: 'auto', objectFit: 'contain' }}
               />
-              <span className="mp-footer__logo-text">MyProperties</span>
+              <span className="mp-footer__logo-text">MyEthioProperties</span>
             </Link>
             <p className="mp-footer__tagline">
-              Rent with trust.
+              Your verified property marketplace.
               <br />
-              Drive with confidence.
+              Rent & buy with trust.
             </p>
             {/* Social links */}
             <div className="mp-footer__socials">
@@ -136,7 +135,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mp-footer__bottom">
-          <p>© {currentYear} MyProperties. All rights reserved.</p>
+          <p>© {currentYear} MyEthioProperties. All rights reserved.</p>
         </div>
       </div>
     </footer>

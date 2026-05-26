@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MyProperties — Rent with trust. Drive with confidence.",
+  title: "MyEthioProperties — Verified Properties for Rent & Sale",
   description:
-    "Rental-first car marketplace for Ethiopia. Find verified cars to rent or list yours on the platform.",
+    "Ethiopia's trusted property marketplace. Find verified apartments, houses, villas, and land for rent or purchase.",
   icons: {
     icon: '/logo.webp',
   },

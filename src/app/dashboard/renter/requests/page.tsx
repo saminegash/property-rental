@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "My Rental Requests — MyEthioProperties",
-  description: "Track your car rental requests and their current status.",
+  title: "My Requests — MyEthioProperties",
+  description: "Track your property and car rental requests and their current status.",
 };
 
 type RequestWithListing = {
@@ -24,7 +24,7 @@ type RequestWithListing = {
   message: string | null;
   status: string;
   created_at: string;
-  listing: { title: string; location: string | null } | null;
+  listing: { title: string; location: string | null; category: string | null } | null;
 };
 
 const STATUS_CONFIG: Record<
@@ -50,21 +50,21 @@ const STATUS_CONFIG: Record<
     color: "#0284c7",
     bg: "#e0f2fe",
     border: "#bae6fd",
-    desc: "We have reached out to the car owner for availability.",
+    desc: "We have reached out to the owner for availability.",
   },
   owner_available: {
     label: "Owner Available",
     color: "#059669",
     bg: "#ecfdf5",
     border: "#a7f3d0",
-    desc: "The car owner has confirmed availability. Finalizing details.",
+    desc: "The owner has confirmed availability. Finalizing details.",
   },
   owner_unavailable: {
     label: "Owner Unavailable",
     color: "#dc2626",
     bg: "#fef2f2",
     border: "#fecaca",
-    desc: "The car was unavailable for your selected dates.",
+    desc: "The listing was unavailable for your selected dates.",
   },
   renter_contacted: {
     label: "We'll Contact You",
@@ -141,7 +141,7 @@ export default async function RenterRequestsPage() {
       id, listing_id, renter_name, renter_phone, renter_email,
       start_date, end_date, needs_driver, needs_delivery,
       delivery_location, message, status, created_at,
-      listing:listings ( title, location )
+      listing:listings ( title, location, category )
     `)
     .eq("renter_id", user.id)
     .order("created_at", { ascending: false });
@@ -177,11 +177,11 @@ export default async function RenterRequestsPage() {
           </p>
         </div>
         <Link
-          href="/cars"
+          href="/properties"
           className="auth-button auth-button--secondary"
           style={{ textDecoration: "none", whiteSpace: "nowrap" }}
         >
-          Browse More Cars
+          Browse Listings
         </Link>
       </div>
 
@@ -190,7 +190,7 @@ export default async function RenterRequestsPage() {
           className="dashboard-card"
           style={{ textAlign: "center", padding: "4rem 2rem" }}
         >
-          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🚗</div>
+          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🏠</div>
           <h2
             style={{
               fontSize: "1.25rem",
@@ -204,10 +204,10 @@ export default async function RenterRequestsPage() {
             className="dashboard-hint"
             style={{ marginBottom: "1.5rem", maxWidth: "400px", margin: "0 auto 1.5rem" }}
           >
-            Browse available cars and submit a rental request to get started.
+            Browse available properties and submit a request to get started.
           </p>
-          <Link href="/cars" className="auth-button" style={{ textDecoration: "none" }}>
-            Browse Cars
+          <Link href="/properties" className="auth-button" style={{ textDecoration: "none" }}>
+            Browse Properties
           </Link>
         </div>
       ) : (
@@ -240,7 +240,7 @@ export default async function RenterRequestsPage() {
                         marginBottom: "0.125rem",
                       }}
                     >
-                      {listing?.title || "Car Listing"}
+                      {listing?.title || "Listing"}
                     </h3>
                     {listing?.location && (
                       <p style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
@@ -293,31 +293,43 @@ export default async function RenterRequestsPage() {
                   }}
                 >
                   <div>
-                    <span style={{ color: "var(--color-text-muted)" }}>Pickup Date</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>{listing?.category === "property" ? "Start Date" : "Pickup Date"}</span>
                     <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
                       {formatDate(request.start_date)}
                     </p>
                   </div>
                   <div>
-                    <span style={{ color: "var(--color-text-muted)" }}>Return Date</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>{listing?.category === "property" ? "End Date" : "Return Date"}</span>
                     <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
                       {formatDate(request.end_date)}
                     </p>
                   </div>
-                  <div>
-                    <span style={{ color: "var(--color-text-muted)" }}>Driver</span>
-                    <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                      {request.needs_driver ? "With Driver" : "Self-Drive"}
-                    </p>
-                  </div>
-                  <div>
-                    <span style={{ color: "var(--color-text-muted)" }}>Delivery</span>
-                    <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                      {request.needs_delivery
-                        ? `Yes — ${request.delivery_location || "Location not set"}`
-                        : "Self Pickup"}
-                    </p>
-                  </div>
+                  {listing?.category !== "property" && (
+                    <>
+                      <div>
+                        <span style={{ color: "var(--color-text-muted)" }}>Driver</span>
+                        <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
+                          {request.needs_driver ? "With Driver" : "Self-Drive"}
+                        </p>
+                      </div>
+                      <div>
+                        <span style={{ color: "var(--color-text-muted)" }}>Delivery</span>
+                        <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
+                          {request.needs_delivery
+                            ? `Yes — ${request.delivery_location || "Location not set"}`
+                            : "Self Pickup"}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                  {listing?.category === "property" && request.message && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <span style={{ color: "var(--color-text-muted)" }}>Message</span>
+                      <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
+                        {request.message}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Submitted at */}
@@ -331,7 +343,7 @@ export default async function RenterRequestsPage() {
                   }}
                 >
                   Submitted {formatDate(request.created_at)} ·{" "}
-                  <Link href={`/cars/${request.listing_id}`} style={{ color: "var(--color-primary)" }}>
+                  <Link href={`/${listing?.category === "property" ? "properties" : "cars"}/${request.listing_id}`} style={{ color: "var(--color-primary)" }}>
                     View Listing
                   </Link>
                 </p>

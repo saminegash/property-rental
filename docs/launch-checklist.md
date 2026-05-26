@@ -1,6 +1,6 @@
-# CarMarket MVP Launch Checklist
+# MyEthioProperties MVP Launch Checklist
 
-This document serves as the final pre-flight checklist before deploying the CarMarket MVP to production. It covers all operational, environmental, and feature-level requirements to ensure the platform launches securely and functions as designed.
+This document serves as the final pre-flight checklist before deploying the MyEthioProperties MVP to production. It covers all operational, environmental, and feature-level requirements to ensure the platform launches securely and functions as designed.
 
 ## 1. Environment Checklist
 - [ ] `NEXT_PUBLIC_SUPABASE_URL` is set to the production Supabase project URL.

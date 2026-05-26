@@ -41,12 +41,12 @@ export async function generateMetadata({
     .single();
 
   if (!listing) {
-    return { title: "Listing Not Found — CarMarket" };
+    return { title: "Listing Not Found — MyEthioProperties" };
   }
 
   return {
-    title: `${listing.title} — CarMarket`,
-    description: `Rent ${listing.title} in ${listing.location || "Ethiopia"}. Browse details, pricing, and availability on CarMarket.`,
+    title: `${listing.title} — MyEthioProperties`,
+    description: `Rent ${listing.title} in ${listing.location || "Ethiopia"}. Browse details, pricing, and availability on MyEthioProperties.`,
   };
 }
 

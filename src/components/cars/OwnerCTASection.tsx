@@ -13,9 +13,9 @@ export function OwnerCTASection() {
     <section className="owner-cta" id="owner-cta">
       <div className="owner-cta__inner">
         <div className="owner-cta__content">
-          <h2 className="owner-cta__title">Own a car? Start earning from it.</h2>
+          <h2 className="owner-cta__title">Own a property or car? Start earning.</h2>
           <p className="owner-cta__subtitle">
-            List your car, set your rental price, choose with-driver or without-driver options, and let our admin team help manage rental requests.
+            List your property or vehicle, set your price, and let our admin team help manage rental or buyer requests securely.
           </p>
           
           <ul className="owner-cta__benefits">
@@ -31,7 +31,7 @@ export function OwnerCTASection() {
           
           <div className="owner-cta__actions">
             <Link href="/dashboard/become-owner" className="owner-cta__button">
-              List Your Car Now
+              List Your Property or Car
             </Link>
           </div>
         </div>

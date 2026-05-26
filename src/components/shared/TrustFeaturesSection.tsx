@@ -10,7 +10,7 @@ export function TrustFeaturesSection() {
         </svg>
       ),
       title: "Verified Owners",
-      description: "Every car owner is strictly vetted with ID and property verification before listing.",
+      description: "Every property and vehicle owner is verified with ID and document checks before listing.",
     },
     {
       icon: (
@@ -28,8 +28,8 @@ export function TrustFeaturesSection() {
           <path d="M12 8v4l3 3" />
         </svg>
       ),
-      title: "With or Without Driver",
-      description: "Choose to drive yourself or hire one of our professional, background-checked drivers.",
+      title: "Flexible Options",
+      description: "Rent, buy, or sell. Choose the listing type that suits you — with full admin support.",
     },
     {
       icon: (
@@ -39,7 +39,7 @@ export function TrustFeaturesSection() {
         </svg>
       ),
       title: "Transparent Pricing",
-      description: "No hidden fees. You see exactly what you pay for the car, driver, and deposit.",
+      description: "No hidden fees. You see exactly what you pay for the property, deposit, and services.",
     },
   ];
 

@@ -7,8 +7,8 @@ interface PopularLocationsSectionProps {
 }
 
 export function PopularLocationsSection({ 
-  baseRoute = "/cars",
-  subtitle = "Find the perfect car exactly where you need it."
+  baseRoute = "/properties",
+  subtitle = "Find the perfect property exactly where you need it."
 }: PopularLocationsSectionProps = {}) {
   const locations = [
     "Addis Ababa",

@@ -16,7 +16,7 @@ export function MarketplaceHeroClient({
   featuredProperty,
   propertyTypes,
 }: MarketplaceHeroClientProps) {
-  const [activeTab, setActiveTab] = useState<"cars" | "properties">("cars");
+  const [activeTab, setActiveTab] = useState<"cars" | "properties">("properties");
   const router = useRouter();
 
   function handleCarSearch(e: React.FormEvent<HTMLFormElement>) {
@@ -45,13 +45,16 @@ export function MarketplaceHeroClient({
     if (location) searchParams.set("location", location);
 
     const listingType = formData.get("listing_type") as string;
-    if (listingType) searchParams.set("listing_type", listingType);
+    if (listingType) searchParams.set("type", listingType);
 
     const propertyType = formData.get("property_type") as string;
-    if (propertyType) searchParams.set("type", propertyType);
+    if (propertyType) searchParams.set("property_type", propertyType);
 
     const bedrooms = formData.get("bedrooms") as string;
-    if (bedrooms) searchParams.set("beds", bedrooms);
+    if (bedrooms) searchParams.set("min_beds", bedrooms);
+
+    const budget = formData.get("budget") as string;
+    if (budget) searchParams.set("max_price", budget);
 
     router.push(`/properties?${searchParams.toString()}`);
   }
@@ -62,26 +65,26 @@ export function MarketplaceHeroClient({
         
         <div className="marketplace-hero__content">
           <h1 className="marketplace-hero__headline">
-            Find your next car or home with{" "}
+            Find your next home with{" "}
             <span className="marketplace-hero__highlight">confidence</span>
           </h1>
           <p className="marketplace-hero__subtext">
-            Verified cars and properties. Admin-reviewed requests. Safe deals.
+            Verified properties for rent & sale. Admin-reviewed listings. Trusted deals.
           </p>
 
           <div className="hero-search-card">
             <div className="hero-search-tabs">
               <button
-                className={`hero-search-tab ${activeTab === "cars" ? "hero-search-tab--active" : ""}`}
-                onClick={() => setActiveTab("cars")}
-              >
-                🚗 Rent / Buy Cars
-              </button>
-              <button
                 className={`hero-search-tab ${activeTab === "properties" ? "hero-search-tab--active" : ""}`}
                 onClick={() => setActiveTab("properties")}
               >
                 🏠 Rent / Buy Properties
+              </button>
+              <button
+                className={`hero-search-tab ${activeTab === "cars" ? "hero-search-tab--active" : ""}`}
+                onClick={() => setActiveTab("cars")}
+              >
+                🚗 Rent / Buy Cars
               </button>
             </div>
 
@@ -149,7 +152,7 @@ export function MarketplaceHeroClient({
                     <select name="property_type" className="form-input">
                       <option value="">Any Type</option>
                       {propertyTypes.map((pt) => (
-                        <option key={pt.id} value={pt.id}>{pt.name}</option>
+                        <option key={pt.id} value={pt.name.toLowerCase()}>{pt.name}</option>
                       ))}
                     </select>
                   </div>
