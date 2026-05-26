@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { trackListingEvent } from "@/lib/analytics";
+import { sendAdminNotification } from "@/lib/notifications";
 
 export async function submitPropertyRequest(formData: FormData) {
   const supabase = await createClient();
@@ -35,7 +36,7 @@ export async function submitPropertyRequest(formData: FormData) {
 
   const { data: listing, error: listingError } = await supabase
     .from("listings")
-    .select("listing_type")
+    .select("listing_type, title")
     .eq("id", listing_id)
     .single();
 
@@ -86,6 +87,33 @@ export async function submitPropertyRequest(formData: FormData) {
       console.error("Error submitting listing request:", error);
       return { error: error.message };
     }
+  }
+
+  // Trigger admin notifications safely (non-blocking)
+  if (listing.listing_type === "rent") {
+    sendAdminNotification({
+      type: "rental",
+      category: "property",
+      renterName: renter_name,
+      renterPhone: renter_phone,
+      renterEmail: renter_email || undefined,
+      message: message || undefined,
+      listingTitle: listing.title,
+      startDate: start_date,
+      endDate: end_date,
+    }).catch(err => console.error("Property rental admin notification exception:", err));
+  } else {
+    sendAdminNotification({
+      type: "sale",
+      category: "property",
+      renterName: renter_name,
+      renterPhone: renter_phone,
+      renterEmail: renter_email || undefined,
+      message: message || undefined,
+      listingTitle: listing.title,
+      preferredViewingDate: preferred_date || undefined,
+      budgetAmount: budget ? parseFloat(budget) : undefined,
+    }).catch(err => console.error("Property sale admin notification exception:", err));
   }
 
   revalidatePath(`/properties/${listing_id}`);

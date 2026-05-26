@@ -19,10 +19,18 @@ export async function trackListingEvent(listing_id: string, event_type: EventTyp
     const headersList = await headers();
     const ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "unknown-ip";
     const userAgent = headersList.get("user-agent") || "unknown-ua";
-    const salt = process.env.ANALYTICS_SALT || "fallback-salt-do-not-use-in-prod";
+    const isProd = process.env.NODE_ENV === "production";
+    const salt = process.env.ANALYTICS_SALT;
+
+    if (isProd && !salt) {
+      console.error("CRITICAL SECURITY ERROR: ANALYTICS_SALT is missing in production! Analytics tracking bypassed to protect visitor privacy.");
+      return;
+    }
+
+    const activeSalt = salt || "fallback-salt-do-not-use-in-prod";
 
     const hash = crypto.createHash('sha256');
-    hash.update(`${ip}-${userAgent}-${salt}`);
+    hash.update(`${ip}-${userAgent}-${activeSalt}`);
     const session_id = hash.digest('hex').substring(0, 32);
 
     const { error } = await supabase

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { trackListingEvent } from "@/lib/analytics";
+import { sendAdminNotification } from "@/lib/notifications";
 
 export async function submitRentalRequest(formData: FormData) {
   const supabase = await createClient();
@@ -30,6 +31,16 @@ export async function submitRentalRequest(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("title")
+    .eq("id", listing_id)
+    .single();
+
+  if (listingError || !listing) {
+    return { error: "Listing not found" };
+  }
+
   const { error } = await supabase.from("rental_requests").insert({
     listing_id,
     renter_id: user?.id || null, // nullable for public users
@@ -49,6 +60,19 @@ export async function submitRentalRequest(formData: FormData) {
     console.error("Error submitting request:", error);
     return { error: error.message };
   }
+
+  // Trigger admin notifications safely (non-blocking)
+  sendAdminNotification({
+    type: "rental",
+    category: "car",
+    renterName: renter_name,
+    renterPhone: renter_phone,
+    renterEmail: renter_email || undefined,
+    message: message || undefined,
+    listingTitle: listing.title,
+    startDate: start_date,
+    endDate: end_date,
+  }).catch(err => console.error("Car rental admin notification exception:", err));
 
   revalidatePath(`/cars/${listing_id}`);
   return { success: true };
@@ -85,6 +109,16 @@ export async function submitCarSaleInquiry(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("title")
+    .eq("id", listing_id)
+    .single();
+
+  if (listingError || !listing) {
+    return { error: "Listing not found" };
+  }
+
   const { error } = await supabase.from("listing_requests").insert({
     listing_id,
     requester_id: user?.id || null, // nullable for public users
@@ -102,6 +136,19 @@ export async function submitCarSaleInquiry(formData: FormData) {
     console.error("Error submitting car sale inquiry:", error);
     return { error: error.message };
   }
+
+  // Trigger admin notifications safely (non-blocking)
+  sendAdminNotification({
+    type: "sale",
+    category: "car",
+    renterName: requester_name,
+    renterPhone: requester_phone,
+    renterEmail: requester_email || undefined,
+    message: finalMessage || undefined,
+    listingTitle: listing.title,
+    preferredViewingDate: preferred_date || undefined,
+    budgetAmount: budget ? parseFloat(budget) : undefined,
+  }).catch(err => console.error("Car sale admin notification exception:", err));
 
   revalidatePath(`/cars/${listing_id}`);
   return { success: true };
