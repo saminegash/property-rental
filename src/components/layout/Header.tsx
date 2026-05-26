@@ -12,20 +12,11 @@ const NAV_LINKS = [
   { href: "/safety", label: "Safety" },
 ] as const;
 
-const LANGUAGES = [
-  { code: "en", label: "EN" },
-  { code: "am", label: "አማ" },
-  { code: "om", label: "OM" },
-] as const;
+
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState<string>("en");
-
-  const currentLangLabel =
-    LANGUAGES.find((l) => l.code === currentLang)?.label ?? "EN";
 
   return (
     <header className="mp-header" id="site-header">
@@ -65,44 +56,7 @@ export default function Header() {
 
         {/* Right actions */}
         <div className="mp-header__actions">
-          {/* Language selector */}
-          <div className="mp-header__lang" id="lang-selector">
-            <button
-              className="mp-header__lang-btn"
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              aria-expanded={langMenuOpen}
-              aria-haspopup="listbox"
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-                <ellipse cx="8" cy="8" rx="3.5" ry="7" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" strokeWidth="1.5" />
-              </svg>
-              <span>{currentLangLabel}</span>
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" className="mp-header__chevron">
-                <path d="M2.5 4L5 6.5L7.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            {langMenuOpen && (
-              <ul className="mp-header__lang-menu" role="listbox">
-                {LANGUAGES.map((lang) => (
-                  <li key={lang.code} role="option" aria-selected={currentLang === lang.code}>
-                    <button
-                      className={`mp-header__lang-option ${currentLang === lang.code ? "mp-header__lang-option--active" : ""}`}
-                      onClick={() => {
-                        setCurrentLang(lang.code);
-                        setLangMenuOpen(false);
-                      }}
-                      type="button"
-                    >
-                      {lang.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+
 
           {/* Dashboard & List Car CTAs */}
           <Link href="/dashboard" className="text-text-heading hover:text-primary p-2 hidden sm:block font-medium text-sm" aria-label="My Dashboard">
