@@ -96,6 +96,8 @@ export default function InquiryReviewCard({ request }: { request: EnrichedInquir
         const overrideResult = await updateInquiryStatus(request.id, newStatus, reason);
         if (overrideResult?.error) {
           alert(overrideResult.error);
+        } else {
+          router.refresh();
         }
       }
     } else if (result?.error) {

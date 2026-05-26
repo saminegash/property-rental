@@ -130,6 +130,8 @@ export default function RequestReviewCard({ request }: { request: EnrichedReques
         const overrideResult = await updateRequestStatus(request.id, newStatus, reason);
         if (overrideResult?.error) {
           alert(overrideResult.error);
+        } else {
+          router.refresh();
         }
       }
     } else if (result?.error) {

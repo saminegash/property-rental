@@ -45,14 +45,18 @@ export async function submitPropertyRequest(formData: FormData) {
 
   if (listing.listing_type === "rent") {
     // Rental request
+    if (!start_date || !end_date) {
+      return { error: "Missing required rental dates" };
+    }
+
     const { error } = await supabase.from("rental_requests").insert({
       listing_id,
       renter_id: user?.id || null, // nullable for public users
       renter_name,
       renter_phone,
       renter_email: renter_email || null,
-      start_date: start_date || new Date().toISOString(), // Fallback if missing
-      end_date: end_date || new Date().toISOString(),
+      start_date,
+      end_date,
       needs_driver: false,
       needs_delivery: false,
       message: message || null,

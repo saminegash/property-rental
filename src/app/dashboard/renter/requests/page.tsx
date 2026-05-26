@@ -76,6 +76,13 @@ const STATUS_CONFIG: Record<
     border: "#bae6fd",
     desc: "Our team will contact you shortly to finalize details.",
   },
+  requester_contacted: {
+    label: "We'll Contact You",
+    color: "#0284c7",
+    bg: "#e0f2fe",
+    border: "#bae6fd",
+    desc: "Our team will contact you shortly to finalize details.",
+  },
   awaiting_payment: {
     label: "Awaiting Payment",
     color: "#d97706",
@@ -368,15 +375,15 @@ export default async function RenterRequestsPage() {
                     )
                   ) : (
                     <>
-                      {listing?.category === "car" && (
+                      {listing?.category === "vehicle" && (
                         <div style={{ marginTop: "0.5rem" }}>
                           <span style={{ color: "var(--color-text-muted)" }}>Driver Required?</span>
                           <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
                             {request.needs_driver ? "Yes" : "No"}
                           </p>
                         </div>
-                      )}                      
-                      {listing?.category === "car" && request.needs_delivery && (
+                      )}
+                      {listing?.category === "vehicle" && request.needs_delivery && (
                         <div style={{ marginTop: "0.5rem" }}>
                           <span style={{ color: "var(--color-text-muted)" }}>Delivery</span>
                           <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
