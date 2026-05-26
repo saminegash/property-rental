@@ -37,7 +37,7 @@ export default function SafetyRulesPage() {
             </ul>
 
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              Look for the <strong>🛡️ Admin Verified</strong> badge on listings to know that the property or vehicle has passed our rigorous checks.
+              Look for the <strong>🛡️ Admin Verified</strong> badge on listings to know that the listing&apos;s owner has passed our rigorous identity and ownership checks.
             </p>
           </div>
 

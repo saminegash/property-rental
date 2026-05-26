@@ -344,7 +344,12 @@ export default function ListingReviewCard({ listing }: Props) {
     const checklistString = `[Admin Verified Checklist Completed: Identity, Ownership, Location, Photos, Price, Contact]`;
     const newNotes = adminNotes ? `${adminNotes}\n${checklistString}` : checklistString;    
     // Save notes with checklist audit trail before approving
-    await saveAdminNotes(listing.id, newNotes);
+    const notesResult = await saveAdminNotes(listing.id, newNotes);
+    if (notesResult.error) {
+      setError(notesResult.error);
+      setLoading(false);
+      return;
+    }
     
     const result = await approveListing(listing.id);
     if (result.error) {
