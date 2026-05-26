@@ -85,7 +85,6 @@ export default async function EditPropertyPage({
       />
 
       <SubmitReviewPanel
-        listingId={listing.id}
         listingStatus={listing.status}
         hasPropertyDetails={!!propertyDetails}
         hasPricing={hasPricing}

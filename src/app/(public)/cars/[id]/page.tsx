@@ -283,7 +283,6 @@ export default async function CarDetailPage({
               weeklyPrice={rt?.weekly_price}
               monthlyPrice={rt?.monthly_price}
               availableWithDriver={!!rt?.available_with_driver}
-              availableWithoutDriver={!!rt?.available_without_driver}
               dailyDriverFee={rt?.daily_driver_fee}
               securityDeposit={rt?.security_deposit_amount}
               deliveryAvailable={!!rt?.delivery_available}

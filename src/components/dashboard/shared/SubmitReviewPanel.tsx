@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 
 type Props = {
-  listingId: string;
   listingStatus: string;
   hasVehicleDetails?: boolean;
   hasPropertyDetails?: boolean;
@@ -26,7 +25,6 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 };
 
 export default function SubmitReviewPanel({
-  listingId,
   listingStatus,
   hasVehicleDetails,
   hasPropertyDetails,

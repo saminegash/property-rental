@@ -71,6 +71,7 @@ export default async function PropertyDetailPage({
         security_deposit_amount, minimum_rental_days,
         rental_notes
       ),
+      sale_terms ( sale_price ),
       listing_images ( id, image_url, is_primary, sort_order )
     `
     )
@@ -81,11 +82,12 @@ export default async function PropertyDetailPage({
     notFound();
   }
 
-  // Extract joined data
   const pdRaw = listing.property_details;
   const pd = Array.isArray(pdRaw) ? pdRaw[0] : pdRaw;
   const rtRaw = listing.rental_terms;
   const rt = Array.isArray(rtRaw) ? rtRaw[0] : rtRaw;
+  const stRaw = listing.sale_terms;
+  const st = Array.isArray(stRaw) ? stRaw[0] : stRaw;
   const images = (
     Array.isArray(listing.listing_images) ? listing.listing_images : []
   ).sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order);
@@ -269,6 +271,7 @@ export default async function PropertyDetailPage({
               listingType={listing.listing_type as "rent" | "sale"}
               dailyPrice={rt?.daily_price}
               monthlyPrice={rt?.monthly_price}
+              salePrice={st?.sale_price}
               securityDeposit={rt?.security_deposit_amount}
               minimumRentalDays={rt?.minimum_rental_days}
             />

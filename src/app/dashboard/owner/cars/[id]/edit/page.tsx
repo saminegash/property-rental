@@ -150,7 +150,6 @@ export default async function EditCarPage({
 
       {/* Section 6: Submit for Review */}
       <SubmitReviewPanel
-        listingId={listing.id}
         listingStatus={listing.status}
         hasVehicleDetails={!!vehicleDetails}
         hasPricing={hasPricing}

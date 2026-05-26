@@ -11,7 +11,6 @@ interface PriceSummaryCardProps {
   weeklyPrice?: number | null;
   monthlyPrice?: number | null;
   availableWithDriver: boolean;
-  availableWithoutDriver: boolean;
   dailyDriverFee?: number | null;
   securityDeposit?: number | null;
   deliveryAvailable: boolean;
@@ -25,7 +24,6 @@ export function PriceSummaryCard({
   weeklyPrice,
   monthlyPrice,
   availableWithDriver,
-  availableWithoutDriver,
   dailyDriverFee,
   securityDeposit,
   deliveryAvailable,

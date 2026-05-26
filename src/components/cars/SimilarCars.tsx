@@ -8,6 +8,25 @@ interface SimilarCarsProps {
   listingType: string;
 }
 
+type SimilarCarData = {
+  id: string;
+  title: string;
+  location: string | null;
+  owner_id: string;
+  listing_type: string;
+  is_featured: boolean;
+  rental_terms: {
+    daily_price: number | null;
+    available_with_driver: boolean;
+    available_without_driver: boolean;
+    delivery_available: boolean;
+  }[];
+  listing_images: {
+    image_url: string;
+    is_primary: boolean;
+  }[];
+};
+
 export async function SimilarCars({ currentListingId, location, listingType }: SimilarCarsProps) {
   const supabase = await createClient();
 
@@ -59,10 +78,10 @@ export async function SimilarCars({ currentListingId, location, listingType }: S
         Similar Cars
       </h2>
       <div className="featured-cars__grid">
-        {listings.map((car: any) => {
+        {(listings as SimilarCarData[]).map((car) => {
           const rt = car.rental_terms?.[0];
           const coverImage =
-            car.listing_images?.find((img: any) => img.is_primary)?.image_url ||
+            car.listing_images?.find((img) => img.is_primary)?.image_url ||
             car.listing_images?.[0]?.image_url ||
             "";
 

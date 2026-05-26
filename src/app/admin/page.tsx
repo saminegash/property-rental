@@ -91,8 +91,8 @@ export default async function AdminPage() {
           description="Review new bookings, active rentals, disputes, and manage platform flow."
         />
         <ActionCard 
-          href="#" 
-          title="General Inquiries (TODO)" 
+          href="/admin/inquiries" 
+          title="General Inquiries & Sales" 
           description="Review property sale and viewing inquiries."
         />
         <ActionCard 

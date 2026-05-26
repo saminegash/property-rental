@@ -8,6 +8,7 @@ interface PropertyPriceSummaryCardProps {
   listingType: "rent" | "sale";
   dailyPrice?: number | null;
   monthlyPrice?: number | null;
+  salePrice?: number | null;
   securityDeposit?: number | null;
   minimumRentalDays?: number | null;
 }
@@ -17,6 +18,7 @@ export function PropertyPriceSummaryCard({
   listingType,
   dailyPrice,
   monthlyPrice,
+  salePrice,
   securityDeposit,
   minimumRentalDays,
 }: PropertyPriceSummaryCardProps) {
@@ -39,9 +41,18 @@ export function PropertyPriceSummaryCard({
             </span>
           )
         ) : (
-          <span style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)" }}>
-            Price on Request
-          </span>
+          salePrice ? (
+            <div>
+              <span style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-primary)" }}>
+                {salePrice.toLocaleString()}
+              </span>
+              <span style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--color-text-heading)" }}> ETB</span>
+            </div>
+          ) : (
+            <span style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)" }}>
+              Price on Request
+            </span>
+          )
         )}
       </div>
 
