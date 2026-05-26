@@ -148,6 +148,9 @@ export default async function CarDetailPage({
                     Driver Available
                   </span>
                 )}
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-success-text, #065f46)", backgroundColor: "var(--color-success-light, #d1fae5)", padding: "0.25rem 0.5rem", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", gap: "0.25rem" }} title="This listing has been manually reviewed and verified by our Trust & Safety team.">
+                  🛡️ Admin Verified
+                </span>
               </div>
               <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "var(--color-text-heading)", lineHeight: 1.2, marginBottom: "0.5rem" }}>
                 {listing.title}
@@ -260,6 +263,22 @@ export default async function CarDetailPage({
                 ownerType={ownerProfile?.owner_type}
                 businessName={ownerProfile?.business_name}
               />
+            </div>
+            
+            <div style={{ marginTop: "1rem", padding: "1.5rem", backgroundColor: "var(--color-surface-hover)", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)", textAlign: "center" }}>
+              <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "0.5rem" }}>
+                Notice an issue with this listing?
+              </h4>
+              <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "1rem" }}>
+                We manually review all listings, but if you believe this violates our trust & safety policies, please let us know.
+              </p>
+              <a 
+                href={`mailto:support@myethioproperties.com?subject=Reporting Listing [${listing.id}] - ${listing.title}`}
+                className="auth-button auth-button--secondary"
+                style={{ display: "inline-flex", width: "auto", padding: "0.5rem 1rem", fontSize: "0.875rem", textDecoration: "none", alignItems: "center", gap: "0.5rem", color: "var(--color-error-text)", border: "1px solid var(--color-error-border)", backgroundColor: "transparent" }}
+              >
+                🚩 Report this listing
+              </a>
             </div>
             
           </div>

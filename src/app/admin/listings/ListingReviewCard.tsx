@@ -317,6 +317,16 @@ export default function ListingReviewCard({ listing }: Props) {
   const [notesSaved, setNotesSaved] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
+  const [checklist, setChecklist] = useState({
+    identity: false,
+    ownership: false,
+    location: false,
+    photos: false,
+    price: false,
+    contact: false,
+  });
+  const allChecked = Object.values(checklist).every(Boolean);
+
   const primaryImage = listing.images.find((img) => img.is_primary);
   const vd = listing.vehicle_details;
   const pd = listing.property_details;
@@ -747,16 +757,41 @@ export default function ListingReviewCard({ listing }: Props) {
           </div>
         )
       ) : !showRejectForm && !showSuspendForm ? (
-        <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem", flexWrap: "wrap" }}>
-          <button
-            type="button"
-            className="auth-button"
-            style={{ flex: "1 1 auto", backgroundColor: "#059669" }}
-            onClick={handleApprove}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : "✓ Approve & Publish"}
-          </button>
+        <>
+          <div style={{ backgroundColor: "var(--color-surface-hover)", padding: "1rem", borderRadius: "var(--radius-md)", marginBottom: "1rem" }}>
+            <h4 style={{ fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.75rem" }}>Admin Verification Checklist</h4>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+              {[
+                { key: 'identity', label: 'Owner identity verified' },
+                { key: 'ownership', label: 'Property/Vehicle ownership verified' },
+                { key: 'location', label: 'Accurate location' },
+                { key: 'photos', label: 'Real photos' },
+                { key: 'price', label: 'Price sanity check' },
+                { key: 'contact', label: 'Phone/contact verified' }
+              ].map(({ key, label }) => (
+                <label key={key} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8125rem", cursor: "pointer" }}>
+                  <input 
+                    type="checkbox" 
+                    checked={checklist[key as keyof typeof checklist]} 
+                    onChange={(e) => setChecklist({ ...checklist, [key]: e.target.checked })}
+                    style={{ cursor: "pointer" }}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="auth-button"
+              style={{ flex: "1 1 auto", backgroundColor: allChecked ? "#059669" : "#9ca3af", cursor: allChecked ? "pointer" : "not-allowed" }}
+              onClick={handleApprove}
+              disabled={loading || !allChecked}
+              title={!allChecked ? "Complete checklist to approve" : ""}
+            >
+              {loading ? "Processing..." : "✓ Approve & Publish"}
+            </button>
           <button
             type="button"
             className="auth-button"
@@ -766,16 +801,17 @@ export default function ListingReviewCard({ listing }: Props) {
           >
             ✕ Reject
           </button>
-          <button
-            type="button"
-            className="auth-button"
-            style={{ flex: "1 1 auto", backgroundColor: "transparent", border: "1px solid #f59e0b", color: "#92400e" }}
-            onClick={() => setShowSuspendForm(true)}
-            disabled={loading}
-          >
-            ⏸ Suspend
-          </button>
-        </div>
+            <button
+              type="button"
+              className="auth-button"
+              style={{ flex: "1 1 auto", backgroundColor: "transparent", border: "1px solid #f59e0b", color: "#92400e" }}
+              onClick={() => setShowSuspendForm(true)}
+              disabled={loading}
+            >
+              ⏸ Suspend
+            </button>
+          </div>
+        </>
       ) : showRejectForm ? (
         <div style={{ marginTop: "1rem" }}>
           <label className="form-label" style={{ marginBottom: "0.5rem", display: "block" }}>

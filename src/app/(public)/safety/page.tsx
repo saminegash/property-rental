@@ -19,19 +19,41 @@ export default function SafetyRulesPage() {
             Welcome to MyEthioProperties! We are dedicated to providing a secure and reliable platform for property and car rentals, as well as property sales. Please read our community guidelines and safety protocols to understand how the platform operates.
           </p>
 
-          <div className="dashboard-card" style={{ marginBottom: "2rem", padding: "2rem" }}>
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem" }}>
-              1. The Rental Process
+          <div className="dashboard-card" style={{ marginBottom: "2rem", padding: "2rem", borderLeft: "4px solid var(--color-primary)" }}>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span>🛡️</span> 1. The Admin Verification Process
             </h2>
             
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Admin-Controlled Review Process</h3>
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              To ensure safety and quality, all rental requests are first reviewed by our administrative team. Owners will only be notified of a request once our team has completed an initial verification. This prevents spam and protects both parties.
+              At MyEthioProperties, your safety is our highest priority. To build a trusted marketplace, <strong>every single listing is manually reviewed and verified</strong> by our Trust & Safety team before it becomes public.
             </p>
 
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Verify Owner Before Payment</h3>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>What We Verify:</h3>
+            <ul style={{ listStyleType: "disc", paddingLeft: "1.5rem", color: "var(--color-text-muted)", lineHeight: 1.6, marginBottom: "1rem" }}>
+              <li><strong>Owner Identity:</strong> We securely verify the identity of the person listing the property or vehicle.</li>
+              <li><strong>Proof of Ownership:</strong> Owners must provide valid documentation or authorization to rent or sell the listing.</li>
+              <li><strong>Listing Accuracy:</strong> We check that the location is accurate, the photos are real (not stock images), and the pricing is reasonable.</li>
+              <li><strong>Contact Information:</strong> We ensure the owner&apos;s phone number and email are active and reachable.</li>
+            </ul>
+
             <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-              Payments for rentals, sales, driver fees, and security deposits are handled directly between you and the owner (or through our verified admins). <strong>Never transfer money</strong> until you have verified the property or vehicle, met the owner or admin in person, and confirmed the booking status on your MyEthioProperties dashboard.
+              Look for the <strong>🛡️ Admin Verified</strong> badge on listings to know that the property or vehicle has passed our rigorous checks.
+            </p>
+          </div>
+
+          <div className="dashboard-card" style={{ marginBottom: "2rem", padding: "2rem" }}>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "var(--color-text-heading)", marginBottom: "1rem", borderBottom: "1px solid var(--color-border)", paddingBottom: "0.5rem" }}>
+              2. The Rental & Buying Process
+            </h2>
+            
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Admin-Mediated Inquiries</h3>
+            <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+              To protect both renters/buyers and owners, all inquiries are first routed to our administrative team. We conduct an initial screening to prevent spam and ensure the request is legitimate before connecting you with the owner.
+            </p>
+
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginTop: "1.5rem", marginBottom: "0.5rem" }}>Verify Before Payment</h3>
+            <p style={{ marginBottom: "1rem", color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+              Payments for rentals, sales, driver fees, and security deposits are handled directly between you and the owner (or through our verified admins). <strong>Never transfer money</strong> until you have verified the property or vehicle, met the owner or admin in person, and confirmed the transaction details.
             </p>
           </div>
 
