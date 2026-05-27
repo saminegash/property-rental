@@ -61,7 +61,7 @@ export function PropertyCard({
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
+      <div className="flex flex-1 flex-col p-4 sm:p-4">
         <h3 className="line-clamp-1 text-sm font-semibold text-slate-900 sm:text-base">
           {title}
         </h3>
@@ -108,7 +108,7 @@ export function PropertyCard({
         )}
 
         {/* CTA */}
-        <span className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 group-hover:border-blue-600 group-hover:text-blue-600 transition-colors">
+        <span className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 group-hover:border-blue-600 group-hover:text-blue-600 transition-colors">
           View Details
         </span>
       </div>

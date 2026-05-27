@@ -43,10 +43,10 @@ export default function WhyChooseSection() {
           {FEATURES.map(({ icon: Icon, color, bg, title, description }) => (
             <div
               key={title}
-              className="flex flex-col items-start rounded-xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-md"
+              className="flex flex-col items-start rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md hover:-translate-y-0.5"
             >
-              <div className={`flex h-11 w-11 items-center justify-center rounded-full ${bg}`}>
-                <Icon className={`h-5 w-5 ${color}`} aria-hidden="true" />
+              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${bg}`}>
+                <Icon className={`h-6 w-6 ${color}`} aria-hidden="true" />
               </div>
               <h3 className="mt-3 text-base font-semibold text-slate-900">{title}</h3>
               <p className="mt-1.5 text-sm text-slate-600">{description}</p>

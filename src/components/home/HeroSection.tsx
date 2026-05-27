@@ -86,7 +86,7 @@ export default function HeroSection({
             </p>
 
             {/* Search card */}
-            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-3 shadow-lg sm:p-4">
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-lg sm:p-5">
               {/* Tabs */}
               <div role="tablist" aria-label="Search type" className="flex gap-2">
                 <button
@@ -208,37 +208,36 @@ export default function HeroSection({
             </div>
           </div>
 
-          {/* RIGHT — Visual */}
+          {/* RIGHT — Visual: single compact image with small car overlay */}
           <div className="relative">
-            {/* Stacked images: property on top, car on bottom */}
-            <div className="flex flex-col gap-3">
-              <div className="relative aspect-[5/3] w-full overflow-hidden rounded-2xl bg-slate-100">
+            {/* Main property image — compact aspect ratio so hero fits in viewport */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-slate-100">
+              <Image
+                src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=900&h=675&q=80"
+                alt="Modern property in Ethiopia"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              {/* Car thumbnail overlay — bottom-left corner of the main image */}
+              <div className="absolute bottom-3 left-3 h-[90px] w-[140px] overflow-hidden rounded-xl shadow-lg ring-2 ring-white sm:h-[100px] sm:w-[160px]">
                 <Image
-                  src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=900&h=600&q=80"
-                  alt="Modern property in Ethiopia"
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
-              <div className="relative aspect-[16/7] w-full overflow-hidden rounded-2xl bg-slate-100">
-                <Image
-                  src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&h=360&q=80"
+                  src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=320&h=200&q=80"
                   alt="Car for sale in Ethiopia"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="160px"
                 />
               </div>
             </div>
 
-            {/* Floating badges — positioned absolutely on top of images, but only on lg+ */}
+            {/* Floating badges — 2×2 grid on mobile, absolute column on lg+ */}
             <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-2 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:flex lg:flex-col lg:justify-around lg:gap-3 lg:py-6 lg:pr-3">
               {FLOATING_BADGES.map(({ icon: Icon, title, subtitle }) => (
                 <div
                   key={title}
-                  className="flex items-center gap-2.5 rounded-xl bg-white/95 backdrop-blur px-3 py-2 shadow-md ring-1 ring-slate-200 lg:max-w-[230px]"
+                  className="flex items-center gap-2.5 rounded-xl bg-white/95 backdrop-blur px-3 py-2 shadow-md ring-1 ring-slate-200 lg:max-w-[220px]"
                 >
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                     <Icon className="h-4 w-4" aria-hidden="true" />

@@ -75,7 +75,11 @@ export async function FeaturedCarsSection() {
         </div>
 
         {cars.length > 0 ? (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-8 lg:grid-cols-4">
+          <div className={`mt-6 lg:mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 ${
+            cars.length >= 4 ? "lg:grid-cols-4" :
+            cars.length >= 3 ? "lg:grid-cols-3" :
+            "lg:grid-cols-2"
+          }`}>
             {cars.map((car) => {
               const cd = car.car_details?.[0];
               const rt = car.rental_terms?.[0];

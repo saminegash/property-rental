@@ -75,7 +75,12 @@ export async function FeaturedPropertiesSection() {
         </div>
 
         {properties.length > 0 ? (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-8 lg:grid-cols-5">
+          <div className={`mt-6 lg:mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 ${
+            properties.length >= 5 ? "lg:grid-cols-5" :
+            properties.length >= 4 ? "lg:grid-cols-4" :
+            properties.length >= 3 ? "lg:grid-cols-3" :
+            "lg:grid-cols-2"
+          }`}>
             {properties.map((prop) => {
               const pd = prop.property_details?.[0];
               const rt = prop.rental_terms?.[0];

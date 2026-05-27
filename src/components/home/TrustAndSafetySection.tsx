@@ -39,8 +39,8 @@ export default function TrustAndSafetySection() {
         <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:mt-8 lg:grid-cols-5">
           {ITEMS.map(({ icon: Icon, title, description }) => (
             <div key={title} className="flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200">
-                <Icon className="h-5 w-5 text-blue-600" aria-hidden="true" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 shadow-sm ring-2 ring-blue-100">
+                <Icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
               </div>
               <h3 className="mt-3 text-sm font-semibold text-slate-900">{title}</h3>
               <p className="mt-1 text-xs text-slate-600 leading-relaxed max-w-[200px]">

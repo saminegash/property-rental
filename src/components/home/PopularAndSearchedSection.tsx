@@ -33,7 +33,7 @@ export default function PopularAndSearchedSection() {
                 <Link
                   key={loc}
                   href={`/properties?location=${encodeURIComponent(loc)}`}
-                  className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors sm:text-sm"
+                  className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-colors sm:text-sm"
                 >
                   {loc}
                 </Link>
@@ -61,7 +61,7 @@ export default function PopularAndSearchedSection() {
                 <Link
                   key={cat.label}
                   href={cat.href}
-                  className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 hover:border-emerald-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors sm:text-sm"
+                  className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-700 shadow-sm hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors sm:text-sm"
                 >
                   {cat.label}
                 </Link>
