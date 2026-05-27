@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -7,9 +8,10 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mp-page">
+    <div className="flex min-h-screen flex-col bg-white">
+      <AnnouncementBar />
       <Header />
-      <main className="mp-main">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );

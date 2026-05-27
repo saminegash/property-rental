@@ -1,46 +1,42 @@
-import { MarketplaceHeroSection } from "@/components/shared/MarketplaceHeroSection";
-import { FeaturedPropertiesSection } from "@/components/properties/FeaturedPropertiesSection";
-import { PropertyCategoriesSection } from "@/components/properties/PropertyCategoriesSection";
-import { TrustFeaturesSection } from "@/components/shared/TrustFeaturesSection";
-import { HowItWorksSection } from "@/components/shared/HowItWorksSection";
-import { PricingTransparencySection } from "@/components/shared/PricingTransparencySection";
-import { PropertyOwnerCTASection } from "@/components/properties/PropertyOwnerCTASection";
-import { PopularLocationsSection } from "@/components/shared/PopularLocationsSection";
 import { Metadata } from "next";
+import HeroSection from "@/components/home/HeroSection";
+import BrowseByCategorySection from "@/components/home/BrowseByCategorySection";
+import { FeaturedPropertiesSection } from "@/components/home/FeaturedPropertiesSection";
+import { FeaturedCarsSection } from "@/components/home/FeaturedCarsSection";
+import HowItWorksSection from "@/components/home/HowItWorksSection";
+import DualCTASection from "@/components/home/DualCTASection";
+import TrustAndSafetySection from "@/components/home/TrustAndSafetySection";
+import PopularAndSearchedSection from "@/components/home/PopularAndSearchedSection";
+import WhyChooseSection from "@/components/home/WhyChooseSection";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "MyEthioProperties — Verified Properties for Rent & Sale",
-  description: "Ethiopia's trusted property marketplace. Find verified apartments, houses, villas, and land. Transparent pricing, admin-reviewed listings, and secure transactions.",
+  title: "MyEthioProperties — Trusted Properties & Cars Across Ethiopia",
+  description:
+    "Ethiopia's trusted marketplace for verified properties and cars. Rent, buy, and list with admin-reviewed safety, transparent process, and only 5% commission after a successful deal.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch property types once for the hero dropdown
+  const supabase = await createClient();
+  const { data: propertyTypes } = await supabase
+    .from("property_types")
+    .select("id, name")
+    .order("name");
+
   return (
     <>
-      {/* Property-first Marketplace Hero */}
-      <MarketplaceHeroSection />
-
-      {/* Featured Properties */}
+      <HeroSection propertyTypes={propertyTypes || []} />
+      <BrowseByCategorySection />
       <FeaturedPropertiesSection />
-
-      {/* Browse by Property Category */}
-      <PropertyCategoriesSection />
-
-      {/* Trust Features */}
-      <TrustFeaturesSection />
-
-      {/* How It Works */}
+      <FeaturedCarsSection />
       <HowItWorksSection />
-
-      {/* Pricing Transparency */}
-      <PricingTransparencySection />
-
-      {/* Popular Locations */}
-      <PopularLocationsSection />
-
-      {/* Property Owner CTA */}
-      <PropertyOwnerCTASection />
+      <DualCTASection />
+      <TrustAndSafetySection />
+      <PopularAndSearchedSection />
+      <WhyChooseSection />
     </>
   );
 }
