@@ -210,18 +210,30 @@ export default function HeroSection({
 
           {/* RIGHT — Visual */}
           <div className="relative">
-            <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl bg-slate-100">
-              <Image
-                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&h=800&q=80"
-                alt="Modern property and car in Ethiopia"
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+            {/* Stacked images: property on top, car on bottom */}
+            <div className="flex flex-col gap-3">
+              <div className="relative aspect-[5/3] w-full overflow-hidden rounded-2xl bg-slate-100">
+                <Image
+                  src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=900&h=600&q=80"
+                  alt="Modern property in Ethiopia"
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+              <div className="relative aspect-[16/7] w-full overflow-hidden rounded-2xl bg-slate-100">
+                <Image
+                  src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&h=360&q=80"
+                  alt="Car for sale in Ethiopia"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
             </div>
 
-            {/* Floating badges — positioned absolutely on top of image, but only on lg+ */}
+            {/* Floating badges — positioned absolutely on top of images, but only on lg+ */}
             <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-2 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:flex lg:flex-col lg:justify-around lg:gap-3 lg:py-6 lg:pr-3">
               {FLOATING_BADGES.map(({ icon: Icon, title, subtitle }) => (
                 <div

@@ -71,10 +71,14 @@ export function PropertyCard({
         </p>
 
         {/* Price */}
-        <p className="mt-2 text-base font-bold text-blue-600 sm:text-lg">
-          ETB {price.toLocaleString()}
-          {isRent && <span className="text-xs font-medium text-slate-500"> / month</span>}
-        </p>
+        {price > 0 ? (
+          <p className="mt-2 text-base font-bold text-blue-600 sm:text-lg">
+            ETB {price.toLocaleString()}
+            {isRent && <span className="text-xs font-medium text-slate-500"> / month</span>}
+          </p>
+        ) : (
+          <p className="mt-2 text-sm font-medium italic text-slate-500">Price on request</p>
+        )}
 
         {/* Meta */}
         <div className="mt-2 flex items-center gap-3 text-xs text-slate-600">

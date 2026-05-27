@@ -70,7 +70,7 @@ export async function FeaturedPropertiesSection() {
             href="/properties"
             className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-blue-600 hover:gap-2 transition-all"
           >
-            View All <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            View All Properties <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
 
