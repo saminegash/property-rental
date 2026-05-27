@@ -5,10 +5,7 @@ import { PropertyListingCard } from "@/components/properties/PropertyListingCard
 
 // Landing Page Components
 import { PropertyRowSection } from "@/components/properties/PropertyRowSection";
-import { PropertyCategoriesSection } from "@/components/properties/PropertyCategoriesSection";
 import { PropertyHowItWorksSection } from "@/components/properties/PropertyHowItWorksSection";
-import { PropertyOwnerCTASection } from "@/components/properties/PropertyOwnerCTASection";
-import { PopularLocationsSection } from "@/components/shared/PopularLocationsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -390,16 +387,7 @@ export default async function BrowsePropertiesPage({
             viewAllLink="/properties?property_type=land"
           />
 
-          <PropertyCategoriesSection />
-
           <PropertyHowItWorksSection />
-
-          <PopularLocationsSection
-            baseRoute="/properties"
-            subtitle="Find properties in the most sought-after neighborhoods."
-          />
-
-          <PropertyOwnerCTASection />
         </div>
       )}
     </div>

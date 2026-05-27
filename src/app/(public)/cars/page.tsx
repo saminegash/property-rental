@@ -6,11 +6,7 @@ import type { Metadata } from "next";
 import { FeaturedCarsSection } from "@/components/cars/FeaturedCarsSection";
 import { CarRowSection } from "@/components/cars/CarRowSection";
 import { CarCategoriesSection } from "@/components/cars/CarCategoriesSection";
-import { TrustFeaturesSection } from "@/components/shared/TrustFeaturesSection";
-import { PricingTransparencySection } from "@/components/shared/PricingTransparencySection";
-import { HowItWorksSection } from "@/components/shared/HowItWorksSection";
 import { OwnerCTASection } from "@/components/cars/OwnerCTASection";
-import { PopularLocationsSection } from "@/components/shared/PopularLocationsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -452,10 +448,6 @@ export default async function BrowseCarsPage({
           />
 
           <CarCategoriesSection />
-          <PricingTransparencySection />
-          <TrustFeaturesSection />
-          <HowItWorksSection />
-          <PopularLocationsSection />
           <OwnerCTASection />
         </div>
       )}
