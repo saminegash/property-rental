@@ -56,7 +56,7 @@ export async function FeaturedPropertiesSection() {
 
   return (
     <section className="bg-slate-50 py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -153,13 +153,13 @@ function EmptyState({
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <Link
           href={primaryHref}
-          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
         >
           {primaryLabel}
         </Link>
         <Link
           href={secondaryHref}
-          className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:shadow-md transition-all"
         >
           {secondaryLabel}
         </Link>

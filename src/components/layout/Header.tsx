@@ -23,10 +23,13 @@ export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // Close drawer on route change
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Close drawer on route change — "adjusting state during render" pattern
+  // (setState during render is supported by React and won't cascade)
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    if (open) setOpen(false);
+  }
 
   // Lock body scroll when mobile menu open
   useEffect(() => {
@@ -38,7 +41,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <div className="flex h-16 items-center justify-between gap-4 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex shrink-0 items-center gap-2">
@@ -82,19 +85,19 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden sm:inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              className="hidden sm:inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="hidden md:inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              className="hidden md:inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Sign Up
             </Link>
             <Link
               href="/dashboard/become-owner"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               Post Listing
@@ -127,7 +130,7 @@ export default function Header() {
         >
           <nav
             aria-label="Mobile"
-            className="mx-auto max-w-7xl px-4 py-3 flex flex-col"
+            className="mx-auto px-4 py-3 flex flex-col"
           >
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;

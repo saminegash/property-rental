@@ -161,7 +161,7 @@ export default async function BrowsePropertiesPage({
       </section>
 
       {/* ── Search + filter bar ── */}
-      <div className="browse-filter-bar" id="filter-bar" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1.5rem" }}>
+      <div className="browse-filter-bar" id="filter-bar" style={{ margin: "0 auto", padding: "0 2rem" }}>
         <form method="GET" action="/properties" className="browse-filter-form" style={{ marginTop: "-2rem", position: "relative", zIndex: 10, background: "#fff", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", borderRadius: "var(--radius-xl)", padding: "1.5rem" }}>
           {/* Location */}
           <div className="browse-filter-field">

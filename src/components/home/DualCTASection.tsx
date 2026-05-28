@@ -5,7 +5,7 @@ import { Home, Car, ArrowRight } from "lucide-react";
 export default function DualCTASection() {
   return (
     <section className="bg-white py-10 lg:py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
           {/* Property CTA */}
           <CtaCard
@@ -76,7 +76,7 @@ function CtaCard({
           </p>
           <Link
             href={buttonHref}
-            className={`mt-5 inline-flex items-center gap-1.5 rounded-lg px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors ${btn}`}
+            className={`mt-5 inline-flex items-center gap-1.5 rounded-xl px-6 py-3 text-sm font-bold shadow-md hover:shadow-lg transition-all ${btn}`}
           >
             {icon}
             {buttonLabel}

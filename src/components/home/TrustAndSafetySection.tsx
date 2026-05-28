@@ -31,7 +31,7 @@ const ITEMS = [
 export default function TrustAndSafetySection() {
   return (
     <section className="bg-slate-50 py-10 lg:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <h2 className="text-center text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
           Trust & Safety You Can Rely On
         </h2>

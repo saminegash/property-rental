@@ -15,7 +15,7 @@ const ITEMS = [
 export default function AnnouncementBar() {
   return (
     <div className="bg-blue-700 text-white text-xs sm:text-sm">
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto px-4">
         <ul
           className="flex items-center gap-6 overflow-x-auto py-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:justify-center md:gap-10"
           aria-label="Platform trust highlights"

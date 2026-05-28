@@ -56,7 +56,7 @@ export async function FeaturedCarsSection() {
 
   return (
     <section className="bg-white py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -124,13 +124,13 @@ export async function FeaturedCarsSection() {
             <div className="mt-5 flex flex-col gap-2 sm:flex-row">
               <Link
                 href="/dashboard/become-owner?category=car"
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-emerald-700 hover:shadow-lg transition-all"
               >
                 List Your Car
               </Link>
               <Link
                 href="/cars"
-                className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:shadow-md transition-all"
               >
                 Browse All
               </Link>

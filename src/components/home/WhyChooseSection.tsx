@@ -34,7 +34,7 @@ const FEATURES = [
 export default function WhyChooseSection() {
   return (
     <section className="bg-slate-50 py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           Why Choose MyEthioProperties?
         </h2>

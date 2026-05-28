@@ -18,7 +18,7 @@ const TOP_CATEGORIES = [
 export default function PopularAndSearchedSection() {
   return (
     <section className="bg-white py-10 lg:py-14">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <div className="grid gap-8 md:grid-cols-2 lg:gap-10">
 
           {/* Popular Locations */}
