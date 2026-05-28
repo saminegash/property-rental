@@ -41,27 +41,27 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200">
-      <div className="mx-auto px-4 sm:px-6">
-        <div className="flex h-16 items-center justify-between gap-4 lg:h-20">
+      <div className="mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="flex h-[52px] items-center justify-between gap-3">
           {/* Logo */}
-          <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Link href="/" className="flex shrink-0 items-center gap-1.5">
             <Image
               src="/logo.webp"
               alt="MyEthioProperties"
-              width={40}
-              height={40}
-              className="h-9 w-auto object-contain lg:h-10"
+              width={32}
+              height={32}
+              className="h-7 w-auto object-contain"
               priority
             />
-            <span className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">
+            <span className="text-[13px] font-bold tracking-tight text-slate-900">
               MyEthio<span className="text-blue-600">Properties</span>
             </span>
           </Link>
 
-          {/* Desktop nav — visible at xl and up because 10 items is a lot */}
+          {/* Desktop nav — visible at lg+ with compact sizing */}
           <nav
             aria-label="Primary"
-            className="hidden xl:flex flex-1 items-center justify-center gap-1"
+            className="hidden lg:flex flex-1 items-center justify-center gap-1.5"
           >
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
@@ -69,7 +69,7 @@ export default function Header() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`px-2.5 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`px-2 py-1.5 text-[13px] font-medium rounded transition-colors whitespace-nowrap ${
                     isActive
                       ? "text-blue-600"
                       : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
@@ -85,21 +85,21 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden sm:inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              className="hidden sm:inline-flex items-center justify-center rounded-md border border-slate-300 px-5 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="hidden md:inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              className="hidden md:inline-flex items-center justify-center rounded-md border border-slate-300 px-5 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Sign Up
             </Link>
             <Link
               href="/dashboard/become-owner"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
+              className="hidden sm:inline-flex items-center gap-1 rounded-md bg-blue-600 px-5 py-2 text-[13px] font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
             >
-              <Plus className="h-4 w-4" aria-hidden="true" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               Post Listing
             </Link>
 
@@ -110,12 +110,12 @@ export default function Header() {
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={open ? "Close menu" : "Open menu"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 xl:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-700 hover:bg-slate-100 lg:hidden"
             >
               {open ? (
-                <X className="h-6 w-6" aria-hidden="true" />
+                <X className="h-5 w-5" aria-hidden="true" />
               ) : (
-                <Menu className="h-6 w-6" aria-hidden="true" />
+                <Menu className="h-5 w-5" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -126,7 +126,7 @@ export default function Header() {
       {open && (
         <div
           id="mobile-menu"
-          className="xl:hidden border-t border-slate-200 bg-white max-h-[calc(100vh-4rem)] overflow-y-auto"
+          className="lg:hidden border-t border-slate-200 bg-white max-h-[calc(100vh-3.25rem)] overflow-y-auto"
         >
           <nav
             aria-label="Mobile"

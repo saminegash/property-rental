@@ -130,9 +130,7 @@ export default function HeroSection({
                 aria-selected={tab === "properties"}
                 onClick={() => setTab("properties")}
                 className={`hero-section__tab ${
-                  tab === "properties"
-                    ? "hero-section__tab--active"
-                    : ""
+                  tab === "properties" ? "hero-section__tab--active" : ""
                 }`}
               >
                 <HomeIcon className="h-4 w-4" aria-hidden="true" />
@@ -143,9 +141,7 @@ export default function HeroSection({
                 aria-selected={tab === "cars"}
                 onClick={() => setTab("cars")}
                 className={`hero-section__tab ${
-                  tab === "cars"
-                    ? "hero-section__tab--active"
-                    : ""
+                  tab === "cars" ? "hero-section__tab--active" : ""
                 }`}
               >
                 <Car className="h-4 w-4" aria-hidden="true" />
@@ -270,7 +266,7 @@ export default function HeroSection({
             {/* Main property image */}
             <div className="hero-section__main-image">
               <Image
-                src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=900&h=675&q=80"
+                src="/luxury.jpg"
                 alt="Modern property in Ethiopia"
                 fill
                 priority

@@ -707,9 +707,14 @@
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  border-radius: var(--radius-xl, 1rem);
   overflow: hidden;
-  background-color: var(--color-surface-alt, #f1f5f9);
+  /* Fade out the image on the left and bottom edges so it blends into the background */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%), linear-gradient(to top, transparent 0%, black 15%);
+  -webkit-mask-size: 100% 100%, 100% 100%;
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0%, black 15%), linear-gradient(to top, transparent 0%, black 15%);
+  mask-size: 100% 100%, 100% 100%;
+  mask-composite: intersect;
 }
 
 .hero-section__img {
