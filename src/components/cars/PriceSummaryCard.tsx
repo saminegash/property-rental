@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import RentalRequestForm from "@/app/(public)/cars/[id]/RentalRequestForm";
-import CarSaleInquiryForm from "@/app/(public)/cars/[id]/CarSaleInquiryForm";
+// TODO: Re-import when car detail routes are rebuilt
+// import RentalRequestForm from "@/app/(public)/cars/[id]/RentalRequestForm";
+// import CarSaleInquiryForm from "@/app/(public)/cars/[id]/CarSaleInquiryForm";
 
 interface PriceSummaryCardProps {
   listingId: string;
@@ -115,16 +116,10 @@ export function PriceSummaryCard({
         </div>
       )}
 
-      {/* CTA Form */}
-      {listingType === "rent" ? (
-        <RentalRequestForm
-          listingId={listingId}
-          availableWithDriver={availableWithDriver}
-          deliveryAvailable={deliveryAvailable}
-        />
-      ) : (
-        <CarSaleInquiryForm listingId={listingId} />
-      )}
+      {/* CTA Form — placeholder until car detail routes are rebuilt */}
+      <div style={{ padding: "1rem", textAlign: "center", color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+        Contact form coming soon
+      </div>
     </div>
   );
 }

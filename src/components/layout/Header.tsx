@@ -8,15 +8,8 @@ import { Menu, X, Plus } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/buy", label: "Buy Property" }, // was /properties?type=sale
-  { href: "/rent", label: "Rent Property" }, // was /properties?type=rent
-  { href: "/cars/sale", label: "Buy a Car" }, // NEW
-  { href: "/cars/rent", label: "Rent a Car" }, // NEW
-  { href: "/dashboard/become-owner", label: "List Your Property" },
-  { href: "/dashboard/become-owner?category=car", label: "Sell Your Car" },
-  { href: "/safety", label: "Safety" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/trade", label: "Buy / Sale" },
+  { href: "/rent", label: "Rent" },
 ] as const;
 
 export default function Header() {
@@ -58,10 +51,10 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Desktop nav — visible at lg+ with compact sizing */}
+          {/* Desktop nav — visible at lg+ */}
           <nav
             aria-label="Primary"
-            className="hidden lg:flex flex-1 items-center justify-center gap-1.5"
+            className="hidden lg:flex items-center gap-1.5"
           >
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
@@ -69,7 +62,7 @@ export default function Header() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`px-2 py-1.5 text-[13px] font-medium rounded transition-colors whitespace-nowrap ${
+                  className={`px-3 py-1.5 text-[13px] font-medium rounded transition-colors whitespace-nowrap ${
                     isActive
                       ? "text-blue-600"
                       : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
@@ -81,7 +74,7 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right actions */}
+          {/* Right action buttons */}
           <div className="flex items-center gap-2">
             <Link
               href="/login"
@@ -147,7 +140,7 @@ export default function Header() {
             })}
 
             {/* Auth + Post on mobile */}
-            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 sm:hidden">
+            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-slate-200 pt-3">
               <Link
                 href="/login"
                 className="rounded-lg border border-slate-300 px-3 py-2.5 text-center text-sm font-medium text-slate-700"

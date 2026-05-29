@@ -7,6 +7,7 @@ const ITEMS = [
     iconColor: "text-blue-600",
     title: "Monthly Rent",
     description: "Transparent rate set by the owner — no markups.",
+    highlight: false,
   },
   {
     icon: Shield,
@@ -14,6 +15,7 @@ const ITEMS = [
     iconColor: "text-emerald-600",
     title: "Security Deposit",
     description: "Refundable deposit. Returned at end of lease.",
+    highlight: false,
   },
   {
     icon: Headphones,
@@ -21,6 +23,7 @@ const ITEMS = [
     iconColor: "text-purple-600",
     title: "Admin Support",
     description: "Optional small service fee included where applicable.",
+    highlight: false,
   },
   {
     icon: Percent,

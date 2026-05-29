@@ -1,11 +1,4 @@
-import Link from "next/link";
 import Image from "next/image";
-
-const LEGAL_LINKS = [
-  { href: "/terms", label: "Terms of Service" },
-  { href: "/privacy", label: "Privacy Policy" },
-  { href: "/refund", label: "Refund & Commission Policy" },
-] as const;
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -41,19 +34,6 @@ export default function Footer() {
           <p className="text-xs text-blue-200 sm:text-sm">
             © {year} MyEthioProperties. All rights reserved.
           </p>
-
-          {/* Legal */}
-          <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2 text-xs sm:text-sm">
-            {LEGAL_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-blue-200 hover:text-white transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
         </div>
       </div>
     </footer>

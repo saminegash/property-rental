@@ -7,6 +7,7 @@ const ITEMS = [
     iconColor: "text-emerald-600",
     title: "Daily Rate",
     description: "Transparent daily price set by the car owner — no surprise markups.",
+    highlight: false,
   },
   {
     icon: Shield,
@@ -14,6 +15,7 @@ const ITEMS = [
     iconColor: "text-blue-600",
     title: "Refundable Deposit",
     description: "Refundable security deposit. Returned after safe vehicle return.",
+    highlight: false,
   },
   {
     icon: UserCheck,
@@ -21,6 +23,7 @@ const ITEMS = [
     iconColor: "text-purple-600",
     title: "Driver Fee (Optional)",
     description: "Only if you choose 'With Driver' — quoted upfront, no hidden costs.",
+    highlight: false,
   },
   {
     icon: Percent,

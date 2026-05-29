@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import PropertyRequestForm from "@/app/(public)/properties/[id]/PropertyRequestForm";
+// TODO: Re-import when property detail routes are rebuilt
+// import PropertyRequestForm from "@/app/(public)/properties/[id]/PropertyRequestForm";
 
 interface PropertyPriceSummaryCardProps {
   listingId: string;
@@ -96,11 +97,10 @@ export function PropertyPriceSummaryCard({
         <strong>Note:</strong> A small fixed commission applies to the base listing price.
       </div>
 
-      {/* CTA Form */}
-      <PropertyRequestForm
-        listingId={listingId}
-        type={listingType}
-      />
+      {/* CTA Form — placeholder until property detail routes are rebuilt */}
+      <div style={{ padding: "1rem", textAlign: "center", color: "var(--color-text-muted)", fontSize: "0.875rem" }}>
+        Contact form coming soon
+      </div>
     </div>
   );
 }
