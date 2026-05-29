@@ -8,10 +8,10 @@ import { Menu, X, Plus } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/properties?type=sale", label: "Buy Property" },
-  { href: "/properties?type=rent", label: "Rent Property" },
-  { href: "/dashboard/become-owner", label: "Sell Property" },
-  { href: "/cars", label: "Cars" },
+  { href: "/buy", label: "Buy Property" }, // was /properties?type=sale
+  { href: "/rent", label: "Rent Property" }, // was /properties?type=rent
+  { href: "/cars/sale", label: "Buy a Car" }, // NEW
+  { href: "/cars/rent", label: "Rent a Car" }, // NEW
   { href: "/dashboard/become-owner", label: "List Your Property" },
   { href: "/dashboard/become-owner?category=car", label: "Sell Your Car" },
   { href: "/safety", label: "Safety" },
@@ -128,10 +128,7 @@ export default function Header() {
           id="mobile-menu"
           className="lg:hidden border-t border-slate-200 bg-white max-h-[calc(100vh-3.25rem)] overflow-y-auto"
         >
-          <nav
-            aria-label="Mobile"
-            className="mx-auto px-4 py-3 flex flex-col"
-          >
+          <nav aria-label="Mobile" className="mx-auto px-4 py-3 flex flex-col">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               return (

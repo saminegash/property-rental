@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RentPage() {
-  // Pre-fetch property types for the hero dropdown
+  // Pre-fetch property types for the hero dropdownp
   const supabase = await createClient();
   const { data: propertyTypes } = await supabase
     .from("property_types")
