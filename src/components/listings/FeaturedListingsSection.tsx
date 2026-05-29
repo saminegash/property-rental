@@ -1,51 +1,31 @@
 import Link from "next/link";
-import { ArrowRight, Home } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { PropertyCard } from "@/components/shared/PropertyCard";
+import { ListingCard } from "@/components/listings/ListingCard";
 
-interface FeaturedPropertyListing {
-  id: string;
-  title: string;
-  location: string | null;
-  owner_id: string;
-  listing_type: string;
-  is_featured: boolean;
-  property_details: {
-    bedrooms: number | null;
-    bathrooms: number | null;
-    area_sqm: number | null;
-    property_types: { name: string } | null;
-  }[];
-  rental_terms: { daily_price: number | null; monthly_price: number | null }[];
-  sale_terms: { sale_price: number | null }[];
-  listing_images: { image_url: string; is_primary: boolean }[];
-}
-
-export async function FeaturedPropertiesSection() {
+export async function FeaturedListingsSection() {
   const supabase = await createClient();
 
+  // Query the new listings table
   const { data: listings } = await supabase
     .from("listings")
     .select(`
-      id, title, location, owner_id, listing_type, is_featured,
-      property_details ( bedrooms, bathrooms, area_sqm, property_types ( name ) ),
-      rental_terms ( daily_price, monthly_price ),
-      sale_terms ( sale_price ),
+      id, title, city, sub_city, owner_id, listing_type, is_featured, property_type, price, details,
       listing_images ( image_url, is_primary )
     `)
-    .eq("category", "property")
     .eq("status", "published")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(5);
 
-  const properties = (listings || []) as unknown as FeaturedPropertyListing[];
+  const activeListings = listings || [];
 
-  const ownerIds = [...new Set(properties.map((p) => p.owner_id))];
+  // Fetch verification status of owners
+  const ownerIds = [...new Set(activeListings.map((p) => p.owner_id))];
   const verifiedOwnerIds = new Set<string>();
   if (ownerIds.length > 0) {
     const { data: ownerProfiles } = await supabase
-      .from("owner_public_profiles")
+      .from("profiles")
       .select("user_id, verification_status")
       .in("user_id", ownerIds)
       .eq("verification_status", "verified");
@@ -60,65 +40,64 @@ export async function FeaturedPropertiesSection() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              Featured Properties
+              Featured Listings
             </h2>
             <p className="mt-1 text-sm text-slate-600">
-              Verified apartments, villas, and more — ready for you.
+              Hand-picked properties and vehicles from verified owners.
             </p>
           </div>
           <Link
-            href="/properties"
+            href="/trade"
             className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-blue-600 hover:gap-2 transition-all"
           >
-            View All Properties <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            View All <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
 
-        {properties.length > 0 ? (
+        {activeListings.length > 0 ? (
           <div className={`mt-6 lg:mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 ${
-            properties.length >= 5 ? "lg:grid-cols-5" :
-            properties.length >= 4 ? "lg:grid-cols-4" :
-            properties.length >= 3 ? "lg:grid-cols-3" :
+            activeListings.length >= 5 ? "lg:grid-cols-5" :
+            activeListings.length >= 4 ? "lg:grid-cols-4" :
+            activeListings.length >= 3 ? "lg:grid-cols-3" :
             "lg:grid-cols-2"
           }`}>
-            {properties.map((prop) => {
-              const pd = prop.property_details?.[0];
-              const rt = prop.rental_terms?.[0];
-              const st = prop.sale_terms?.[0];
+            {activeListings.map((listing) => {
               const image =
-                prop.listing_images?.find((i) => i.is_primary)?.image_url ||
-                prop.listing_images?.[0]?.image_url ||
+                listing.listing_images?.find((i) => i.is_primary)?.image_url ||
+                listing.listing_images?.[0]?.image_url ||
                 "";
-              const price = prop.listing_type === "sale"
-                ? st?.sale_price || 0
-                : rt?.monthly_price || rt?.daily_price || 0;
+                
+              const details = listing.details as Record<string, any>;
 
               return (
-                <PropertyCard
-                  key={prop.id}
-                  id={prop.id}
-                  title={prop.title}
-                  location={prop.location || "Addis Ababa"}
+                <ListingCard
+                  key={listing.id}
+                  id={listing.id}
+                  title={listing.title}
+                  location={`${listing.sub_city || ""}, ${listing.city || ""}`.replace(/^, /, '')}
                   image={image}
-                  price={price}
-                  type={prop.listing_type === "sale" ? "sale" : "rent"}
-                  beds={pd?.bedrooms ?? undefined}
-                  baths={pd?.bathrooms ?? undefined}
-                  area={pd?.area_sqm ?? undefined}
-                  isVerified={verifiedOwnerIds.has(prop.owner_id)}
+                  price={listing.price}
+                  type={listing.listing_type}
+                  propertyType={listing.property_type.charAt(0).toUpperCase() + listing.property_type.slice(1)}
+                  beds={details?.bedrooms || null}
+                  baths={details?.bathrooms || null}
+                  area={details?.area_sqm || null}
+                  isVerified={verifiedOwnerIds.has(listing.owner_id)}
+                  isFeatured={listing.is_featured}
+                  href={`/listings/${listing.id}`}
                 />
               );
             })}
           </div>
         ) : (
           <EmptyState
-            icon={<Home className="h-10 w-10 text-blue-600" />}
-            title="No properties listed yet"
-            description="We're onboarding verified property owners right now. Check back soon."
-            primaryHref="/dashboard/owner/properties/new"
-            primaryLabel="List Your Property"
-            secondaryHref="/properties"
-            secondaryLabel="Browse All"
+            icon={<Sparkles className="h-10 w-10 text-blue-600" />}
+            title="No listings available right now"
+            description="We're onboarding verified owners right now. Check back soon."
+            primaryHref="/dashboard/owner/listings/new"
+            primaryLabel="Post a Listing"
+            secondaryHref="/trade"
+            secondaryLabel="Browse Marketplace"
           />
         )}
       </div>

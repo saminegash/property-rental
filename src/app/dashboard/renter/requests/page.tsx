@@ -13,21 +13,17 @@ export const metadata: Metadata = {
 type RequestWithListing = {
   id: string;
   listing_id: string;
-  renter_name: string;
-  renter_phone: string;
-  renter_email: string | null;
-  start_date: string;
-  end_date: string;
-  needs_driver: boolean;
-  needs_delivery: boolean;
-  delivery_location: string | null;
+  name: string;
+  phone: string;
+  email: string | null;
+  start_date: string | null;
+  end_date: string | null;
   message: string | null;
   status: string;
   created_at: string;
-  listing: { title: string; location: string | null; category: string | null } | null;
-  request_type?: string;
-  preferred_viewing_date?: string | null;
-  budget_amount?: number | null;
+  listing: { title: string; location: string | null; property_type: string | null } | null;
+  request_type: string;
+  offered_price: number | null;
 };
 
 const STATUS_CONFIG: Record<
@@ -127,7 +123,8 @@ const STATUS_CONFIG: Record<
   },
 };
 
-function formatDate(d: string) {
+function formatDate(d: string | null) {
+  if (!d) return "N/A";
   return new Date(d).toLocaleDateString("en-ET", {
     day: "numeric",
     month: "short",
@@ -145,58 +142,27 @@ export default async function RenterRequestsPage() {
     redirect("/login");
   }
 
-  const { data: rentalRequests, error: rentalError } = await supabase
-    .from("rental_requests")
+  const { data: allRequests, error } = await supabase
+    .from("requests")
     .select(`
-      id, listing_id, renter_name, renter_phone, renter_email,
-      start_date, end_date, needs_driver, needs_delivery,
-      delivery_location, message, status, created_at,
-      listing:listings ( title, location, category )
+      id, listing_id, name, phone, email,
+      start_date, end_date, message, status, created_at,
+      request_type, offered_price,
+      listing:listings ( title, location, property_type )
     `)
-    .eq("renter_id", user.id);
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
 
-  const { data: listingRequests, error: listingError } = await supabase
-    .from("listing_requests")
-    .select(`
-      id, listing_id, requester_name, requester_phone, requester_email,
-      request_type, preferred_viewing_date, budget_amount, message, status, created_at,
-      listing:listings ( title, location, category )
-    `)
-    .eq("requester_id", user.id);
-
-  if (rentalError || listingError) {
+  if (error) {
     return (
       <div className="dashboard-card">
         <h1 className="dashboard-title">My Requests</h1>
-        <div className="auth-error">Error loading requests: {rentalError?.message || listingError?.message}</div>
+        <div className="auth-error">Error loading requests: {error?.message}</div>
       </div>
     );
   }
 
-  const typedRentalRequests = (rentalRequests || []) as unknown as RequestWithListing[];
-  const typedListingRequests = (listingRequests || []).map(lr => ({
-    id: lr.id,
-    listing_id: lr.listing_id,
-    renter_name: lr.requester_name,
-    renter_phone: lr.requester_phone,
-    renter_email: lr.requester_email,
-    start_date: lr.preferred_viewing_date || lr.created_at, // Use as sort of "target date"
-    end_date: lr.preferred_viewing_date || lr.created_at,
-    needs_driver: false,
-    needs_delivery: false,
-    delivery_location: null,
-    message: lr.message,
-    status: lr.status,
-    created_at: lr.created_at,
-    listing: Array.isArray(lr.listing) ? lr.listing[0] : lr.listing,
-    request_type: lr.request_type,
-    preferred_viewing_date: lr.preferred_viewing_date,
-    budget_amount: lr.budget_amount,
-  })) as unknown as RequestWithListing[];
-
-  const allRequests = [...typedRentalRequests, ...typedListingRequests].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  const typedRequests = (allRequests || []) as unknown as RequestWithListing[];
 
   return (
     <div>
@@ -226,7 +192,7 @@ export default async function RenterRequestsPage() {
         </Link>
       </div>
 
-      {allRequests.length === 0 ? (
+      {typedRequests.length === 0 ? (
         <div
           className="dashboard-card"
           style={{ textAlign: "center", padding: "4rem 2rem" }}
@@ -253,7 +219,7 @@ export default async function RenterRequestsPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {allRequests.map((request) => {
+          {typedRequests.map((request) => {
             const listing = Array.isArray(request.listing)
               ? request.listing[0]
               : request.listing;
@@ -333,7 +299,7 @@ export default async function RenterRequestsPage() {
                     fontSize: "0.875rem",
                   }}
                 >
-                  {request.request_type ? (
+                  {request.request_type !== "rental" ? (
                     <>
                       <div>
                         <span style={{ color: "var(--color-text-muted)" }}>Request Type</span>
@@ -341,57 +307,30 @@ export default async function RenterRequestsPage() {
                           {request.request_type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                         </p>
                       </div>
-                      <div>
-                        <span style={{ color: "var(--color-text-muted)" }}>Target Date</span>
-                        <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                          {request.preferred_viewing_date ? formatDate(request.preferred_viewing_date) : "Any"}
-                        </p>
-                      </div>
                     </>
                   ) : (
                     <>
                       <div>
-                        <span style={{ color: "var(--color-text-muted)" }}>{listing?.category === "property" ? "Start Date" : "Pickup Date"}</span>
+                        <span style={{ color: "var(--color-text-muted)" }}>{listing?.property_type === "property" ? "Start Date" : "Pickup Date"}</span>
                         <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
                           {formatDate(request.start_date)}
                         </p>
                       </div>
                       <div>
-                        <span style={{ color: "var(--color-text-muted)" }}>{listing?.category === "property" ? "End Date" : "Return Date"}</span>
+                        <span style={{ color: "var(--color-text-muted)" }}>{listing?.property_type === "property" ? "End Date" : "Return Date"}</span>
                         <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
                           {formatDate(request.end_date)}
                         </p>
                       </div>
                     </>
                   )}
-                  {request.request_type ? (
-                    request.budget_amount && (
-                      <div style={{ marginTop: "0.5rem" }}>
-                        <span style={{ color: "var(--color-text-muted)" }}>Budget</span>
-                        <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                          {request.budget_amount.toLocaleString()} ETB
-                        </p>
-                      </div>
-                    )
-                  ) : (
-                    <>
-                      {listing?.category === "vehicle" && (
-                        <div style={{ marginTop: "0.5rem" }}>
-                          <span style={{ color: "var(--color-text-muted)" }}>Driver Required?</span>
-                          <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                            {request.needs_driver ? "Yes" : "No"}
-                          </p>
-                        </div>
-                      )}
-                      {listing?.category === "vehicle" && request.needs_delivery && (
-                        <div style={{ marginTop: "0.5rem" }}>
-                          <span style={{ color: "var(--color-text-muted)" }}>Delivery</span>
-                          <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                            {request.delivery_location}
-                          </p>
-                        </div>
-                      )}
-                    </>
+                  {request.request_type !== "rental" && request.offered_price != null && (
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <span style={{ color: "var(--color-text-muted)" }}>Offered Price</span>
+                      <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
+                        {request.offered_price.toLocaleString()} ETB
+                      </p>
+                    </div>
                   )}
                 </div>
 
@@ -406,7 +345,7 @@ export default async function RenterRequestsPage() {
                   }}
                 >
                   Submitted {formatDate(request.created_at)} ·{" "}
-                  <Link href={`/${listing?.category === "property" ? "properties" : "cars"}/${request.listing_id}`} style={{ color: "var(--color-primary)" }}>
+                  <Link href={`/${listing?.property_type === "property" ? "properties" : "cars"}/${request.listing_id}`} style={{ color: "var(--color-primary)" }}>
                     View Listing
                   </Link>
                 </p>

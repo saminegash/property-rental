@@ -17,7 +17,7 @@ export default async function OwnerAnalyticsPage() {
   // 1. Fetch Owner's Listings
   const { data: listings } = await supabase
     .from("listings")
-    .select("id, title, category, listing_type, status")
+    .select("id, title, property_type, listing_type, status")
     .eq("owner_id", user.id);
 
   const listingIds = listings?.map((l) => l.id) || [];
@@ -27,59 +27,33 @@ export default async function OwnerAnalyticsPage() {
   const pendingReviewListings = listings?.filter(l => l.status === "pending_review").length || 0;
   const rejectedListings = listings?.filter(l => l.status === "rejected").length || 0;
 
-  // 2. Fetch Rental Requests for those listings
-  const { data: rentalRequests } = await supabase
-    .from("rental_requests")
-    .select("id, status, listing_id")
+  // 2. Fetch Requests for those listings
+  const { data: allRequests } = await supabase
+    .from("requests")
+    .select("id, status, name, listing_id, created_at")
     .in("listing_id", listingIds);
 
-  // 3. Fetch Listing Requests (General/Sale Inquiries) for those listings
-  const { data: listingRequests } = await supabase
-    .from("listing_requests")
-    .select("id, status, listing_id")
-    .in("listing_id", listingIds);
-
-  // Combine both types of requests for volume tracking
-  const allRequests = [
-    ...(rentalRequests || []),
-    ...(listingRequests || [])
-  ];
-
-  const totalRequests = allRequests.length;
+  const totalRequests = allRequests?.length || 0;
   
   // Aggregate Requests by Status
-  const requestStatusCounts = allRequests.reduce((acc, req) => {
+  const requestStatusCounts = (allRequests || []).reduce((acc, req) => {
     acc[req.status] = (acc[req.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  const completedRentals = (rentalRequests?.filter(r => r.status === "completed").length || 0) + 
-                           (listingRequests?.filter(r => r.status === "completed").length || 0);
+  const completedRentals = allRequests?.filter(r => r.status === "completed").length || 0;
 
-  // 4. Fetch Pending Price Changes
-  const { data: pendingPriceChanges } = await supabase
-    .from("pending_price_changes")
-    .select("id")
-    .in("listing_id", listingIds)
-    .eq("status", "pending");
+  const pendingPriceChangesCount = 0;
 
-  const pendingPriceChangesCount = pendingPriceChanges?.length || 0;
-
-  // 4.5 Fetch Listing Events (Views)
-  const { data: listingEvents } = await supabase
-    .from("listing_events")
-    .select("id, event_type")
-    .in("listing_id", listingIds)
-    .eq("event_type", "view");
-
-  const totalViews = listingEvents?.length || 0;
-  const conversionRate = totalViews > 0 ? ((totalRequests / totalViews) * 100).toFixed(1) : "0";
+  // Analytics views are disabled in new schema
+  const totalViews = 0;
+  const conversionRate = "0";
 
   // 5. Find Top Performing Listing
   let topListingId: string | null = null;
   let topListingRequestCount = 0;
 
-  if (allRequests.length > 0) {
+  if (allRequests && allRequests.length > 0) {
     const requestCounts: Record<string, number> = {};
     allRequests.forEach(req => {
       requestCounts[req.listing_id] = (requestCounts[req.listing_id] || 0) + 1;
@@ -167,7 +141,7 @@ export default async function OwnerAnalyticsPage() {
                 <span style={{ color: "var(--color-primary)", backgroundColor: "var(--color-primary-light)", padding: "0.125rem 0.5rem", borderRadius: "10px" }}>
                   {topListingRequestCount} Requests
                 </span>
-                <Link href={`/dashboard/owner/${topListing.category === 'vehicle' ? 'cars' : 'properties'}/${topListing.id}/edit`} className="text-primary hover:underline">
+                <Link href={`/dashboard/owner/listings/${topListing.id}/edit`} className="text-primary hover:underline">
                   View
                 </Link>
               </div>

@@ -1,9 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { SponsoredStrip } from "@/components/hub/SponsoredStrip";
-import { MixedListingsSection } from "@/components/hub/MixedListingsSection";
-import { PropertyHowItWorksSection } from "@/components/properties/PropertyHowItWorksSection";
+import { GenericListingsSection } from "@/components/listings/GenericListingsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -52,50 +50,11 @@ export default async function BuyPage() {
     <>
       <BuyHero />
 
-      {/* 1. Featured / Sponsored — mixed property + car (first-come-first-served) */}
-      <SponsoredStrip
-        surface="buy_hub"
+      <GenericListingsSection
+        title="Properties & Cars for Sale"
+        subtitle="Verified homes, land, and vehicles — priority listings first."
         listingType="sale"
-        viewAllHref="/properties?listing_type=sale"
-        title="Featured for Sale"
-        subtitle="Promoted listings from verified owners — a mix of properties and cars."
       />
-
-      {/* 2. Buy section — top properties for sale, prioritized (featured first) */}
-      <MixedListingsSection
-        title="Properties for Sale"
-        subtitle="Verified homes, land, and commercial space — priority listings first."
-        listingType="sale"
-        category="property"
-        viewAllHref="/properties?listing_type=sale"
-        limit={8}
-        background="white"
-      />
-
-      {/* 3. Buy section — cars for sale, prioritized */}
-      <MixedListingsSection
-        title="Cars for Sale"
-        subtitle="Verified vehicles from trusted sellers across Ethiopia."
-        listingType="sale"
-        category="vehicle"
-        viewAllHref="/cars?listing_type=sale"
-        limit={8}
-        background="slate"
-      />
-
-      {/* 4. Everything for sale — mixed grid, priority-ordered */}
-      <MixedListingsSection
-        title="More to Explore"
-        subtitle="A mix of properties and cars currently for sale."
-        listingType="sale"
-        category="both"
-        viewAllHref="/properties?listing_type=sale"
-        limit={8}
-        background="white"
-        hideWhenEmpty
-      />
-
-      <PropertyHowItWorksSection />
     </>
   );
 }

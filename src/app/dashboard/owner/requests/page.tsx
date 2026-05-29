@@ -15,25 +15,19 @@ type CombinedRequest = {
   admin_notes?: string | null;
   created_at: string;
   listing: { title: string } | { title: string }[];
-  __type: 'rental' | 'listing';
+  request_type: string;
   
-  // Rental fields
-  renter_name?: string;
-  renter_phone?: string;
-  renter_email?: string | null;
-  start_date?: string;
-  end_date?: string;
-  needs_driver?: boolean;
-  needs_delivery?: boolean;
-  delivery_location?: string | null;
+  // Renter / Requester fields
+  name: string;
+  phone: string;
+  email?: string | null;
+  
+  // Rental specific fields
+  start_date?: string | null;
+  end_date?: string | null;
 
-  // Listing fields
-  request_type?: string;
-  requester_name?: string;
-  requester_phone?: string;
-  requester_email?: string | null;
-  preferred_viewing_date?: string | null;
-  budget_amount?: number | null;
+  // Sale/General fields
+  offered_price?: number | null;
 };
 
 export default async function OwnerRequestsPage() {
@@ -44,32 +38,22 @@ export default async function OwnerRequestsPage() {
 
   if (!user) return null;
 
-  // Fetch rental requests.
+  // Fetch requests.
   // Note: The RLS policy natively enforces:
   // 1. Only requests for listings owned by this user are returned.
   // 2. Requests with status 'new_request' or 'admin_reviewing' are hidden.
-  const { data: rentalRequests, error: rentalError } = await supabase
-    .from("rental_requests")
+  const { data: combinedRequests, error } = await supabase
+    .from("requests")
     .select(`
-      id, status, renter_name, renter_phone, renter_email, start_date, end_date, needs_driver, needs_delivery, delivery_location, message, admin_notes, created_at,
+      id, status, request_type, name, phone, email,
+      start_date, end_date, offered_price, message, admin_notes, created_at,
       listing:listings (
         title
       )
     `)
     .order("created_at", { ascending: false });
 
-  // Fetch listing requests (general/sale inquiries)
-  const { data: listingRequests, error: listingError } = await supabase
-    .from("listing_requests")
-    .select(`
-      id, status, request_type, requester_name, requester_phone, requester_email, message, preferred_viewing_date, budget_amount, admin_notes, created_at,
-      listing:listings (
-        title
-      )
-    `)
-    .order("created_at", { ascending: false });
-
-  if (rentalError || listingError) {
+  if (error) {
     return (
       <div className="dashboard-card">
         <h1 className="dashboard-title">Requests & Inquiries</h1>
@@ -77,12 +61,6 @@ export default async function OwnerRequestsPage() {
       </div>
     );
   }
-
-  // Combine and sort
-  const combinedRequests = [
-    ...(rentalRequests || []).map(r => ({ ...r, __type: 'rental' as const })),
-    ...(listingRequests || []).map(r => ({ ...r, __type: 'listing' as const }))
-  ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div>
@@ -101,14 +79,14 @@ export default async function OwnerRequestsPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {combinedRequests.map((request: CombinedRequest) => {
+          {combinedRequests?.map((request: CombinedRequest) => {
             const listing = Array.isArray(request.listing) ? request.listing[0] : request.listing;
             
             return (
               <div 
-                key={`${request.__type}-${request.id}`} 
+                key={`${request.request_type}-${request.id}`} 
                 className="dashboard-card" 
-                style={{ padding: "1.5rem", borderLeft: request.__type === 'rental' ? "4px solid var(--color-primary)" : "4px solid #10b981" }}
+                style={{ padding: "1.5rem", borderLeft: request.request_type === 'rental' ? "4px solid var(--color-primary)" : "4px solid #10b981" }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                   <div>
@@ -116,7 +94,7 @@ export default async function OwnerRequestsPage() {
                       {listing?.title || "Unknown Listing"}
                     </h3>
                     <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 600 }}>
-                      {request.__type === 'rental' ? 'Rental Request' : `${formatStatus(request.request_type || 'general')} Inquiry`}
+                      {request.request_type === 'rental' ? 'Rental Request' : `${formatStatus(request.request_type || 'general')} Inquiry`}
                     </span>
                   </div>
                   <span style={{ 
@@ -137,28 +115,17 @@ export default async function OwnerRequestsPage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
                   <div>
                     <h4 style={{ fontSize: "0.875rem", marginBottom: "0.5rem", color: "var(--color-text-muted)" }}>Request Details</h4>
-                    {request.__type === 'rental' ? (
+                    {request.request_type === 'rental' ? (
                       <>
                         <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
                           <strong>Dates:</strong> {request.start_date && request.end_date ? `${new Date(request.start_date).toLocaleDateString()} to ${new Date(request.end_date).toLocaleDateString()}` : "N/A"}
                         </p>
-                        <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                          <strong>Driver:</strong> {request.needs_driver ? "Required" : "Self-Drive"}
-                        </p>
-                        <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                          <strong>Delivery:</strong> {request.needs_delivery ? `Yes (${request.delivery_location})` : "No (Pickup)"}
-                        </p>
                       </>
                     ) : (
                       <>
-                        {request.preferred_viewing_date && (
+                        {request.offered_price != null && (
                           <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                            <strong>Preferred Date:</strong> {new Date(request.preferred_viewing_date).toLocaleDateString()}
-                          </p>
-                        )}
-                        {request.budget_amount != null && (
-                          <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                            <strong>Budget:</strong> {new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB' }).format(request.budget_amount)}
+                            <strong>Offered Price:</strong> {new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB' }).format(request.offered_price)}
                           </p>
                         )}
                       </>
@@ -174,14 +141,14 @@ export default async function OwnerRequestsPage() {
                   <div>
                     <h4 style={{ fontSize: "0.875rem", marginBottom: "0.5rem", color: "var(--color-text-muted)" }}>Contact Info</h4>
                     <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                      <strong>Name:</strong> {request.__type === 'rental' ? request.renter_name : request.requester_name}
+                      <strong>Name:</strong> {request.name}
                     </p>
                     <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                      <strong>Phone:</strong> {request.__type === 'rental' ? request.renter_phone : request.requester_phone}
+                      <strong>Phone:</strong> {request.phone}
                     </p>
-                    {(request.renter_email || request.requester_email) && (
+                    {request.email && (
                       <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                        <strong>Email:</strong> {request.__type === 'rental' ? request.renter_email : request.requester_email}
+                        <strong>Email:</strong> {request.email}
                       </p>
                     )}
                   </div>

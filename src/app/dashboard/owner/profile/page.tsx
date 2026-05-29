@@ -11,7 +11,7 @@ export default async function OwnerProfilePage() {
   let profile = null;
   if (user) {
     const { data } = await supabase
-      .from("owner_profiles")
+      .from("profiles")
       .select("verification_status")
       .eq("user_id", user.id)
       .single();
@@ -55,19 +55,7 @@ export default async function OwnerProfilePage() {
             </p>
           </div>
         );
-      case "rejected":
-        return (
-          <div style={{ backgroundColor: "#fef2f2", padding: "1.5rem", borderRadius: "var(--radius-md)", border: "1px solid #fecaca" }}>
-            <h3 style={{ color: "#dc2626", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span>❌</span> Verification Rejected
-            </h3>
-            <p style={{ color: "#991b1b", fontSize: "0.875rem", margin: 0 }}>
-              Your previous verification request was rejected. Please submit a new request or contact support.
-            </p>
-            <VerificationForm />
-          </div>
-        );
-      case "not_submitted":
+      case "unverified":
       default:
         return (
           <div style={{ backgroundColor: "var(--color-surface-hover)", padding: "1.5rem", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>

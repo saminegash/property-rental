@@ -13,7 +13,7 @@ async function verifyListingOwnership(listingId: string) {
 
   const { data: listing, error: listingError } = await supabase
     .from("listings")
-    .select("owner_id, category")
+    .select("owner_id, property_type")
     .eq("id", listingId)
     .single();
 
@@ -25,7 +25,7 @@ async function verifyListingOwnership(listingId: string) {
     return { error: "You can only manage images for your own listings" };
   }
 
-  return { userId: user.id, category: listing.category };
+  return { userId: user.id, property_type: listing.property_type };
 }
 
 export async function saveImageMetadata(params: {
@@ -67,8 +67,7 @@ export async function saveImageMetadata(params: {
     return { error: "Failed to save image metadata: " + error.message };
   }
 
-  const basePath = ownership.category === "vehicle" ? "cars" : "properties";
-  revalidatePath(`/dashboard/owner/${basePath}/${params.listingId}/edit`);
+  revalidatePath(`/dashboard/owner/listings/${params.listingId}/edit`);
   return { image: data };
 }
 
@@ -104,8 +103,7 @@ export async function setPrimaryImage(params: {
     return { error: "Failed to set primary image: " + setError.message };
   }
 
-  const basePath = ownership.category === "vehicle" ? "cars" : "properties";
-  revalidatePath(`/dashboard/owner/${basePath}/${params.listingId}/edit`);
+  revalidatePath(`/dashboard/owner/listings/${params.listingId}/edit`);
   return { success: true };
 }
 
@@ -157,7 +155,6 @@ export async function deleteImage(params: {
       .eq("id", remaining.id);
   }
 
-  const basePath = ownership.category === "vehicle" ? "cars" : "properties";
-  revalidatePath(`/dashboard/owner/${basePath}/${params.listingId}/edit`);
+  revalidatePath(`/dashboard/owner/listings/${params.listingId}/edit`);
   return { success: true };
 }

@@ -14,7 +14,7 @@ export default async function OwnerOverviewPage() {
   // 1. Fetch Listings Data
   const { data: listings } = await supabase
     .from("listings")
-    .select("id, status, category")
+    .select("id, status, property_type")
     .eq("owner_id", user.id);
 
   const totalListings = listings?.length || 0;
@@ -23,22 +23,17 @@ export default async function OwnerOverviewPage() {
   const rejectedListings = listings?.filter(l => l.status === "rejected").length || 0;
 
   // 2. Fetch Requests Data
-  // To get requests for this owner, we need to join through listings
-  // The policy "Owners can view requests assigned to them" restricts visibility,
-  // but to count *all* requests we might need a custom query or RPC. 
-  // For now we rely on what RLS allows the owner to see.
   const { data: requests } = await supabase
-    .from("rental_requests")
+    .from("requests")
     .select("id, status, listing_id");
 
-  // Since RLS only returns requests for their listings, this count is accurate to what they have access to
   const totalRequests = requests?.length || 0;
-  const activeRentals = requests?.filter(r => r.status === "active" || r.status === "confirmed").length || 0;
+  const activeRentals = requests?.filter(r => r.status === "confirmed").length || 0;
 
   // 3. Fetch Recent Activity (Limit 3)
   const { data: recentActivity } = await supabase
     .from("listings")
-    .select("id, title, category, status, created_at, pending_price_changes(status)")
+    .select("id, title, property_type, status, created_at, pending_price_changes(status)")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
     .limit(3);
@@ -96,20 +91,19 @@ export default async function OwnerOverviewPage() {
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--color-text-heading)" }}>Recent Listings</h2>
-            <Link href="/dashboard/owner/cars" style={{ fontSize: "0.875rem", color: "var(--color-primary)", textDecoration: "none", fontWeight: 600 }}>View All</Link>
+            <Link href="/dashboard/owner/listings" style={{ fontSize: "0.875rem", color: "var(--color-primary)", textDecoration: "none", fontWeight: 600 }}>View All</Link>
           </div>
 
           {!recentActivity || recentActivity.length === 0 ? (
             <div className="dashboard-card" style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
-              <p style={{ color: "var(--color-text-muted)" }}>No listings found. Start by adding a car or property.</p>
+              <p style={{ color: "var(--color-text-muted)" }}>No listings found. Start by adding a new listing.</p>
               <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginTop: "1.5rem" }}>
-                <Link href="/dashboard/owner/cars/new" className="auth-button">Add Car</Link>
-                <Link href="/dashboard/owner/properties/new" className="auth-button auth-button--secondary">Add Property</Link>
+                <Link href="/dashboard/owner/listings/new" className="auth-button">Add Listing</Link>
               </div>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {recentActivity.map((listing: { id: string; title: string | null; category: string; status: string; created_at: string; pending_price_changes: unknown }) => {
+              {recentActivity.map((listing: { id: string; title: string | null; property_type: string; status: string; created_at: string; pending_price_changes: unknown }) => {
                 const pendingChanges = Array.isArray(listing.pending_price_changes) 
                   ? listing.pending_price_changes 
                   : [];
@@ -119,8 +113,8 @@ export default async function OwnerOverviewPage() {
                   <div key={listing.id} className="dashboard-card" style={{ padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
-                        <span style={{ fontSize: "0.625rem", textTransform: "uppercase", fontWeight: 700, padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: listing.category === "vehicle" ? "var(--color-primary-light)" : "var(--color-surface-hover)", color: listing.category === "vehicle" ? "var(--color-primary)" : "var(--color-text-heading)" }}>
-                          {listing.category}
+                        <span style={{ fontSize: "0.625rem", textTransform: "uppercase", fontWeight: 700, padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: listing.property_type === "vehicle" ? "var(--color-primary-light)" : "var(--color-surface-hover)", color: listing.property_type === "vehicle" ? "var(--color-primary)" : "var(--color-text-heading)" }}>
+                          {listing.property_type}
                         </span>
                         <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--color-text-heading)" }}>
                           {listing.title || "Untitled"}
@@ -149,7 +143,7 @@ export default async function OwnerOverviewPage() {
                         {listing.status.replace('_', ' ')}
                       </span>
                       <Link 
-                        href={`/dashboard/owner/${listing.category === "vehicle" ? "cars" : "properties"}/${listing.id}/edit`}
+                        href={`/dashboard/owner/listings/${listing.id}/edit`}
                         className="auth-button auth-button--secondary"
                         style={{ padding: "0.375rem 0.75rem", fontSize: "0.75rem" }}
                       >

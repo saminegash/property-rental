@@ -39,20 +39,19 @@ export async function ensureProfileExists(user: User) {
       return;
     }
 
-    // 3. Assign Role (Default to renter, allow owner if specified in metadata)
+    // 3. Assign Role (Default to user, allow owner if specified in metadata)
     const requestedRole = user.user_metadata?.role;
-    const roleName = requestedRole === "owner" ? "owner" : "renter";
+    
+    // Always insert 'user' role
+    await adminClient.from("user_roles").insert({
+      user_id: user.id,
+      role: 'user',
+    });
 
-    const { data: roleData } = await adminClient
-      .from("roles")
-      .select("id")
-      .eq("role_name", roleName)
-      .single();
-
-    if (roleData) {
+    if (requestedRole === "owner") {
       await adminClient.from("user_roles").insert({
         user_id: user.id,
-        role_id: roleData.id,
+        role: 'owner',
       });
     }
   } catch (error) {

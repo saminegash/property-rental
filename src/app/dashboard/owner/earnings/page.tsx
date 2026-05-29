@@ -21,52 +21,52 @@ export default async function OwnerEarningsPage() {
 
   const listingIds = listings?.map((l) => l.id) || [];
 
-  // 2. Fetch Rental Requests for those listings
-  const { data: rentalRequests } = await supabase
-    .from("rental_requests")
+  // 2. Fetch Requests for those listings
+  const { data: allRequests } = await supabase
+    .from("requests")
     .select("id, status, listing_id, start_date, end_date")
     .in("listing_id", listingIds)
     .order("end_date", { ascending: false });
 
-  const requestIds = rentalRequests?.map((r) => r.id) || [];
+  const requestIds = allRequests?.map((r) => r.id) || [];
 
   // 3. Fetch Commissions for those requests
   const { data: commissions } = await supabase
     .from("commissions")
-    .select("id, rental_request_id, commission_base_amount, commission_amount, commission_status, created_at")
-    .in("rental_request_id", requestIds)
+    .select("id, request_id, deal_amount, commission_amount, status, created_at")
+    .in("request_id", requestIds)
     .order("created_at", { ascending: false });
 
   // 4. Fetch Security Deposits for those requests
   const { data: securityDeposits } = await supabase
     .from("security_deposits")
-    .select("id, rental_request_id, deposit_amount, deposit_status")
-    .in("rental_request_id", requestIds);
+    .select("id, request_id, deposit_amount, deposit_status")
+    .in("request_id", requestIds);
 
   // 5. Calculate Metrics
-  const completedRequests = rentalRequests?.filter(r => r.status === "completed") || [];
-  const confirmedRequests = rentalRequests?.filter(r => r.status === "confirmed" || r.status === "active") || [];
+  const completedRequests = allRequests?.filter(r => r.status === "completed") || [];
+  const confirmedRequests = allRequests?.filter(r => r.status === "confirmed") || [];
   
   const completedRequestIds = completedRequests.map(r => r.id);
 
-  // We rely on 'commission_base_amount' to ensure we never fake data and align with admin billing
-  const completedCommissions = commissions?.filter(c => completedRequestIds.includes(c.rental_request_id)) || [];
+  // We rely on 'deal_amount' to ensure we never fake data and align with admin billing
+  const completedCommissions = commissions?.filter(c => completedRequestIds.includes(c.request_id!)) || [];
   
-  const totalGrossEarnings = completedCommissions.reduce((sum, c) => sum + (c.commission_base_amount || 0), 0);
+  const totalGrossEarnings = completedCommissions.reduce((sum, c) => sum + (c.deal_amount || 0), 0);
   const totalPlatformCommission = completedCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
   const netEarnings = totalGrossEarnings - totalPlatformCommission;
   
-  const pendingCommissionsAmount = commissions?.filter(c => c.commission_status === "pending").reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0;
-  const collectedCommissionsAmount = commissions?.filter(c => c.commission_status === "paid" || c.commission_status === "collected").reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0;
+  const pendingCommissionsAmount = commissions?.filter(c => c.status === "pending").reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0;
+  const collectedCommissionsAmount = commissions?.filter(c => c.status === "collected").reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0;
 
-  const totalSecurityDepositsHeld = securityDeposits?.filter(d => d.deposit_status === "held").reduce((sum, d) => sum + (d.deposit_amount || 0), 0) || 0;
-  const totalSecurityDepositsWithheld = securityDeposits?.filter(d => d.deposit_status === "withheld").reduce((sum, d) => sum + (d.deposit_amount || 0), 0) || 0;
+  const totalSecurityDepositsHeld = securityDeposits?.filter(d => d.deposit_status === "collected").reduce((sum, d) => sum + (d.deposit_amount || 0), 0) || 0;
+  const totalSecurityDepositsWithheld = securityDeposits?.filter(d => d.deposit_status === "forfeited").reduce((sum, d) => sum + (d.deposit_amount || 0), 0) || 0;
 
   // Earnings by Listing
   const earningsByListing = listings?.map(listing => {
     const reqs = completedRequests.filter(r => r.listing_id === listing.id).map(r => r.id);
-    const comms = completedCommissions.filter(c => reqs.includes(c.rental_request_id));
-    const gross = comms.reduce((sum, c) => sum + (c.commission_base_amount || 0), 0);
+    const comms = completedCommissions.filter(c => reqs.includes(c.request_id!));
+    const gross = comms.reduce((sum, c) => sum + (c.deal_amount || 0), 0);
     const comm = comms.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
     return {
       id: listing.id,
@@ -79,15 +79,15 @@ export default async function OwnerEarningsPage() {
 
   // Recent Completed Deals
   const recentDeals = completedRequests.slice(0, 5).map(req => {
-    const comm = completedCommissions.find(c => c.rental_request_id === req.id);
+    const comm = completedCommissions.find(c => c.request_id === req.id);
     const listing = listings?.find(l => l.id === req.listing_id);
     return {
       id: req.id,
       listingTitle: listing?.title || "Unknown Listing",
-      endDate: req.end_date,
-      gross: comm?.commission_base_amount || 0,
+      endDate: req.end_date || new Date().toISOString(),
+      gross: comm?.deal_amount || 0,
       commission: comm?.commission_amount || 0,
-      net: (comm?.commission_base_amount || 0) - (comm?.commission_amount || 0)
+      net: (comm?.deal_amount || 0) - (comm?.commission_amount || 0)
     };
   });
 

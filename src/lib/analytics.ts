@@ -33,19 +33,19 @@ export async function trackListingEvent(listing_id: string, event_type: EventTyp
     hash.update(`${ip}-${userAgent}-${activeSalt}`);
     const session_id = hash.digest('hex').substring(0, 32);
 
-    const { error } = await supabase
-      .from("listing_events")
-      .insert({
-        listing_id,
-        event_type,
-        viewer_id: user?.id || null,
-        session_id
-      });
+    // const { error } = await supabase
+    //   .from("listing_events")
+    //   .insert({
+    //     listing_id,
+    //     event_type,
+    //     viewer_id: user?.id || null,
+    //     session_id
+    //   });
 
-    if (error) {
-      console.warn("Analytics insertion failed:", error.message);
-      // We don't throw here to avoid breaking the page
-    }
+    // if (error) {
+    //   console.warn("Analytics insertion failed:", error.message);
+    //   // We don't throw here to avoid breaking the page
+    // }
   } catch (err) {
     console.error("Analytics tracking exception:", err);
     // Suppress error to avoid breaking the user flow

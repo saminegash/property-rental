@@ -16,9 +16,9 @@ export default async function RenterDashboardPage() {
 
   // Fetch request counts for summary
   const { data: requests } = await supabase
-    .from("rental_requests")
+    .from("requests")
     .select("id, status")
-    .eq("renter_id", user.id);
+    .eq("user_id", user.id);
 
   const totalRequests = requests?.length || 0;
   const activeRequests =

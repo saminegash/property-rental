@@ -1,14 +1,13 @@
 import { Metadata } from "next";
 import HeroSection from "@/components/home/HeroSection";
 import BrowseByCategorySection from "@/components/home/BrowseByCategorySection";
-import { FeaturedPropertiesSection } from "@/components/home/FeaturedPropertiesSection";
-import { FeaturedCarsSection } from "@/components/home/FeaturedCarsSection";
+import { FeaturedListingsSection } from "@/components/listings/FeaturedListingsSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import DualCTASection from "@/components/home/DualCTASection";
 import TrustAndSafetySection from "@/components/home/TrustAndSafetySection";
 import PopularAndSearchedSection from "@/components/home/PopularAndSearchedSection";
 import WhyChooseSection from "@/components/home/WhyChooseSection";
-import { createClient } from "@/lib/supabase/server";
+
 
 export const dynamic = "force-dynamic";
 
@@ -19,19 +18,11 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  // Fetch property types once for the hero dropdown
-  const supabase = await createClient();
-  const { data: propertyTypes } = await supabase
-    .from("property_types")
-    .select("id, name")
-    .order("name");
-
   return (
     <>
-      <HeroSection propertyTypes={propertyTypes || []} />
+      <HeroSection />
       <BrowseByCategorySection />
-      <FeaturedPropertiesSection />
-      <FeaturedCarsSection />
+      <FeaturedListingsSection />
       <HowItWorksSection />
       <DualCTASection />
       <TrustAndSafetySection />

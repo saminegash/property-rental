@@ -8,24 +8,14 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * allowing it to securely query the `roles` and `user_roles` tables
  * without exposing the service-role key to the client.
  */
-export async function hasRole(userId: string, roleName: string): Promise<boolean> {
+export async function hasRole(userId: string, roleName: 'user' | 'owner' | 'admin'): Promise<boolean> {
   const adminClient = createAdminClient();
-
-  const { data: roleData } = await adminClient
-    .from("roles")
-    .select("id")
-    .eq("role_name", roleName)
-    .single();
-
-  if (!roleData) {
-    return false;
-  }
 
   const { data: userRole } = await adminClient
     .from("user_roles")
     .select("id")
     .eq("user_id", userId)
-    .eq("role_id", roleData.id)
+    .eq("role", roleName)
     .maybeSingle();
 
   return !!userRole;

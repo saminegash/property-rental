@@ -15,7 +15,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-type Tab = "properties" | "cars";
+type Tab = "rent" | "sale";
 
 const POPULAR_LOCATIONS = [
   "Bole",
@@ -52,16 +52,10 @@ const FLOATING_BADGES = [
 ] as const;
 
 /**
- * Hero section — property-first marketplace.
- * Two-column layout: Left has headline + search form, Right has composite image with floating trust badges.
- * Stacks on mobile, side-by-side from lg breakpoint.
+ * Hero section — unified marketplace.
  */
-export default function HeroSection({
-  propertyTypes = [],
-}: {
-  propertyTypes?: { id: string; name: string }[];
-}) {
-  const [tab, setTab] = useState<Tab>("properties");
+export default function HeroSection() {
+  const [tab, setTab] = useState<Tab>("rent");
   const router = useRouter();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -72,24 +66,18 @@ export default function HeroSection({
     const location = formData.get("location") as string;
     if (location) params.set("location", location);
 
-    if (tab === "properties") {
-      const ptype = formData.get("property_type") as string;
-      if (ptype) params.set("property_type", ptype);
-      const rentSale = formData.get("rent_sale") as string;
-      if (rentSale) params.set("type", rentSale);
-      const min = formData.get("min_price") as string;
-      const max = formData.get("max_price") as string;
-      if (min) params.set("min_price", min);
-      if (max) params.set("max_price", max);
-      router.push(`/properties?${params.toString()}`);
+    const ptype = formData.get("property_type") as string;
+    if (ptype) params.set("property_type", ptype);
+
+    const min = formData.get("min_price") as string;
+    const max = formData.get("max_price") as string;
+    if (min) params.set("min_price", min);
+    if (max) params.set("max_price", max);
+
+    if (tab === "rent") {
+      router.push(`/rent?${params.toString()}`);
     } else {
-      const rentSale = formData.get("rent_sale") as string;
-      if (rentSale) params.set("listing_type", rentSale);
-      const min = formData.get("min_price") as string;
-      const max = formData.get("max_price") as string;
-      if (min) params.set("min_price", min);
-      if (max) params.set("max_price", max);
-      router.push(`/cars?${params.toString()}`);
+      router.push(`/trade?${params.toString()}`);
     }
   }
 
@@ -127,25 +115,25 @@ export default function HeroSection({
             >
               <button
                 role="tab"
-                aria-selected={tab === "properties"}
-                onClick={() => setTab("properties")}
+                aria-selected={tab === "rent"}
+                onClick={() => setTab("rent")}
                 className={`hero-section__tab ${
-                  tab === "properties" ? "hero-section__tab--active" : ""
+                  tab === "rent" ? "hero-section__tab--active" : ""
                 }`}
               >
                 <HomeIcon className="h-4 w-4" aria-hidden="true" />
-                Properties
+                Rent
               </button>
               <button
                 role="tab"
-                aria-selected={tab === "cars"}
-                onClick={() => setTab("cars")}
+                aria-selected={tab === "sale"}
+                onClick={() => setTab("sale")}
                 className={`hero-section__tab ${
-                  tab === "cars" ? "hero-section__tab--active" : ""
+                  tab === "sale" ? "hero-section__tab--active" : ""
                 }`}
               >
                 <Car className="h-4 w-4" aria-hidden="true" />
-                Cars
+                Buy
               </button>
             </div>
 
@@ -167,46 +155,25 @@ export default function HeroSection({
                 </div>
               </Field>
 
-              {/* Row 2: Property Type + Rent/Sale */}
+              {/* Row 2: Property Type */}
               <div className="hero-section__row-2col">
-                {tab === "properties" && (
-                  <Field label="Property Type">
-                    <div className="hero-section__select-wrap">
-                      <select name="property_type" className={selectClass}>
-                        <option value="">All Types</option>
-                        {propertyTypes.length === 0
-                          ? [
-                              "Apartment",
-                              "House",
-                              "Villa",
-                              "Land",
-                              "Commercial",
-                              "Condominium",
-                            ].map((n) => (
-                              <option key={n} value={n.toLowerCase()}>
-                                {n}
-                              </option>
-                            ))
-                          : propertyTypes.map((p) => (
-                              <option key={p.id} value={p.name.toLowerCase()}>
-                                {p.name}
-                              </option>
-                            ))}
-                      </select>
-                      <ChevronDown
-                        className="hero-section__select-chevron"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </Field>
-                )}
-
-                <Field label="Rent / Sale">
+                <Field label="Type">
                   <div className="hero-section__select-wrap">
-                    <select name="rent_sale" className={selectClass}>
-                      <option value="">All</option>
-                      <option value="rent">Rent</option>
-                      <option value="sale">Buy</option>
+                    <select name="property_type" className={selectClass}>
+                      <option value="">All Types</option>
+                      {[
+                        "Apartment",
+                        "House",
+                        "Villa",
+                        "Land",
+                        "Commercial",
+                        "Condominium",
+                        "Vehicle"
+                      ].map((n) => (
+                        <option key={n} value={n.toLowerCase()}>
+                          {n}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown
                       className="hero-section__select-chevron"
@@ -214,6 +181,9 @@ export default function HeroSection({
                     />
                   </div>
                 </Field>
+
+                {/* Just an empty placeholder or additional filter for the 2nd column if needed */}
+                <div />
               </div>
 
               {/* Row 3: Price Range */}
@@ -240,7 +210,7 @@ export default function HeroSection({
               {/* Search button */}
               <button type="submit" className="hero-section__search-btn">
                 <Search className="h-4 w-4" aria-hidden="true" />
-                Search {tab === "properties" ? "Properties" : "Cars"}
+                Search {tab === "rent" ? "Rentals" : "Listings"}
               </button>
             </form>
 
@@ -250,7 +220,7 @@ export default function HeroSection({
               {POPULAR_LOCATIONS.map((loc) => (
                 <a
                   key={loc}
-                  href={`/${tab === "properties" ? "properties" : "cars"}?location=${encodeURIComponent(loc)}`}
+                  href={`/${tab === "rent" ? "rent" : "trade"}?location=${encodeURIComponent(loc)}`}
                   className="hero-section__popular-link"
                 >
                   {loc}

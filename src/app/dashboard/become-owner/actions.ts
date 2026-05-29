@@ -35,12 +35,14 @@ export async function submitOwnerOnboarding(formData: FormData) {
 
   const data = parseResult.data;
 
-  // 1. Update the base profile with phone and city
+  // 1. Update the base profile with owner information
   const { error: profileError } = await supabase
     .from("profiles")
     .update({
       phone: data.phone,
       city: data.city,
+      business_name: data.businessName || null,
+      verification_status: "pending",
     })
     .eq("user_id", user.id);
 
@@ -48,50 +50,23 @@ export async function submitOwnerOnboarding(formData: FormData) {
     return { error: "Failed to update profile: " + profileError.message };
   }
 
-  // 2. Create or update the owner profile (using UPSERT on the unique user_id)
-  const { error: ownerProfileError } = await supabase
-    .from("owner_profiles")
-    .upsert(
-      {
-        user_id: user.id,
-        owner_type: data.ownerType,
-        business_name: data.businessName || null,
-        verification_status: "pending", // Default as requested
-      },
-      { onConflict: "user_id" }
-    );
-
-  if (ownerProfileError) {
-    return {
-      error: "Failed to create owner profile: " + ownerProfileError.message,
-    };
-  }
-
-  // 3. Ensure the user has the 'owner' role assigned safely via admin client
+  // 2. Ensure the user has the 'owner' role assigned safely via admin client
   const adminClient = createAdminClient();
 
-  const { data: roleData } = await adminClient
-    .from("roles")
+  const { data: existingRole } = await adminClient
+    .from("user_roles")
     .select("id")
-    .eq("role_name", "owner")
-    .single();
+    .eq("user_id", user.id)
+    .eq("role", "owner")
+    .maybeSingle();
 
-  if (roleData) {
-    const { data: existingRole } = await adminClient
-      .from("user_roles")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("role_id", roleData.id)
-      .maybeSingle();
-
-    if (!existingRole) {
-      await adminClient.from("user_roles").insert({
-        user_id: user.id,
-        role_id: roleData.id,
-      });
-    }
+  if (!existingRole) {
+    await adminClient.from("user_roles").insert({
+      user_id: user.id,
+      role: "owner",
+    });
   }
 
-  // 4. Redirect back to the dashboard when complete
+  // 3. Redirect back to the dashboard when complete
   redirect("/dashboard");
 }

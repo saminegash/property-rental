@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { clientEnv } from "@/lib/env/client";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
+
+export type TypedSupabaseClient = SupabaseClient<Database>;
 
 /**
  * Creates a Supabase client for use in Server Components (RSC).
@@ -30,7 +33,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  *   the token with the Auth server). `getSession()` reads unverified
  *   cookie data and must NOT be used for authorization.
  */
-export async function createClient(): Promise<SupabaseClient> {
+export async function createClient(): Promise<TypedSupabaseClient> {
   const env = clientEnv();
   const cookieStore = await cookies();
 
@@ -56,5 +59,5 @@ export async function createClient(): Promise<SupabaseClient> {
         },
       },
     }
-  );
+  ) as TypedSupabaseClient;
 }

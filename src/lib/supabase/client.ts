@@ -4,8 +4,9 @@ import { createBrowserClient } from "@supabase/ssr";
 import { clientEnv } from "@/lib/env/client";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 
-export type TypedSupabaseClient = SupabaseClient;
+export type TypedSupabaseClient = SupabaseClient<Database, "public">;
 
 /**
  * Creates a Supabase client for use in browser / client components.
@@ -41,5 +42,5 @@ export function createClient(): TypedSupabaseClient {
     {
       isSingleton: true,
     }
-  );
+  ) as TypedSupabaseClient;
 }

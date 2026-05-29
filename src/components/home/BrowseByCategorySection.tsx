@@ -28,7 +28,7 @@ const CATEGORIES: Category[] = [
     description: "Modern & affordable apartment units",
     image:
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&h=300&q=80",
-    href: "/properties?type=Apartment",
+    href: "/trade?property_type=apartment",
     icon: Building2,
     iconBg: "bg-blue-50",
     iconColor: "text-blue-600",
@@ -39,7 +39,7 @@ const CATEGORIES: Category[] = [
     description: "Comfortable homes for families",
     image:
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=400&h=300&q=80",
-    href: "/properties?type=House",
+    href: "/trade?property_type=house",
     icon: Home,
     iconBg: "bg-emerald-50",
     iconColor: "text-emerald-600",
@@ -50,7 +50,7 @@ const CATEGORIES: Category[] = [
     description: "Luxury villas with premium living",
     image:
       "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=400&h=300&q=80",
-    href: "/properties?type=Villa",
+    href: "/trade?property_type=villa",
     icon: Castle,
     iconBg: "bg-purple-50",
     iconColor: "text-purple-600",
@@ -61,7 +61,7 @@ const CATEGORIES: Category[] = [
     description: "Residential & commercial land for sale",
     image:
       "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=400&h=300&q=80",
-    href: "/properties?type=Land",
+    href: "/trade?property_type=land",
     icon: Trees,
     iconBg: "bg-orange-50",
     iconColor: "text-orange-600",
@@ -72,7 +72,7 @@ const CATEGORIES: Category[] = [
     description: "Offices, shops & commercial spaces",
     image:
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&h=300&q=80",
-    href: "/properties?type=Commercial",
+    href: "/trade?property_type=commercial",
     icon: Store,
     iconBg: "bg-teal-50",
     iconColor: "text-teal-600",
@@ -83,7 +83,7 @@ const CATEGORIES: Category[] = [
     description: "Sedans, SUVs & more from trusted sellers",
     image:
       "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&h=300&q=80",
-    href: "/cars",
+    href: "/trade?property_type=vehicle",
     icon: Car,
     iconBg: "bg-sky-50",
     iconColor: "text-sky-600",
@@ -91,31 +91,23 @@ const CATEGORIES: Category[] = [
 ];
 
 export default async function BrowseByCategorySection() {
-  // Count from DB for property categories
+  // Count from DB for all listing types
   const supabase = await createClient();
-  const { data: properties } = await supabase
-    .from("property_details")
-    .select(`property_types(name), listings!inner(status)`)
-    .eq("listings.status", "published");
+  const { data: listings } = await supabase
+    .from("listings")
+    .select("property_type")
+    .eq("status", "published");
 
   const counts: Record<string, number> = {};
-  if (properties) {
-    for (const p of properties) {
-      const pt = p.property_types as
-        | { name: string }
-        | { name: string }[]
-        | null;
-      const name = Array.isArray(pt) ? pt[0]?.name : pt?.name;
-      if (name) counts[name] = (counts[name] || 0) + 1;
+  if (listings) {
+    for (const listing of listings) {
+      const type = listing.property_type;
+      const key = type.charAt(0).toUpperCase() + type.slice(1);
+      counts[key] = (counts[key] || 0) + 1;
     }
   }
 
-  // Count cars too
-  const { count: carCount } = await supabase
-    .from("listings")
-    .select("*", { count: "exact", head: true })
-    .eq("category", "vehicle")
-    .eq("status", "published");
+  const carCount = counts["Vehicle"] || 0;
 
   return (
     <section className="bg-white py-12 lg:py-16">
