@@ -155,38 +155,33 @@ export default function HeroSection() {
                 </div>
               </Field>
 
-              {/* Row 2: Property Type */}
-              <div className="hero-section__row-2col">
-                <Field label="Type">
-                  <div className="hero-section__select-wrap">
-                    <select name="property_type" className={selectClass}>
-                      <option value="">All Types</option>
-                      {[
-                        "Apartment",
-                        "House",
-                        "Villa",
-                        "Land",
-                        "Commercial",
-                        "Condominium",
-                        "Vehicle"
-                      ].map((n) => (
-                        <option key={n} value={n.toLowerCase()}>
-                          {n}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      className="hero-section__select-chevron"
-                      aria-hidden="true"
-                    />
-                  </div>
-                </Field>
+              {/* Property Type */}
+              <Field label="Type">
+                <div className="hero-section__select-wrap">
+                  <select name="property_type" className={selectClass}>
+                    <option value="">All Types</option>
+                    {[
+                      "Apartment",
+                      "House",
+                      "Villa",
+                      "Land",
+                      "Commercial",
+                      "Condominium",
+                      "Vehicle"
+                    ].map((n) => (
+                      <option key={n} value={n.toLowerCase()}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    className="hero-section__select-chevron"
+                    aria-hidden="true"
+                  />
+                </div>
+              </Field>
 
-                {/* Just an empty placeholder or additional filter for the 2nd column if needed */}
-                <div />
-              </div>
-
-              {/* Row 3: Price Range */}
+              {/* Price Range */}
               <Field label="Price Range (ETB)">
                 <div className="hero-section__price-row">
                   <input
@@ -243,31 +238,6 @@ export default function HeroSection() {
                 className="hero-section__img"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              {/* Car thumbnail overlay */}
-              <div className="hero-section__car-thumb">
-                <Image
-                  src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=320&h=200&q=80"
-                  alt="Car for sale in Ethiopia"
-                  fill
-                  className="hero-section__img"
-                  sizes="140px"
-                />
-              </div>
-            </div>
-
-            {/* Floating trust badges — overlaid on the image */}
-            <div className="hero-section__badges">
-              {FLOATING_BADGES.map(({ icon: Icon, title, subtitle }) => (
-                <div key={title} className="hero-section__badge">
-                  <div className="hero-section__badge-icon">
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                  </div>
-                  <div className="hero-section__badge-text">
-                    <p className="hero-section__badge-title">{title}</p>
-                    <p className="hero-section__badge-sub">{subtitle}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
