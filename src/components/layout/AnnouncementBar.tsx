@@ -4,7 +4,7 @@ const ITEMS = [
   { icon: ShieldCheck, label: "Admin Reviewed Listings" },
   { icon: BadgeCheck, label: "Verified Owners & Sellers" },
   { icon: Lock, label: "Safe & Transparent Process" },
-  { icon: Percent, label: "5% Commission After Successful Deal" },
+  { icon: Percent, label: "1-5% Commission After Successful Deal" },
 ] as const;
 
 /**

@@ -1,6 +1,9 @@
-ignoredBuiltDependencies:
+onlyBuiltDependencies:
+  - esbuild
   - sharp
   - unrs-resolver
 
-onlyBuiltDependencies:
-  - esbuild
+# This workspace is located at /home/sam/Documents/Kode/car-market-place, so pnpm should already know
+# where the root is without needing this setting. If you encounter issues, try removing this section.
+# turbopack:
+#   root: /home/sam/Documents/Kode/car-market-place
