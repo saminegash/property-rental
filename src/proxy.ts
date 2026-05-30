@@ -25,7 +25,7 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet, headers) {
+        setAll(cookiesToSet) {
           // Set cookies on the request (for downstream server code)
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
@@ -40,13 +40,6 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
-
-          // Set cache headers to prevent CDN caching of auth responses
-          if (headers) {
-            Object.entries(headers).forEach(([key, value]) =>
-              supabaseResponse.headers.set(key, value)
-            );
-          }
         },
       },
     }
