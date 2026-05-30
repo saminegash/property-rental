@@ -22,10 +22,11 @@ export default async function OwnerOverviewPage() {
   const pendingListings = listings?.filter(l => l.status === "pending_review").length || 0;
   const rejectedListings = listings?.filter(l => l.status === "rejected").length || 0;
 
-  // 2. Fetch Requests Data
+  // 2. Fetch Requests Data (only for this owner's listings)
   const { data: requests } = await supabase
     .from("requests")
-    .select("id, status, listing_id");
+    .select("id, status, listing_id, listings!inner(owner_id)")
+    .eq("listings.owner_id", user.id);
 
   const totalRequests = requests?.length || 0;
   const activeRentals = requests?.filter(r => r.status === "confirmed").length || 0;
@@ -33,7 +34,7 @@ export default async function OwnerOverviewPage() {
   // 3. Fetch Recent Activity (Limit 3)
   const { data: recentActivity } = await supabase
     .from("listings")
-    .select("id, title, property_type, status, created_at, pending_price_changes(status)")
+    .select("id, title, property_type, status, created_at")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
     .limit(3);
@@ -103,13 +104,7 @@ export default async function OwnerOverviewPage() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              {recentActivity.map((listing: { id: string; title: string | null; property_type: string; status: string; created_at: string; pending_price_changes: unknown }) => {
-                const pendingChanges = Array.isArray(listing.pending_price_changes) 
-                  ? listing.pending_price_changes 
-                  : [];
-                const hasPendingPriceChange = pendingChanges.some((c: { status: string }) => c.status === "pending");
-                
-                return (
+              {recentActivity.map((listing) => (
                   <div key={listing.id} className="dashboard-card" style={{ padding: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
@@ -120,14 +115,9 @@ export default async function OwnerOverviewPage() {
                           {listing.title || "Untitled"}
                         </h3>
                       </div>
-                      <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>
+                      <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
                         Added {new Date(listing.created_at).toLocaleDateString()}
                       </p>
-                      {hasPendingPriceChange && (
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", padding: "0.125rem 0.375rem", borderRadius: "4px", backgroundColor: "#e0f2fe", color: "#0369a1", border: "1px solid #bae6fd", display: "inline-block" }}>
-                          ⚠️ Price Edit Pending Review
-                        </span>
-                      )}
                     </div>
                     
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -151,8 +141,7 @@ export default async function OwnerOverviewPage() {
                       </Link>
                     </div>
                   </div>
-                );
-              })}
+              ))}
             </div>
           )}
         </div>
