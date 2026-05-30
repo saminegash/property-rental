@@ -8,8 +8,7 @@ export function OwnerTabsNav() {
 
   const tabs = [
     { name: "Overview", href: "/dashboard/owner", exact: true },
-    { name: "Cars", href: "/dashboard/owner/cars" },
-    { name: "Properties", href: "/dashboard/owner/properties" },
+    { name: "Listings", href: "/dashboard/owner/listings" },
     { name: "Requests", href: "/dashboard/owner/requests" },
     { name: "Earnings", href: "/dashboard/owner/earnings" },
     { name: "Analytics", href: "/dashboard/owner/analytics" },
