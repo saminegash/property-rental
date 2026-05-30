@@ -66,12 +66,12 @@ export default function SignupPage() {
         <fieldset className="form-group">
           <legend className="form-label">I want to</legend>
           <div className="role-options">
-            <label htmlFor="role-renter" className="role-option">
+            <label htmlFor="role-user" className="role-option">
               <input
-                id="role-renter"
+                id="role-user"
                 type="radio"
                 name="role"
-                value="renter"
+                value="user"
                 defaultChecked
                 className="role-radio"
               />

@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
  *
  * The role is passed as user metadata so the Postgres trigger
  * (when implemented) can read it and set the profile role.
- * Until the trigger exists, role defaults to 'renter'.
+ * Until the trigger exists, role defaults to 'user'.
  */
 export async function signup(formData: FormData) {
   const supabase = await createClient();
@@ -21,8 +21,8 @@ export async function signup(formData: FormData) {
     return { error: "Email and password are required." };
   }
 
-  if (role !== "owner" && role !== "renter") {
-    return { error: "Role must be 'owner' or 'renter'." };
+  if (role !== "owner" && role !== "user") {
+    return { error: "Role must be 'owner' or 'user'." };
   }
 
   const { error } = await supabase.auth.signUp({
