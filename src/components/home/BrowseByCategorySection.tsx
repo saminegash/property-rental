@@ -1,14 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Building2,
-  Home,
-  Castle,
-  Trees,
-  Store,
-  Car,
-  ArrowRight,
-} from "lucide-react";
+import { Building2, Home, Castle, Trees, Store, Car } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 type Category = {
@@ -137,12 +129,15 @@ export default async function BrowseByCategorySection() {
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 17vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
                     <div
                       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/20 backdrop-blur-md`}
                     >
-                      <Icon className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                      <Icon
+                        className="h-3.5 w-3.5 text-white"
+                        aria-hidden="true"
+                      />
                     </div>
                   </div>
                 </div>
