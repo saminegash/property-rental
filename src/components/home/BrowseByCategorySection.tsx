@@ -119,28 +119,43 @@ export default async function BrowseByCategorySection() {
           Find exactly what you are looking for
         </p>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:mt-8 lg:grid-cols-6">
           {CATEGORIES.map((cat) => {
             const count = cat.dbKey ? counts[cat.dbKey] || 0 : carCount || 0;
             const Icon = cat.icon;
-            
             return (
               <Link
                 key={cat.title}
                 href={cat.href}
-                className="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
+                className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
               >
-                <div
-                  className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110 ${cat.iconBg} ${cat.iconColor}`}
-                >
-                  <Icon className="h-7 w-7" aria-hidden="true" />
+                <div className="relative h-28 w-full overflow-hidden bg-slate-100 sm:h-32">
+                  <Image
+                    src={cat.image}
+                    alt={cat.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 17vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+                    <div
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/20 backdrop-blur-md`}
+                    >
+                      <Icon className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="mb-1 text-sm font-bold text-slate-900">
-                  {cat.title}
-                </h3>
-                <p className="text-xs font-medium text-slate-500">
-                  {count} {count === 1 ? "Listing" : "Listings"}
-                </p>
+                <div className="p-3">
+                  <h3 className="text-sm font-bold text-slate-900 line-clamp-1">
+                    {cat.title}
+                  </h3>
+                  <div className="mt-1 flex items-center justify-between">
+                    <p className="text-[11px] text-slate-500">
+                      {count} {count === 1 ? "Listing" : "Listings"}
+                    </p>
+                  </div>
+                </div>
               </Link>
             );
           })}
