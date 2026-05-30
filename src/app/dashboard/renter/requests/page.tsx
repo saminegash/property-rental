@@ -31,7 +31,7 @@ const STATUS_CONFIG: Record<
   string,
   { label: string; color: string; bg: string; border: string; desc: string }
 > = {
-  new_request: {
+  new: {
     label: "Submitted",
     color: "#6366f1",
     bg: "#eef2ff",
@@ -52,68 +52,33 @@ const STATUS_CONFIG: Record<
     border: "#bae6fd",
     desc: "We have reached out to the owner for availability.",
   },
-  owner_available: {
-    label: "Owner Available",
+  owner_responded: {
+    label: "Owner Responded",
     color: "#059669",
     bg: "#ecfdf5",
     border: "#a7f3d0",
-    desc: "The owner has confirmed availability. Finalizing details.",
-  },
-  owner_unavailable: {
-    label: "Owner Unavailable",
-    color: "#dc2626",
-    bg: "#fef2f2",
-    border: "#fecaca",
-    desc: "The listing was unavailable for your selected dates.",
-  },
-  renter_contacted: {
-    label: "We'll Contact You",
-    color: "#0284c7",
-    bg: "#e0f2fe",
-    border: "#bae6fd",
-    desc: "Our team will contact you shortly to finalize details.",
-  },
-  requester_contacted: {
-    label: "We'll Contact You",
-    color: "#0284c7",
-    bg: "#e0f2fe",
-    border: "#bae6fd",
-    desc: "Our team will contact you shortly to finalize details.",
-  },
-  awaiting_payment: {
-    label: "Awaiting Payment",
-    color: "#d97706",
-    bg: "#fffbeb",
-    border: "#fde68a",
-    desc: "Please complete payment to confirm your booking.",
+    desc: "The owner has responded. Our team will contact you to finalize details.",
   },
   confirmed: {
     label: "Confirmed",
     color: "#16a34a",
     bg: "#f0fdf4",
     border: "#bbf7d0",
-    desc: "Your rental is confirmed! Check admin notes for pickup details.",
-  },
-  active: {
-    label: "Active",
-    color: "#16a34a",
-    bg: "#f0fdf4",
-    border: "#bbf7d0",
-    desc: "Your rental is currently active.",
+    desc: "Your request is confirmed! Check admin notes for next steps.",
   },
   completed: {
     label: "Completed",
     color: "#6b7280",
     bg: "#f9fafb",
     border: "#e5e7eb",
-    desc: "This rental has been completed.",
+    desc: "This request has been completed.",
   },
   cancelled: {
     label: "Cancelled",
     color: "#6b7280",
     bg: "#f9fafb",
     border: "#e5e7eb",
-    desc: "This rental request was cancelled.",
+    desc: "This request was cancelled.",
   },
   rejected: {
     label: "Rejected",
@@ -225,7 +190,7 @@ export default async function RenterRequestsPage() {
               ? request.listing[0]
               : request.listing;
             const statusCfg =
-              STATUS_CONFIG[request.status] ?? STATUS_CONFIG["new_request"];
+              STATUS_CONFIG[request.status] ?? STATUS_CONFIG["new"];
 
             return (
               <div key={request.id} className="dashboard-card" style={{ padding: "1.5rem" }}>

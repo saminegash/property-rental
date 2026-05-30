@@ -23,11 +23,11 @@ export default async function RenterDashboardPage() {
   const totalRequests = requests?.length || 0;
   const activeRequests =
     requests?.filter((r) =>
-      ["confirmed", "active"].includes(r.status)
+      ["confirmed"].includes(r.status)
     ).length || 0;
   const pendingRequests =
     requests?.filter((r) =>
-      ["new_request", "admin_reviewing", "owner_contacted", "renter_contacted", "awaiting_payment"].includes(r.status)
+      ["new", "admin_reviewing", "owner_contacted", "owner_responded"].includes(r.status)
     ).length || 0;
 
   return (

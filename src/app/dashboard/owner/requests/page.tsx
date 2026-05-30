@@ -42,7 +42,7 @@ export default async function OwnerRequestsPage() {
   // Fetch requests.
   // Note: The RLS policy natively enforces:
   // 1. Only requests for listings owned by this user are returned.
-  // 2. Requests with status 'new_request' or 'admin_reviewing' are hidden.
+  // 2. Requests with status 'new' or 'admin_reviewing' are hidden.
   const { data: combinedRequests, error } = await supabase
     .from("requests")
     .select(`
