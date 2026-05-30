@@ -21,8 +21,8 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection />
-      <BrowseByCategorySection />
       <FeaturedListingsSection />
+      <BrowseByCategorySection />
       <HowItWorksSection />
       <DualCTASection />
       <TrustAndSafetySection />

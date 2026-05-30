@@ -112,58 +112,35 @@ export default async function BrowseByCategorySection() {
   return (
     <section className="bg-white py-12 lg:py-16">
       <div className="mx-auto px-4 sm:px-6">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl text-center">
           Browse by Category
         </h2>
+        <p className="mt-2 text-sm text-slate-600 text-center mb-8">
+          Find exactly what you are looking for
+        </p>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:mt-8 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {CATEGORIES.map((cat) => {
             const count = cat.dbKey ? counts[cat.dbKey] || 0 : carCount || 0;
             const Icon = cat.icon;
+            
             return (
               <Link
                 key={cat.title}
                 href={cat.href}
-                className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"
+                className="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
               >
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-100">
-                  <Image
-                    src={cat.image}
-                    alt={cat.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 17vw"
-                  />
+                <div
+                  className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110 ${cat.iconBg} ${cat.iconColor}`}
+                >
+                  <Icon className="h-7 w-7" aria-hidden="true" />
                 </div>
-                <div className="p-3 sm:p-4">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${cat.iconBg}`}
-                    >
-                      <Icon
-                        className={`h-4 w-4 ${cat.iconColor}`}
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <h3 className="text-sm font-semibold text-slate-900 sm:text-base">
-                      {cat.title}
-                    </h3>
-                  </div>
-                  <p className="mt-2 text-xs text-slate-500 line-clamp-2">
-                    {cat.description}
-                  </p>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 group-hover:gap-2 transition-all">
-                      Explore
-                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                    </span>
-                    {count > 0 && (
-                      <span className="text-[11px] font-medium text-slate-500">
-                        {count} available
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <h3 className="mb-1 text-sm font-bold text-slate-900">
+                  {cat.title}
+                </h3>
+                <p className="text-xs font-medium text-slate-500">
+                  {count} {count === 1 ? "Listing" : "Listings"}
+                </p>
               </Link>
             );
           })}

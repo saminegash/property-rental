@@ -16,7 +16,7 @@ export async function FeaturedListingsSection() {
     .eq("status", "published")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(30);
 
   const activeListings = listings || [];
 
@@ -55,12 +55,7 @@ export async function FeaturedListingsSection() {
         </div>
 
         {activeListings.length > 0 ? (
-          <div className={`mt-6 lg:mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 ${
-            activeListings.length >= 5 ? "lg:grid-cols-5" :
-            activeListings.length >= 4 ? "lg:grid-cols-4" :
-            activeListings.length >= 3 ? "lg:grid-cols-3" :
-            "lg:grid-cols-2"
-          }`}>
+          <div className="mt-6 lg:mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
             {activeListings.map((listing) => {
               const image =
                 listing.listing_images?.find((i) => i.is_primary)?.image_url ||
