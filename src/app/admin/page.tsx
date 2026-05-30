@@ -11,36 +11,30 @@ export default async function AdminPage() {
   const [
     { count: totalListings },
     { count: pendingListings },
-    { count: pendingCars },
-    { count: pendingProperties },
+    { count: pendingVehicles },
     { count: publishedListings },
-    { count: pendingPriceChanges },
-    { count: newRentalRequests },
-    { count: newListingRequests },
-    { count: activeDeals },
-    { count: disputedRentalRequests },
-    { count: disputedListingRequests },
+    { count: newRequests },
+    { count: rentalRequests },
+    { count: nonRentalRequests },
+    { count: confirmedDeals },
     { count: pendingOwnerVerifications },
     { count: pendingCommissions },
     { count: pendingSecurityDeposits },
   ] = await Promise.all([
     adminClient.from("listings").select("id", { count: "exact", head: true }),
     adminClient.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending_review"),
-    adminClient.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending_review").eq("category", "vehicle"),
-    adminClient.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending_review").eq("category", "property"),
+    adminClient.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending_review").eq("property_type", "vehicle"),
     adminClient.from("listings").select("id", { count: "exact", head: true }).eq("status", "published"),
-    adminClient.from("pending_price_changes").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "new_request"),
-    adminClient.from("listing_requests").select("id", { count: "exact", head: true }).eq("status", "new_request"),
-    adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "active"),
-    adminClient.from("rental_requests").select("id", { count: "exact", head: true }).eq("status", "disputed"),
-    adminClient.from("listing_requests").select("id", { count: "exact", head: true }).eq("status", "disputed"),
-    adminClient.from("owner_profiles").select("id", { count: "exact", head: true }).eq("verification_status", "pending"),
-    adminClient.from("commissions").select("id", { count: "exact", head: true }).eq("commission_status", "pending"),
+    adminClient.from("requests").select("id", { count: "exact", head: true }).eq("status", "new"),
+    adminClient.from("requests").select("id", { count: "exact", head: true }).eq("status", "new").eq("request_type", "rental"),
+    adminClient.from("requests").select("id", { count: "exact", head: true }).eq("status", "new").neq("request_type", "rental"),
+    adminClient.from("requests").select("id", { count: "exact", head: true }).eq("status", "confirmed"),
+    adminClient.from("profiles").select("user_id", { count: "exact", head: true }).eq("verification_status", "pending"),
+    adminClient.from("commissions").select("id", { count: "exact", head: true }).eq("status", "pending"),
     adminClient.from("security_deposits").select("id", { count: "exact", head: true }).eq("deposit_status", "pending"),
   ]);
 
-  const totalDisputed = (disputedRentalRequests || 0) + (disputedListingRequests || 0);
+  const pendingProperties = (pendingListings || 0) - (pendingVehicles || 0);
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -65,14 +59,13 @@ export default async function AdminPage() {
         <MetricCard title="Published Listings" count={publishedListings || 0} icon="✅" />
 
         <MetricCard title="Pending Listings" count={pendingListings || 0} icon="⏳" highlight={!!pendingListings} />
-        <MetricCard title="Pending Cars" count={pendingCars || 0} icon="🚗" highlight={!!pendingCars} />
-        <MetricCard title="Pending Properties" count={pendingProperties || 0} icon="🏢" highlight={!!pendingProperties} />
-        <MetricCard title="Pending Price Changes" count={pendingPriceChanges || 0} icon="💰" highlight={!!pendingPriceChanges} />
+        <MetricCard title="Pending Vehicles" count={pendingVehicles || 0} icon="🚗" highlight={!!pendingVehicles} />
+        <MetricCard title="Pending Properties" count={pendingProperties} icon="🏢" highlight={pendingProperties > 0} />
 
-        <MetricCard title="New Rental Requests" count={newRentalRequests || 0} icon="📫" highlight={!!newRentalRequests} />
-        <MetricCard title="New General Inquiries" count={newListingRequests || 0} icon="💬" highlight={!!newListingRequests} />
-        <MetricCard title="Active Rentals" count={activeDeals || 0} icon="🚀" />
-        <MetricCard title="Disputed Requests" count={totalDisputed} icon="🚨" highlight={totalDisputed > 0} error />
+        <MetricCard title="New Requests" count={newRequests || 0} icon="📫" highlight={!!newRequests} />
+        <MetricCard title="New Rental Requests" count={rentalRequests || 0} icon="🏠" highlight={!!rentalRequests} />
+        <MetricCard title="New Inquiries" count={nonRentalRequests || 0} icon="💬" highlight={!!nonRentalRequests} />
+        <MetricCard title="Confirmed Deals" count={confirmedDeals || 0} icon="🚀" />
 
         <MetricCard title="Pending Owners" count={pendingOwnerVerifications || 0} icon="👤" highlight={!!pendingOwnerVerifications} />
         <MetricCard title="Pending Commissions" count={pendingCommissions || 0} icon="💵" highlight={!!pendingCommissions} />
