@@ -20,34 +20,17 @@ async function ensureAdmin() {
   return user;
 }
 
-export async function updateOwnerStatus(ownerProfileId: string, status: string) {
+export async function updateOwnerStatus(userId: string, status: string) {
   await ensureAdmin();
   const adminClient = createAdminClient();
 
   const { error } = await adminClient
-    .from("owner_profiles")
+    .from("profiles")
     .update({ verification_status: status })
-    .eq("id", ownerProfileId);
+    .eq("user_id", userId);
 
   if (error) {
     return { error: "Failed to update status: " + error.message };
-  }
-
-  revalidatePath("/admin/owners");
-  return { success: true };
-}
-
-export async function updateAdminNotes(ownerProfileId: string, notes: string) {
-  await ensureAdmin();
-  const adminClient = createAdminClient();
-
-  const { error } = await adminClient
-    .from("owner_profiles")
-    .update({ admin_notes: notes })
-    .eq("id", ownerProfileId);
-
-  if (error) {
-    return { error: "Failed to update notes: " + error.message };
   }
 
   revalidatePath("/admin/owners");

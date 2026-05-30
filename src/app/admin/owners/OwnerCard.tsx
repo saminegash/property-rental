@@ -1,27 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { updateOwnerStatus, updateAdminNotes } from "./actions";
+import { updateOwnerStatus } from "./actions";
 
 type OwnerData = {
-  id: string;
   user_id: string;
-  owner_type: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  city: string | null;
   business_name: string | null;
   verification_status: string;
-  admin_notes: string | null;
-  created_at: string;
-  profile: {
-    full_name: string | null;
-    email: string | null;
-    phone: string | null;
-    city: string | null;
-  };
+  joined_at: string;
 };
 
 export default function OwnerCard({ owner }: { owner: OwnerData }) {
   const [status, setStatus] = useState(owner.verification_status);
-  const [notes, setNotes] = useState(owner.admin_notes || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -33,25 +27,11 @@ export default function OwnerCard({ owner }: { owner: OwnerData }) {
     setError(null);
     setSuccess(null);
 
-    const res = await updateOwnerStatus(owner.id, newStatus);
+    const res = await updateOwnerStatus(owner.user_id, newStatus);
     if (res.error) {
       setError(res.error);
     } else {
       setSuccess("Status updated");
-    }
-    setLoading(false);
-  }
-
-  async function handleSaveNotes() {
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    const res = await updateAdminNotes(owner.id, notes);
-    if (res.error) {
-      setError(res.error);
-    } else {
-      setSuccess("Notes saved");
     }
     setLoading(false);
   }
@@ -61,15 +41,19 @@ export default function OwnerCard({ owner }: { owner: OwnerData }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
         <div>
           <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--color-text-heading)" }}>
-            {owner.profile.full_name || "Unknown Name"}
+            {owner.full_name || "Unknown Name"}
           </h3>
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
-            {owner.profile.email} • {owner.profile.phone || "No phone"} • {owner.profile.city || "No city"}
+            {owner.email} • {owner.phone || "No phone"} • {owner.city || "No city"}
           </p>
-          <div style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
-            <span style={{ fontWeight: 500 }}>Type:</span> {owner.owner_type}
-            {owner.business_name && <span> • <span style={{ fontWeight: 500 }}>Business:</span> {owner.business_name}</span>}
-          </div>
+          {owner.business_name && (
+            <div style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
+              <span style={{ fontWeight: 500 }}>Business:</span> {owner.business_name}
+            </div>
+          )}
+          <p style={{ marginTop: "0.375rem", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+            Owner since {new Date(owner.joined_at).toLocaleDateString("en-ET", { day: "numeric", month: "short", year: "numeric" })}
+          </p>
         </div>
         
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
@@ -80,35 +64,12 @@ export default function OwnerCard({ owner }: { owner: OwnerData }) {
             className="form-input"
             style={{ padding: "0.25rem 0.5rem", fontSize: "0.875rem", width: "auto" }}
           >
-            <option value="not_submitted">Not Submitted</option>
+            <option value="unverified">Unverified</option>
             <option value="pending">Pending</option>
             <option value="verified">Verified</option>
-            <option value="rejected">Rejected</option>
             <option value="suspended">Suspended</option>
           </select>
           {loading && <span style={{ fontSize: "0.75rem", color: "var(--color-primary)" }}>Saving...</span>}
-        </div>
-      </div>
-
-      <div style={{ marginTop: "1rem", borderTop: "1px solid var(--color-border)", paddingTop: "1rem" }}>
-        <label className="form-label" style={{ display: "block", marginBottom: "0.5rem" }}>Admin Notes (Internal)</label>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <input 
-            type="text" 
-            value={notes} 
-            onChange={(e) => setNotes(e.target.value)}
-            className="form-input" 
-            placeholder="Add internal notes about this owner..."
-            style={{ flex: 1 }}
-          />
-          <button 
-            onClick={handleSaveNotes}
-            disabled={loading || notes === (owner.admin_notes || "")}
-            className="auth-button"
-            style={{ marginTop: 0, padding: "0.5rem 1rem" }}
-          >
-            Save
-          </button>
         </div>
       </div>
 
