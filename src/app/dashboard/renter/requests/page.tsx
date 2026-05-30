@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { formatPrice } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -328,7 +329,7 @@ export default async function RenterRequestsPage() {
                     <div style={{ marginTop: "0.5rem" }}>
                       <span style={{ color: "var(--color-text-muted)" }}>Offered Price</span>
                       <p style={{ fontWeight: 500, marginTop: "0.125rem" }}>
-                        {request.offered_price.toLocaleString()} ETB
+                        {formatPrice(request.offered_price)}
                       </p>
                     </div>
                   )}

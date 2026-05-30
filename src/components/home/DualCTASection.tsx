@@ -86,7 +86,7 @@ function CtaCard({
 
         {/* Image — inset from card corners */}
         <div className="pb-2 pr-2 sm:pb-3 sm:pr-3">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-white/10 sm:aspect-square">
+          <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl bg-white/10 sm:aspect-square">
             <Image
               src={image}
               alt={imageAlt}

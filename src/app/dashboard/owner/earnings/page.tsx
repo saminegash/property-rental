@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { formatCurrency } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -91,11 +92,7 @@ export default async function OwnerEarningsPage() {
     };
   });
 
-  
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB', maximumFractionDigits: 0 }).format(amount);
-  };
+
 
   return (
     <div>

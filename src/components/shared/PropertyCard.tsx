@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Bed, Bath, Maximize2, BadgeCheck } from "lucide-react";
+import { formatCompactNumber } from "@/lib/format";
 
 export type PropertyCardProps = {
   id: string;
@@ -43,7 +44,7 @@ export function PropertyCard({
       className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
     >
       {/* Image with badge */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+      <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-100">
         <Image
           src={image || "/placeholder-property.jpg"}
           alt={title}
@@ -73,7 +74,7 @@ export function PropertyCard({
         {/* Price */}
         {price > 0 ? (
           <p className="mt-2 text-base font-bold text-blue-600 sm:text-lg">
-            ETB {price.toLocaleString()}
+            ETB {formatCompactNumber(price)}
             {isRent && <span className="text-xs font-medium text-slate-500"> / month</span>}
           </p>
         ) : (

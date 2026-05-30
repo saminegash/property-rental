@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { formatCurrency } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -125,7 +126,7 @@ export default async function OwnerRequestsPage() {
                       <>
                         {request.offered_price != null && (
                           <p style={{ fontSize: "0.875rem", marginBottom: "0.25rem" }}>
-                            <strong>Offered Price:</strong> {new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB' }).format(request.offered_price)}
+                            <strong>Offered Price:</strong> {formatCurrency(request.offered_price)}
                           </p>
                         )}
                       </>

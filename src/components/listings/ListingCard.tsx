@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatCompactNumber } from "@/lib/format";
 
 export interface ListingCardProps {
   id: string;
@@ -97,7 +98,7 @@ export function ListingCard({
             <span style={{ fontSize: "1.1rem" }}>Price on Request</span>
           ) : (
             <>
-              {price.toLocaleString()} ETB
+              {formatCompactNumber(price)} ETB
               {type === "rent" && (
                 <span className="property-listing-card__price-period">/month</span>
               )}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ListingCard } from "@/components/listings/ListingCard";
+import type { ListingDetails } from "@/lib/format";
 
 export async function FeaturedListingsSection() {
   const supabase = await createClient();
@@ -62,7 +63,7 @@ export async function FeaturedListingsSection() {
                 listing.listing_images?.[0]?.image_url ||
                 "";
                 
-              const details = listing.details as Record<string, any>;
+              const details = listing.details as ListingDetails | null;
 
               return (
                 <ListingCard

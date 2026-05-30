@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Gauge, Settings2, BadgeCheck } from "lucide-react";
+import { formatCompactNumber } from "@/lib/format";
 
 export type CarCardProps = {
   id: string;
@@ -36,7 +37,7 @@ export function CarCard({
       href={displayHref}
       className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+      <div className="relative aspect-4/3 w-full overflow-hidden bg-slate-100">
         <Image
           src={image || "/placeholder-car.jpg"}
           alt={title}
@@ -62,7 +63,7 @@ export function CarCard({
 
         {price > 0 ? (
           <p className="mt-2 text-base font-bold text-blue-600 sm:text-lg">
-            ETB {price.toLocaleString()}
+            ETB {formatCompactNumber(price)}
             {isRent && <span className="text-xs font-medium text-slate-500"> / day</span>}
           </p>
         ) : (
@@ -73,7 +74,7 @@ export function CarCard({
           {typeof mileage === "number" && mileage > 0 && (
             <span className="inline-flex items-center gap-1">
               <Gauge className="h-3.5 w-3.5" aria-hidden="true" />
-              {mileage.toLocaleString()} km
+              {formatCompactNumber(mileage)} km
             </span>
           )}
           {transmission && (

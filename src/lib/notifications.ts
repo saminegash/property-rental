@@ -1,5 +1,7 @@
 "use server";
 
+import { formatPrice } from "@/lib/format";
+
 interface NotificationPayload {
   type: "rental" | "sale";
   category: "property" | "car";
@@ -62,7 +64,7 @@ export async function sendAdminNotification(payload: NotificationPayload) {
     ${escapedStartDate ? `<p><strong>Start Date:</strong> ${escapedStartDate}</p>` : ""}
     ${escapedEndDate ? `<p><strong>End Date:</strong> ${escapedEndDate}</p>` : ""}
     ${escapedPreferredViewingDate ? `<p><strong>Preferred Viewing Date:</strong> ${escapedPreferredViewingDate}</p>` : ""}
-    ${payload.budgetAmount ? `<p><strong>Budget:</strong> ${payload.budgetAmount.toLocaleString()} ETB</p>` : ""}
+    ${payload.budgetAmount ? `<p><strong>Budget:</strong> ${formatPrice(payload.budgetAmount)}</p>` : ""}
     <p><strong>Message:</strong> ${escapedMessage}</p>
     <br />
     <p style="color: #666; font-size: 0.8rem;">Submitted via MyEthioProperties Trust & Safety Notification Layer.</p>
@@ -79,7 +81,7 @@ export async function sendAdminNotification(payload: NotificationPayload) {
     ${payload.startDate ? `Start: ${payload.startDate}` : ""}
     ${payload.endDate ? `End: ${payload.endDate}` : ""}
     ${payload.preferredViewingDate ? `Preferred Date: ${payload.preferredViewingDate}` : ""}
-    ${payload.budgetAmount ? `Budget: ${payload.budgetAmount.toLocaleString()} ETB` : ""}
+    ${payload.budgetAmount ? `Budget: ${formatPrice(payload.budgetAmount)}` : ""}
     Message: ${payload.message || "None"}
   `.trim().replace(/\n\s*\n/g, '\n');
 
