@@ -745,6 +745,33 @@ body {
   color: var(--color-text-muted);
 }
 
+/* Mobile-first scaling for dashboard surfaces */
+@media (max-width: 640px) {
+  .dashboard-main {
+    padding: 1.25rem 1rem;
+  }
+  .dashboard-card {
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+  }
+  .dashboard-title {
+    font-size: 1.25rem;
+  }
+  /* Header on phones — let the email truncate so it doesn't push the layout */
+  .dashboard-header {
+    padding: 0 1rem;
+  }
+  .dashboard-user-email {
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dashboard-user-nav {
+    gap: 0.75rem;
+  }
+}
+
 /* ============================================================
    Public Browse Layout
    ============================================================ */

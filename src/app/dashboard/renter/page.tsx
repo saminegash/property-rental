@@ -22,12 +22,12 @@ export default async function RenterDashboardPage() {
 
   const totalRequests = requests?.length || 0;
   const activeRequests =
-    requests?.filter((r) =>
-      ["confirmed"].includes(r.status)
-    ).length || 0;
+    requests?.filter((r) => ["confirmed"].includes(r.status)).length || 0;
   const pendingRequests =
     requests?.filter((r) =>
-      ["new", "admin_reviewing", "owner_contacted", "owner_responded"].includes(r.status)
+      ["new", "admin_reviewing", "owner_contacted", "owner_responded"].includes(
+        r.status,
+      ),
     ).length || 0;
 
   return (
@@ -43,39 +43,74 @@ export default async function RenterDashboardPage() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: "0.75rem",
           marginBottom: "2rem",
         }}
       >
-        <div className="dashboard-card" style={{ textAlign: "center", padding: "1.5rem" }}>
-          <div style={{ fontSize: "2rem", fontWeight: 700, color: "var(--color-primary)" }}>
+        <div
+          className="dashboard-card"
+          style={{ textAlign: "center", padding: "1.5rem" }}
+        >
+          <div
+            style={{
+              fontSize: "2rem",
+              fontWeight: 700,
+              color: "var(--color-primary)",
+            }}
+          >
             {totalRequests}
           </div>
-          <div style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
+          <div
+            style={{
+              fontSize: "0.8125rem",
+              color: "var(--color-text-muted)",
+              marginTop: "0.25rem",
+            }}
+          >
             Total Requests
           </div>
         </div>
-        <div className="dashboard-card" style={{ textAlign: "center", padding: "1.5rem" }}>
+        <div
+          className="dashboard-card"
+          style={{ textAlign: "center", padding: "1.5rem" }}
+        >
           <div style={{ fontSize: "2rem", fontWeight: 700, color: "#059669" }}>
             {activeRequests}
           </div>
-          <div style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
+          <div
+            style={{
+              fontSize: "0.8125rem",
+              color: "var(--color-text-muted)",
+              marginTop: "0.25rem",
+            }}
+          >
             Active Rentals
           </div>
         </div>
-        <div className="dashboard-card" style={{ textAlign: "center", padding: "1.5rem" }}>
+        <div
+          className="dashboard-card"
+          style={{ textAlign: "center", padding: "1.5rem" }}
+        >
           <div style={{ fontSize: "2rem", fontWeight: 700, color: "#d97706" }}>
             {pendingRequests}
           </div>
-          <div style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
+          <div
+            style={{
+              fontSize: "0.8125rem",
+              color: "var(--color-text-muted)",
+              marginTop: "0.25rem",
+            }}
+          >
             Pending
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}
+      >
         <Link
           href="/dashboard/renter/requests"
           style={{
@@ -88,7 +123,13 @@ export default async function RenterDashboardPage() {
             transition: "border-color 0.15s ease",
           }}
         >
-          <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
+          <h2
+            style={{
+              fontSize: "1.125rem",
+              color: "var(--color-text-heading)",
+              marginBottom: "0.25rem",
+            }}
+          >
             My Requests
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
@@ -108,7 +149,13 @@ export default async function RenterDashboardPage() {
             transition: "border-color 0.15s ease",
           }}
         >
-          <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
+          <h2
+            style={{
+              fontSize: "1.125rem",
+              color: "var(--color-text-heading)",
+              marginBottom: "0.25rem",
+            }}
+          >
             Browse Properties
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
@@ -129,7 +176,13 @@ export default async function RenterDashboardPage() {
             gridColumn: "1 / -1",
           }}
         >
-          <h2 style={{ fontSize: "1.125rem", color: "var(--color-text-heading)", marginBottom: "0.25rem" }}>
+          <h2
+            style={{
+              fontSize: "1.125rem",
+              color: "var(--color-text-heading)",
+              marginBottom: "0.25rem",
+            }}
+          >
             🏠 Become an Owner
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
