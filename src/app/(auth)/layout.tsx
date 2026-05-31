@@ -1,11 +1,16 @@
-/**
- * Auth layout is now a passthrough — each auth page owns its own
- * full-bleed two-column layout (logo, copy, form) to match the design.
- */
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import Header from "@/components/layout/Header";
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="flex min-h-screen flex-col bg-white">
+      <AnnouncementBar />
+      <Header />
+      <main className="flex-1">{children}</main>
+    </div>
+  );
 }
