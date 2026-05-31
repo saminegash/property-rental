@@ -46,7 +46,7 @@ export default function LoginPage() {
             priority
           />
           {/* Gradient so logo + cards stay readable over any image */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/55 via-blue-900/20 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-blue-900/55 via-blue-900/20 to-transparent" />
 
           <div className="relative z-10 flex h-full flex-col p-8 xl:p-10">
             <div className="flex items-center gap-2 text-white drop-shadow-md">

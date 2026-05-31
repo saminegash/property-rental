@@ -426,15 +426,14 @@
 
 .hero-section {
   background: linear-gradient(180deg, #ffffff 0%, var(--color-primary-surface, #f0f6ff) 40%, #ffffff 100%);
-  padding: 1rem 1.5rem;
-  height: 33vh;
-  min-height: 350px;
+  padding: 2rem 1.5rem;
   display: flex;
   align-items: center;
 }
 @media (min-width: 1024px) {
   .hero-section {
-    padding: 0 2.5rem;
+    padding: 2.5rem 2.5rem;
+    min-height: 420px;
   }
 }
 
