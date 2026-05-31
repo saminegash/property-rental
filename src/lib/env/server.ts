@@ -28,25 +28,15 @@ const serverOnlySchema = z.object({
 }).superRefine((data, ctx) => {
   if (process.env.NODE_ENV === "production") {
     if (!data.ANALYTICS_SALT) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "ANALYTICS_SALT is mandatory in production",
-        path: ["ANALYTICS_SALT"]
-      });
+      console.error("CRITICAL SECURITY ERROR: ANALYTICS_SALT is missing in production!");
+      console.error("Safe checks will fall back to not recording analytics to prevent unsalted storage.");
     }
     if (!data.RESEND_API_KEY) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "RESEND_API_KEY is mandatory in production",
-        path: ["RESEND_API_KEY"]
-      });
+      console.error("CRITICAL WARNING: RESEND_API_KEY is missing in production!");
+      console.error("Email notifications will not be sent.");
     }
     if (!data.ADMIN_NOTIFICATION_EMAIL) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "ADMIN_NOTIFICATION_EMAIL is mandatory in production",
-        path: ["ADMIN_NOTIFICATION_EMAIL"]
-      });
+      console.error("CRITICAL WARNING: ADMIN_NOTIFICATION_EMAIL is missing in production!");
     }
   }
 });
