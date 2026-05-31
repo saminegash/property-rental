@@ -15,6 +15,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 
+import { COMMISSION_COPY } from "@/lib/commission";
+
 type Tab = "rent" | "sale";
 
 const POPULAR_LOCATIONS = [
@@ -46,8 +48,8 @@ const FLOATING_BADGES = [
   },
   {
     icon: Percent,
-    title: "5% Commission",
-    subtitle: "Only after successful deal",
+    title: COMMISSION_COPY.badgeTitle,
+    subtitle: COMMISSION_COPY.badgeSubtitle,
   },
 ] as const;
 
@@ -167,7 +169,7 @@ export default function HeroSection() {
                       "Land",
                       "Commercial",
                       "Condominium",
-                      "Vehicle"
+                      "Vehicle",
                     ].map((n) => (
                       <option key={n} value={n.toLowerCase()}>
                         {n}

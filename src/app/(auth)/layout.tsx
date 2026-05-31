@@ -1,17 +1,11 @@
+/**
+ * Auth layout is now a passthrough — each auth page owns its own
+ * full-bleed two-column layout (logo, copy, form) to match the design.
+ */
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="auth-layout">
-      <div className="auth-container">
-        <div className="auth-header">
-          <h1 className="auth-logo">MyEthioProperties</h1>
-          <p className="auth-tagline">Verified properties for rent & sale</p>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
+  return <>{children}</>;
 }

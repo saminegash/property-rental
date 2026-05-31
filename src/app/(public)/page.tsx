@@ -7,14 +7,13 @@ import DualCTASection from "@/components/home/DualCTASection";
 import TrustAndSafetySection from "@/components/home/TrustAndSafetySection";
 import PopularAndSearchedSection from "@/components/home/PopularAndSearchedSection";
 import WhyChooseSection from "@/components/home/WhyChooseSection";
-
+import { COMMISSION_COPY } from "@/lib/commission";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "MyEthioProperties — Trusted Properties & Cars Across Ethiopia",
-  description:
-    "Ethiopia's trusted marketplace for verified properties and cars. Rent, buy, and list with admin-reviewed safety, transparent process, and only 5% commission after a successful deal.",
+  description: `Ethiopia's trusted marketplace for verified properties and cars. Rent, buy, and list with admin-reviewed safety and transparent pricing — ${COMMISSION_COPY.meta}`,
 };
 
 export default async function HomePage() {

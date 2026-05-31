@@ -94,6 +94,6 @@ INSERT INTO public.security_deposits (
 INSERT INTO public.commissions (
   listing_id, request_id, listing_type, deal_amount, commission_rate, status, collected_by
 ) VALUES (
-  'aaaa1111-1111-1111-1111-111111111111', 'dddd4444-4444-4444-4444-444444444444', 
-  'rent', 80000, 0.05, 'collected', '33333333-3333-3333-3333-333333333333'
+  'aaaa1111-1111-1111-1111-111111111111', 'dddd4444-4444-4444-4444-444444444444',
+  'rent', 80000, 0.06, 'collected', '33333333-3333-3333-3333-333333333333'
 );

@@ -1,4 +1,5 @@
 import { UserCheck, Car, ClipboardCheck, Ban, Percent } from "lucide-react";
+import { COMMISSION_COPY } from "@/lib/commission";
 
 const ITEMS = [
   {
@@ -23,8 +24,8 @@ const ITEMS = [
   },
   {
     icon: Percent,
-    title: "5% Commission",
-    description: "Only after successful deal is completed.",
+    title: COMMISSION_COPY.badgeTitle,
+    description: COMMISSION_COPY.description,
   },
 ] as const;
 

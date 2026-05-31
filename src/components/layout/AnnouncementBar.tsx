@@ -1,10 +1,14 @@
 import { ShieldCheck, BadgeCheck, Lock, Percent } from "lucide-react";
+import { COMMISSION_COPY } from "@/lib/commission";
 
 const ITEMS = [
   { icon: ShieldCheck, label: "Admin Reviewed Listings" },
   { icon: BadgeCheck, label: "Verified Owners & Sellers" },
   { icon: Lock, label: "Safe & Transparent Process" },
-  { icon: Percent, label: "1-5% Commission After Successful Deal" },
+  {
+    icon: Percent,
+    label: `${COMMISSION_COPY.short} — Only After a Successful Deal`,
+  },
 ] as const;
 
 /**
