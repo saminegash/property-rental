@@ -25,7 +25,6 @@ export default function LoginPage() {
 
     const result = await login(formData);
 
-    // If we reach this line, the server redirect didn't happen → there was an error.
     if (result?.error) {
       setError(result.error);
     }
@@ -35,21 +34,22 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-blue-50/60 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden grid lg:grid-cols-2">
-        {/* Left: building hero + feature cards (desktop only) */}
+        {/* Left: elegant cityscape illustration + feature cards (desktop only) */}
         <aside className="relative hidden lg:block min-h-[560px]">
+          {/* SVG hero — replaces /luxury.jpg */}
           <Image
-            src="/luxury.jpg"
+            src="/auth-hero.svg"
             alt=""
             fill
             className="object-cover"
             sizes="(min-width: 1024px) 50vw, 0vw"
             priority
           />
-          {/* Gradient so logo + cards stay readable over any image */}
-          <div className="absolute inset-0 bg-linear-to-br from-blue-900/55 via-blue-900/20 to-transparent" />
+          {/* Subtle inner shadow so the right edge blends into the form panel */}
+          <div className="absolute inset-y-0 right-0 w-24 bg-linear-to-l from-white/15 to-transparent pointer-events-none" />
 
           <div className="relative z-10 flex h-full flex-col p-8 xl:p-10">
-            <div className="flex items-center gap-2 text-white drop-shadow-md">
+            <div className="flex items-center gap-2 text-white drop-shadow-lg">
               <Image
                 src="/logo.webp"
                 alt=""
@@ -179,7 +179,6 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Divider — leave room for OAuth providers once wired up */}
             <div className="my-6 flex items-center gap-3 text-xs text-slate-500">
               <span className="h-px flex-1 bg-slate-200" />
               <span>or continue with</span>
@@ -215,7 +214,7 @@ function OverlayFeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/30 bg-white/95 p-3.5 shadow-md backdrop-blur-sm">
+    <div className="rounded-xl border border-white/30 bg-white/95 p-3.5 shadow-lg backdrop-blur-sm">
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
           {icon}

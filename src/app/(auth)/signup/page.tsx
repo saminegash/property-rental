@@ -38,9 +38,21 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-blue-50/60 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
-        {/* Left: feature panel (desktop only) */}
-        <aside className="hidden lg:flex flex-col justify-between bg-slate-50/70 p-8 xl:p-10 border-r border-slate-200">
-          <div className="space-y-4">
+        {/* Left: feature panel with architectural blueprint background (desktop only) */}
+        <aside className="relative hidden lg:flex flex-col justify-between p-8 xl:p-10 border-r border-slate-200 overflow-hidden">
+          {/* SVG decoration */}
+          <Image
+            src="/auth-pattern.svg"
+            alt=""
+            fill
+            className="object-cover z-0"
+            sizes="(min-width: 1024px) 42vw, 0vw"
+            priority
+          />
+          {/* Light wash to keep cards crisp on top */}
+          <div className="absolute inset-0 bg-slate-50/40 backdrop-blur-[2px] z-0" />
+
+          <div className="relative space-y-4">
             <FeatureCard
               icon={<ShieldCheck className="h-5 w-5 text-blue-600" />}
               title="Verified Owner Flow"
@@ -58,7 +70,7 @@ export default function SignupPage() {
             />
           </div>
 
-          <div className="mt-8">
+          <div className="relative mt-8 rounded-xl bg-white/85 backdrop-blur-sm border border-slate-200 p-4 shadow-sm">
             <h4 className="text-sm font-bold text-slate-900">
               {COMMISSION_COPY.signupCalloutTitle}
             </h4>
@@ -74,7 +86,6 @@ export default function SignupPage() {
 
         {/* Right: form */}
         <div className="p-6 sm:p-8 lg:p-10">
-          {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-6">
             <Image
               src="/logo.webp"
@@ -88,7 +99,6 @@ export default function SignupPage() {
             </span>
           </div>
 
-          {/* Role toggle (maps to `role` form field: user | owner) */}
           <div
             className="mx-auto flex w-full max-w-sm rounded-full bg-slate-100 p-1 mb-6"
             role="tablist"
@@ -334,7 +344,7 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="relative rounded-xl border border-slate-200 bg-white/95 backdrop-blur-sm p-4 shadow-sm">
       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50">
         {icon}
       </div>
