@@ -122,3 +122,27 @@ export async function logout() {
   await supabase.auth.signOut();
   redirect("/login");
 }
+
+/**
+ * Send password reset email.
+ */
+export async function resetPassword(formData: FormData) {
+  const supabase = await createClient();
+  const email = ((formData.get("email") as string) ?? "").trim().toLowerCase();
+
+  if (!email) {
+    return { error: "Email is required." };
+  }
+
+  // Use the origin from headers to construct the redirect URL if possible,
+  // but in Next.js Server Actions, we can just let Supabase use the default SITE_URL
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://myethioproperties.com"}/auth/callback?next=/dashboard/owner/profile`,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
