@@ -22,7 +22,7 @@ type RequestWithListing = {
   message: string | null;
   status: string;
   created_at: string;
-  listing: { title: string; location: string | null; property_type: string | null } | null;
+  listing: { title: string; city: string | null; sub_city: string | null; property_type: string | null } | null;
   request_type: string;
   offered_price: number | null;
 };
@@ -114,7 +114,7 @@ export default async function RenterRequestsPage() {
       id, listing_id, name, phone, email,
       start_date, end_date, message, status, created_at,
       request_type, offered_price,
-      listing:listings ( title, location, property_type )
+      listing:listings ( title, city, sub_city, property_type )
     `)
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -150,7 +150,7 @@ export default async function RenterRequestsPage() {
           </p>
         </div>
         <Link
-          href="/properties"
+          href="/rent"
           className="auth-button auth-button--secondary"
           style={{ textDecoration: "none", whiteSpace: "nowrap" }}
         >
@@ -179,7 +179,7 @@ export default async function RenterRequestsPage() {
           >
             Browse available properties and submit a request to get started.
           </p>
-          <Link href="/properties" className="auth-button" style={{ textDecoration: "none" }}>
+          <Link href="/rent" className="auth-button" style={{ textDecoration: "none" }}>
             Browse Properties
           </Link>
         </div>
@@ -215,9 +215,9 @@ export default async function RenterRequestsPage() {
                     >
                       {listing?.title || "Listing"}
                     </h3>
-                    {listing?.location && (
+                    {(listing?.city || listing?.sub_city) && (
                       <p style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
-                        📍 {listing.location}
+                        📍 {[listing.sub_city, listing.city].filter(Boolean).join(", ")}
                       </p>
                     )}
                   </div>
@@ -311,7 +311,7 @@ export default async function RenterRequestsPage() {
                   }}
                 >
                   Submitted {formatDate(request.created_at)} ·{" "}
-                  <Link href={`/${listing?.property_type === "property" ? "properties" : "cars"}/${request.listing_id}`} style={{ color: "var(--color-primary)" }}>
+                  <Link href={`/listings/${request.listing_id}`} style={{ color: "var(--color-primary)" }}>
                     View Listing
                   </Link>
                 </p>

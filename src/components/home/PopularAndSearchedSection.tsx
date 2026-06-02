@@ -7,12 +7,12 @@ const LOCATIONS = [
 ] as const;
 
 const TOP_CATEGORIES = [
-  { label: "Apartments for Rent", href: "/properties?type=Apartment&listing_type=rent" },
-  { label: "Houses for Sale", href: "/properties?type=House&listing_type=sale" },
-  { label: "Land for Sale", href: "/properties?type=Land&listing_type=sale" },
-  { label: "Toyota Cars", href: "/cars?brand=Toyota" },
-  { label: "SUVs", href: "/cars?body=SUV" },
-  { label: "Office Spaces", href: "/properties?type=Commercial" },
+  { label: "Apartments for Rent", href: "/rent?property_type=apartment" },
+  { label: "Houses for Sale", href: "/trade?property_type=house" },
+  { label: "Land for Sale", href: "/trade?property_type=land" },
+  { label: "Toyota Cars", href: "/rent?property_type=vehicle" },
+  { label: "SUVs", href: "/rent?property_type=vehicle" },
+  { label: "Office Spaces", href: "/rent?property_type=commercial" },
 ] as const;
 
 export default function PopularAndSearchedSection() {
@@ -32,7 +32,7 @@ export default function PopularAndSearchedSection() {
               {LOCATIONS.map((loc) => (
                 <Link
                   key={loc}
-                  href={`/properties?location=${encodeURIComponent(loc)}`}
+                  href={`/rent?location=${encodeURIComponent(loc)}`}
                   className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-colors sm:text-sm"
                 >
                   {loc}
@@ -41,7 +41,7 @@ export default function PopularAndSearchedSection() {
             </div>
 
             <Link
-              href="/properties"
+              href="/rent"
               className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:gap-2 transition-all sm:text-sm"
             >
               Explore all locations
@@ -69,7 +69,7 @@ export default function PopularAndSearchedSection() {
             </div>
 
             <Link
-              href="/properties"
+              href="/rent"
               className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:gap-2 transition-all sm:text-sm"
             >
               See all categories

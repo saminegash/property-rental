@@ -142,7 +142,7 @@ export default async function RenterDashboardPage() {
         </Link>
 
         <Link
-          href="/properties"
+          href="/rent"
           style={{
             display: "block",
             padding: "1.5rem",
