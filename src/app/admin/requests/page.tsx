@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
+import { updateRequestStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -141,13 +142,36 @@ function RequestCard({ request, highlight = false }: { request: RequestRow; high
             </span>
           </div>
         </div>
-        <span style={{
-          fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase",
-          padding: "0.25rem 0.5rem", borderRadius: "9999px",
-          backgroundColor: style.bg, color: style.color,
-        }}>
-          {request.status.replace(/_/g, " ")}
-        </span>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <span style={{
+            fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase",
+            padding: "0.25rem 0.5rem", borderRadius: "9999px",
+            backgroundColor: style.bg, color: style.color,
+          }}>
+            {request.status.replace(/_/g, " ")}
+          </span>
+          
+          <form action={updateRequestStatus} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <input type="hidden" name="request_id" value={request.id} />
+            <select 
+              name="status" 
+              defaultValue={request.status}
+              className="text-xs border border-slate-300 rounded px-2 py-1 bg-white"
+            >
+              <option value="new">New</option>
+              <option value="admin_reviewing">Admin Reviewing</option>
+              <option value="owner_contacted">Owner Contacted</option>
+              <option value="owner_responded">Owner Responded</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="rejected">Rejected</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button type="submit" className="text-xs bg-slate-800 text-white px-2 py-1 rounded hover:bg-slate-700">
+              Update
+            </button>
+          </form>
+        </div>
       </div>
 
       <div style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>

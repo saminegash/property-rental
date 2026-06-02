@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { formatCompactNumber } from "@/lib/format";
+import { updateListingStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -148,6 +149,25 @@ function ListingRow({ listing, highlight = false }: { listing: ListingRow; highl
         }}>
           {listing.status.replace("_", " ")}
         </span>
+        
+        {/* Action Form */}
+        <form action={updateListingStatus} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <input type="hidden" name="listing_id" value={listing.id} />
+          <select 
+            name="status" 
+            defaultValue={listing.status}
+            className="text-xs border border-slate-300 rounded px-2 py-1 bg-white"
+          >
+            <option value="draft">Draft</option>
+            <option value="pending_review">Pending Review</option>
+            <option value="published">Published</option>
+            <option value="rejected">Rejected</option>
+            <option value="archived">Archived</option>
+          </select>
+          <button type="submit" className="text-xs bg-slate-800 text-white px-2 py-1 rounded hover:bg-slate-700">
+            Update
+          </button>
+        </form>
       </div>
     </div>
   );
