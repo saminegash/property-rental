@@ -30,6 +30,13 @@ export default function Footer() {
             <p>✉ info@myethioproperties.com</p>
           </div>
 
+          {/* Links */}
+          <div className="flex gap-4 text-xs text-blue-200 sm:text-sm font-medium">
+            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/privacy" className="hover:text-white">Privacy</Link>
+            <Link href="/contact" className="hover:text-white">Contact</Link>
+          </div>
+
           {/* Copyright */}
           <p className="text-xs text-blue-200 sm:text-sm">
             © {year} MyEthioProperties. All rights reserved.

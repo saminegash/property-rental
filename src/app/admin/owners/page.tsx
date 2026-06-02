@@ -6,22 +6,32 @@ export const dynamic = "force-dynamic";
 export default async function AdminOwnersPage() {
   const adminClient = createAdminClient();
 
-  // Fetch owners by joining user_roles (role = 'owner') with profiles
-  const { data: ownerRoles, error } = await adminClient
+  // Fetch user_roles
+  const { data: ownerRoles, error: rolesError } = await adminClient
     .from("user_roles")
-    .select(
-      "user_id, created_at, profiles(user_id, full_name, email, phone, city, business_name, verification_status)"
-    )
+    .select("user_id, created_at")
     .eq("role", "owner")
     .order("created_at", { ascending: false });
 
-  if (error || !ownerRoles) {
+  if (rolesError || !ownerRoles) {
     return (
       <div className="dashboard-card">
         <h1 className="dashboard-title">Owner Management</h1>
-        <div className="auth-error">Error loading owners: {error?.message}</div>
+        <div className="auth-error">Error loading owners: {rolesError?.message}</div>
       </div>
     );
+  }
+
+  // Fetch profiles
+  const ownerIds = ownerRoles.map((r) => r.user_id);
+  
+  let profiles: any[] = [];
+  if (ownerIds.length > 0) {
+    const { data: profilesData } = await adminClient
+      .from("profiles")
+      .select("user_id, full_name, email, phone, city, business_name, verification_status")
+      .in("user_id", ownerIds);
+    if (profilesData) profiles = profilesData;
   }
 
   type OwnerRow = {
@@ -38,8 +48,7 @@ export default async function AdminOwnersPage() {
   // Flatten the joined data into the shape OwnerCard expects
   const owners: OwnerRow[] = ownerRoles
     .map((role) => {
-      // Supabase returns the joined relation as an object (single) or array
-      const profile = Array.isArray(role.profiles) ? role.profiles[0] : role.profiles;
+      const profile = profiles.find((p) => p.user_id === role.user_id);
       if (!profile) return null;
 
       return {

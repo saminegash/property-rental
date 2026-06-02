@@ -46,6 +46,12 @@ export default async function AdminLayout({
             <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--color-primary)", padding: "0.25rem 0.5rem", backgroundColor: "rgba(99, 102, 241, 0.1)", borderRadius: "var(--radius-sm)" }}>
               ADMIN PANEL
             </span>
+            <nav style={{ display: "flex", gap: "1rem", marginLeft: "2rem" }}>
+              <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-slate-900">Overview</Link>
+              <Link href="/admin/listings" className="text-sm font-medium text-slate-600 hover:text-slate-900">Listings</Link>
+              <Link href="/admin/requests" className="text-sm font-medium text-slate-600 hover:text-slate-900">Requests</Link>
+              <Link href="/admin/owners" className="text-sm font-medium text-slate-600 hover:text-slate-900">Owners</Link>
+            </nav>
           </div>
 
           <div className="dashboard-user-nav">
