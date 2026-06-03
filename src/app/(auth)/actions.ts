@@ -59,10 +59,15 @@ export async function signup(formData: FormData) {
   // Normalize to E.164. Drop a leading 0 if the user typed local-style "09…".
   const phoneE164 = `+251${rawPhone.replace(/^0/, "")}`;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://myethioproperties.com";
+
+
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: `${siteUrl}/auth/callback?next=/dashboard`,
       data: {
         full_name: fullName,
         phone: phoneE164,
