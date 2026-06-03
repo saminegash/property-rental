@@ -3,41 +3,24 @@
 import { createClient } from "@/lib/supabase/server";
 import { sendAdminNotification } from "@/lib/notifications";
 import { revalidatePath } from "next/cache";
+import { requestSchema } from "@/lib/validation/requests";
+import { email } from "zod";
 
 export async function submitRequest(formData: FormData) {
   const supabase = await createClient();
 
-  const listing_id = formData.get("listing_id") as string;
-  const name = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
-  const email = (formData.get("email") as string) || null;
-  const message = (formData.get("message") as string) || null;
-  const request_type = formData.get("request_type") as "rental" | "purchase" | "viewing" | "info";
-  const start_date = (formData.get("start_date") as string) || null;
-  const end_date = (formData.get("end_date") as string) || null;
-  const offered_price = formData.get("offered_price") ? Number(formData.get("offered_price")) : null;
-
-  if (!listing_id || !name || !phone || !request_type) {
-    throw new Error("Listing ID, Name, Phone, and Request Type are required.");
+  const parsed = requestSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) {
+    return { error: "Invalid data", issues: parsed.error.issues };
   }
+  const data = parsed.data;
 
   // Get user_id if logged in
   const { data: { user } } = await supabase.auth.getUser();
 
   // Insert request
-  const { error } = await supabase.from("requests").insert({
-    listing_id,
-    name,
-    phone,
-    email,
-    message,
-    request_type,
-    start_date,
-    end_date,
-    offered_price,
-    user_id: user?.id || null,
-    status: "new",
-  });
+  const { error } = await supabase.from("requests").insert({...data, 
+    user_id: user?.id || null,});
 
   if (error) {
     throw new Error("Failed to submit request: " + error.message);
@@ -47,7 +30,7 @@ export async function submitRequest(formData: FormData) {
   const { data: listing } = await supabase
     .from("listings")
     .select("title, property_type, listing_type")
-    .eq("id", listing_id)
+    .eq("id", data.listing_id)
     .single();
 
   // Fire and forget notification
@@ -55,17 +38,17 @@ export async function submitRequest(formData: FormData) {
     sendAdminNotification({
       type: listing.listing_type === "rent" ? "rental" : "sale",
       category: listing.property_type === "vehicle" ? "car" : "property",
-      renterName: name,
-      renterPhone: phone,
-      renterEmail: email || undefined,
-      message: message || undefined,
+      renterName: data.name,
+      renterPhone: data.phone,
+      renterEmail: data.email || undefined,
+      message: data.message || undefined,
       listingTitle: listing.title,
-      startDate: start_date || undefined,
-      endDate: end_date || undefined,
-      budgetAmount: offered_price || undefined,
+      startDate: data.start_date || undefined,
+      endDate: data.end_date || undefined,
+      budgetAmount: data.offered_price || undefined,
     }).catch((err) => console.error("Failed to send admin notification:", err));
   }
 
-  revalidatePath(`/rent/${listing_id}`);
-  revalidatePath(`/trade/${listing_id}`);
+  revalidatePath(`/rent/${data.listing_id}`);
+  revalidatePath(`/trade/${data.listing_id}`);
 }
