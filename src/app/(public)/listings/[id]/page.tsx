@@ -1,10 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import Link from "next/link";
 import { formatCurrency } from "@/lib/format";
 import { RequestForm } from "./RequestForm";
 import type { ListingDetails } from "@/lib/format";
-import { MapPin, BedDouble, Bath, Square, Calendar, CheckCircle } from "lucide-react";
+import type { Enums } from "@/lib/supabase/database.types";
+import {
+  MapPin,
+  BedDouble,
+  Bath,
+  Square,
+  Calendar,
+  CheckCircle,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -24,14 +32,23 @@ export default async function ListingDetailPage({
       id, owner_id, title, description, property_type, listing_type,
       price, currency, city, sub_city, location_detail, 
       bedrooms, bathrooms, area_sqm, details, status, is_featured
-      `
+      `,
     )
     .eq("id", id)
+    .is("deleted_at", null)
     .single();
 
-  if (!listing || listing.status !== "published") {
+  const VIEWABLE: Enums<"listing_status">[] = [
+    "published",
+    "reserved",
+    "rented",
+    "sold",
+  ];
+  if (!listing || !VIEWABLE.includes(listing.status)) {
     notFound();
   }
+  const isClosed = listing.status === "rented" || listing.status === "sold";
+  const isReserved = listing.status === "reserved";
 
   // 2. Fetch images
   const { data: images } = await supabase
@@ -49,8 +66,12 @@ export default async function ListingDetailPage({
     .single();
 
   const isVerified = ownerProfile?.verification_status === "verified";
-  const primaryImage = images?.find((img) => img.is_primary)?.image_url || images?.[0]?.image_url || "/placeholder-property.jpg";
-  const otherImages = images?.filter((img) => img.image_url !== primaryImage).slice(0, 4) || [];
+  const primaryImage =
+    images?.find((img) => img.is_primary)?.image_url ||
+    images?.[0]?.image_url ||
+    "/placeholder-property.jpg";
+  const otherImages =
+    images?.filter((img) => img.image_url !== primaryImage).slice(0, 4) || [];
 
   const locationStr = [listing.location_detail, listing.sub_city, listing.city]
     .filter(Boolean)
@@ -64,13 +85,20 @@ export default async function ListingDetailPage({
         {/* Breadcrumb & Top actions */}
         <div className="mb-6 flex items-center justify-between">
           <nav className="text-sm font-medium text-slate-500">
-            <a href="/" className="hover:text-blue-600">Home</a>
+            <Link href="/" className="hover:text-blue-600">
+              Home
+            </Link>
             <span className="mx-2">›</span>
-            <a href={`/${listing.listing_type === "rent" ? "rent" : "trade"}`} className="hover:text-blue-600 capitalize">
+            <Link
+              href={`/${listing.listing_type === "rent" ? "rent" : "trade"}`}
+              className="hover:text-blue-600 capitalize"
+            >
               {listing.listing_type}
-            </a>
+            </Link>
             <span className="mx-2">›</span>
-            <span className="text-slate-900 capitalize">{listing.property_type}</span>
+            <span className="text-slate-900 capitalize">
+              {listing.property_type}
+            </span>
           </nav>
         </div>
 
@@ -102,7 +130,12 @@ export default async function ListingDetailPage({
             <div className="text-right">
               <div className="text-3xl font-extrabold text-blue-600">
                 {formatCurrency(listing.price, listing.currency)}
-                {listing.listing_type === "rent" && <span className="text-base font-normal text-slate-500"> / month</span>}
+                {listing.listing_type === "rent" && (
+                  <span className="text-base font-normal text-slate-500">
+                    {" "}
+                    / month
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -121,7 +154,10 @@ export default async function ListingDetailPage({
           </div>
           {/* Other Images */}
           {otherImages.map((img, idx) => (
-            <div key={idx} className="hidden md:block relative overflow-hidden rounded-2xl bg-slate-200 h-full">
+            <div
+              key={idx}
+              className="hidden md:block relative overflow-hidden rounded-2xl bg-slate-200 h-full"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.image_url}
@@ -131,9 +167,14 @@ export default async function ListingDetailPage({
             </div>
           ))}
           {/* Fill empty spots if less than 4 other images */}
-          {Array.from({ length: Math.max(0, 4 - otherImages.length) }).map((_, idx) => (
-            <div key={`empty-${idx}`} className="hidden md:block relative overflow-hidden rounded-2xl bg-slate-200/50 h-full"></div>
-          ))}
+          {Array.from({ length: Math.max(0, 4 - otherImages.length) }).map(
+            (_, idx) => (
+              <div
+                key={`empty-${idx}`}
+                className="hidden md:block relative overflow-hidden rounded-2xl bg-slate-200/50 h-full"
+              ></div>
+            ),
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
@@ -143,12 +184,20 @@ export default async function ListingDetailPage({
             <div className="flex items-center justify-between rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 overflow-hidden rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl font-bold">
-                  {(ownerProfile?.business_name || ownerProfile?.full_name || "O").charAt(0).toUpperCase()}
+                  {(
+                    ownerProfile?.business_name ||
+                    ownerProfile?.full_name ||
+                    "O"
+                  )
+                    .charAt(0)
+                    .toUpperCase()}
                 </div>
                 <div>
                   <p className="text-sm text-slate-500">Listed by</p>
                   <p className="font-semibold text-slate-900 text-lg flex items-center gap-2">
-                    {ownerProfile?.business_name || ownerProfile?.full_name || "Owner"}
+                    {ownerProfile?.business_name ||
+                      ownerProfile?.full_name ||
+                      "Owner"}
                     {isVerified && (
                       <span className="inline-flex items-center gap-1 rounded bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800">
                         <CheckCircle className="h-3 w-3" /> Verified
@@ -161,33 +210,43 @@ export default async function ListingDetailPage({
 
             {/* Overview / Specs */}
             <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Overview</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-4">
+                Overview
+              </h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {listing.bedrooms != null && (
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-100">
                     <BedDouble className="h-5 w-5 text-slate-400" />
-                    <span className="font-semibold text-slate-900">{listing.bedrooms}</span>
+                    <span className="font-semibold text-slate-900">
+                      {listing.bedrooms}
+                    </span>
                     <span className="text-xs text-slate-500">Bedrooms</span>
                   </div>
                 )}
                 {listing.bathrooms != null && (
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-100">
                     <Bath className="h-5 w-5 text-slate-400" />
-                    <span className="font-semibold text-slate-900">{listing.bathrooms}</span>
+                    <span className="font-semibold text-slate-900">
+                      {listing.bathrooms}
+                    </span>
                     <span className="text-xs text-slate-500">Bathrooms</span>
                   </div>
                 )}
                 {listing.area_sqm != null && (
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-100">
                     <Square className="h-5 w-5 text-slate-400" />
-                    <span className="font-semibold text-slate-900">{listing.area_sqm} m²</span>
+                    <span className="font-semibold text-slate-900">
+                      {listing.area_sqm} m²
+                    </span>
                     <span className="text-xs text-slate-500">Area</span>
                   </div>
                 )}
                 {details?.year_built != null && (
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-100">
                     <Calendar className="h-5 w-5 text-slate-400" />
-                    <span className="font-semibold text-slate-900">{details.year_built}</span>
+                    <span className="font-semibold text-slate-900">
+                      {details.year_built}
+                    </span>
                     <span className="text-xs text-slate-500">Year Built</span>
                   </div>
                 )}
@@ -196,23 +255,28 @@ export default async function ListingDetailPage({
 
             {/* Description */}
             <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Description</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-4">
+                Description
+              </h2>
               <div className="prose prose-slate max-w-none">
                 {listing.description ? (
-                  <p className="whitespace-pre-line text-slate-700">{listing.description}</p>
+                  <p className="whitespace-pre-line text-slate-700">
+                    {listing.description}
+                  </p>
                 ) : (
-                  <p className="text-slate-500 italic">No description provided.</p>
+                  <p className="text-slate-500 italic">
+                    No description provided.
+                  </p>
                 )}
               </div>
             </div>
-
           </div>
 
           {/* Sidebar (Right, 1 column) */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              <RequestForm 
-                listingId={listing.id} 
+              <RequestForm
+                listingId={listing.id}
                 listingType={listing.listing_type}
                 propertyType={listing.property_type}
               />

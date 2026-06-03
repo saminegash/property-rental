@@ -505,6 +505,10 @@ export type Database = {
         | "published"
         | "rejected"
         | "archived"
+        | "reserved"
+        | "rented"
+        | "sold"
+        | "inactive"
       listing_type: "rent" | "sale"
       property_type:
         | "apartment"
@@ -666,6 +670,10 @@ export const Constants = {
         "published",
         "rejected",
         "archived",
+        "reserved",
+        "rented",
+        "sold",
+        "inactive",
       ],
       listing_type: ["rent", "sale"],
       property_type: [
