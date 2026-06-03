@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 
 export default function Footer() {
@@ -17,7 +18,9 @@ export default function Footer() {
               className="h-7 w-auto object-contain"
             />
             <div className="flex flex-col text-sm leading-tight">
-              <span className="font-semibold text-white">MyEthioProperties</span>
+              <span className="font-semibold text-white">
+                MyEthioProperties
+              </span>
               <span className="text-blue-200">
                 Ethiopia&apos;s trusted marketplace for properties and cars.
               </span>
@@ -32,9 +35,15 @@ export default function Footer() {
 
           {/* Links */}
           <div className="flex gap-4 text-xs text-blue-200 sm:text-sm font-medium">
-            <Link href="/terms" className="hover:text-white">Terms</Link>
-            <Link href="/privacy" className="hover:text-white">Privacy</Link>
-            <Link href="/contact" className="hover:text-white">Contact</Link>
+            <Link href="/terms" className="hover:text-white">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-white">
+              Privacy
+            </Link>
+            <Link href="/contact" className="hover:text-white">
+              Contact
+            </Link>
           </div>
 
           {/* Copyright */}
