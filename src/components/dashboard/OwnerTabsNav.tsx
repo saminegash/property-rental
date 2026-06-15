@@ -6,13 +6,16 @@ import { usePathname } from "next/navigation";
 export function OwnerTabsNav() {
   const pathname = usePathname();
 
+  const lang = pathname.split('/')[1] || "en";
+  const prefix = `/${lang}`;
+
   const tabs = [
-    { name: "Overview", href: "/dashboard/owner", exact: true },
-    { name: "Listings", href: "/dashboard/owner/listings" },
-    { name: "Requests", href: "/dashboard/owner/requests" },
-    { name: "Earnings", href: "/dashboard/owner/earnings" },
-    { name: "Analytics", href: "/dashboard/owner/analytics" },
-    { name: "Profile", href: "/dashboard/owner/profile" },
+    { name: "Overview", href: `${prefix}/dashboard/owner`, exact: true },
+    { name: "Listings", href: `${prefix}/dashboard/owner/listings` },
+    { name: "Requests", href: `${prefix}/dashboard/owner/requests` },
+    { name: "Earnings", href: `${prefix}/dashboard/owner/earnings` },
+    { name: "Analytics", href: `${prefix}/dashboard/owner/analytics` },
+    { name: "Profile", href: `${prefix}/dashboard/owner/profile` },
   ];
 
   return (

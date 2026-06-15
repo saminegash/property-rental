@@ -5,16 +5,29 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, Plus } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/trade", label: "Buy / Sale" },
-  { href: "/rent", label: "Rent" },
-] as const;
+interface HeaderProps {
+  lang: string;
+  dict: {
+    home: string;
+    buy: string;
+    rent: string;
+    login: string;
+    signUp: string;
+    postListing: string;
+  };
+}
 
-export default function Header() {
+export default function Header({ lang, dict }: HeaderProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const NAV_LINKS = [
+    { href: `/${lang}`, label: dict.home },
+    { href: `/${lang}/trade`, label: dict.buy },
+    { href: `/${lang}/rent`, label: dict.rent },
+  ];
 
   // Close drawer on route change — "adjusting state during render" pattern
   // (setState during render is supported by React and won't cascade)
@@ -37,7 +50,7 @@ export default function Header() {
       <div className="mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex h-[52px] items-center justify-between gap-3">
           {/* Logo */}
-          <Link href="/" className="flex shrink-0 items-center gap-1.5">
+          <Link href={`/${lang}`} className="flex shrink-0 items-center gap-1.5">
             <Image
               src="/logo.webp"
               alt="MyEthioProperties"
@@ -76,24 +89,25 @@ export default function Header() {
 
           {/* Right action buttons */}
           <div className="flex items-center gap-2">
+            <LanguageSwitcher currentLocale={lang} />
             <Link
-              href="/login"
+              href={`/${lang}/login`}
               className="hidden sm:inline-flex items-center justify-center rounded-md border border-slate-300 px-5 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              Login
+              {dict.login}
             </Link>
             <Link
-              href="/signup"
+              href={`/${lang}/signup`}
               className="hidden md:inline-flex items-center justify-center rounded-md border border-slate-300 px-5 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              Sign Up
+              {dict.signUp}
             </Link>
             <Link
-              href="/dashboard/become-owner"
+              href={`/${lang}/dashboard/become-owner`}
               className="hidden sm:inline-flex items-center gap-1 rounded-md bg-blue-600 px-5 py-2 text-[13px] font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
             >
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-              Post Listing
+              {dict.postListing}
             </Link>
 
             {/* Mobile hamburger */}
@@ -142,23 +156,23 @@ export default function Header() {
             {/* Auth + Post on mobile */}
             <div className="mt-3 grid grid-cols-2 gap-2 border-t border-slate-200 pt-3">
               <Link
-                href="/login"
+                href={`/${lang}/login`}
                 className="rounded-lg border border-slate-300 px-3 py-2.5 text-center text-sm font-medium text-slate-700"
               >
-                Login
+                {dict.login}
               </Link>
               <Link
-                href="/signup"
+                href={`/${lang}/signup`}
                 className="rounded-lg border border-slate-300 px-3 py-2.5 text-center text-sm font-medium text-slate-700"
               >
-                Sign Up
+                {dict.signUp}
               </Link>
               <Link
-                href="/dashboard/become-owner"
+                href={`/${lang}/dashboard/become-owner`}
                 className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-semibold text-white"
               >
                 <Plus className="h-4 w-4" aria-hidden="true" />
-                Post Listing
+                {dict.postListing}
               </Link>
             </div>
           </nav>

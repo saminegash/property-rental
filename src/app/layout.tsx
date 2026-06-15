@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://myethioproperties.com"),
@@ -14,11 +7,12 @@ export const metadata: Metadata = {
   description:
     "Ethiopia's trusted marketplace. Find verified apartments, houses, villas, land, and vehicles for rent or purchase with guaranteed security.",
   icons: {
-    icon: '/logo.webp',
+    icon: "/logo.webp",
   },
   openGraph: {
     title: "MyEthioProperties — Real Estate & Verified Rentals in Ethiopia",
-    description: "Ethiopia's trusted marketplace. Find verified apartments, houses, villas, land, and vehicles for rent or purchase.",
+    description:
+      "Ethiopia's trusted marketplace. Find verified apartments, houses, villas, land, and vehicles for rent or purchase.",
     url: "https://myethioproperties.com",
     siteName: "MyEthioProperties",
     images: [
@@ -45,9 +39,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className={inter.variable}>
-      <body>{children}</body>
-    </html>
-  );
+  return children;
 }

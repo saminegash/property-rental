@@ -2,15 +2,68 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { clientEnv } from "@/lib/env/client";
 
+/* ── Locale helpers ── */
+const LOCALES = ["en", "am"] as const;
+type Locale = (typeof LOCALES)[number];
+const DEFAULT_LOCALE: Locale = "en";
+
+function getPathnameLocale(pathname: string): Locale | null {
+  const found = LOCALES.find(
+    (l) => pathname.startsWith(`/${l}/`) || pathname === `/${l}`
+  );
+  return found ?? null;
+}
+
+function getPreferredLocale(request: NextRequest): Locale {
+  // 1. Explicit cookie
+  const cookie = request.cookies.get("NEXT_LOCALE")?.value;
+  if (cookie && LOCALES.includes(cookie as Locale)) return cookie as Locale;
+
+  // 2. Accept-Language header (simple check for "am")
+  const accept = request.headers.get("accept-language") ?? "";
+  if (accept.includes("am")) return "am";
+
+  return DEFAULT_LOCALE;
+}
+
+/**
+ * Strip the locale prefix from a pathname so auth checks work uniformly.
+ * e.g. "/en/dashboard/owner" → "/dashboard/owner"
+ */
+function stripLocale(pathname: string): string {
+  for (const l of LOCALES) {
+    if (pathname.startsWith(`/${l}/`)) return pathname.slice(l.length + 1);
+    if (pathname === `/${l}`) return "/";
+  }
+  return pathname;
+}
+
 /**
  * Middleware that runs on every matched request.
  *
  * Responsibilities:
- * 1. Refresh the Supabase auth session (token rotation).
- * 2. Redirect unauthenticated users away from protected routes.
- * 3. Redirect authenticated users away from auth pages.
+ * 1. Detect / redirect to locale-prefixed URL.
+ * 2. Refresh the Supabase auth session (token rotation).
+ * 3. Redirect unauthenticated users away from protected routes.
+ * 4. Redirect authenticated users away from auth pages.
  */
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  /* ── 1. Locale redirect ── */
+  const pathLocale = getPathnameLocale(pathname);
+
+  if (!pathLocale) {
+    const locale = getPreferredLocale(request);
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}${pathname}`;
+    return NextResponse.redirect(url);
+  }
+
+  // The "clean" path without the locale prefix (for auth checks below)
+  const cleanPath = stripLocale(pathname);
+
+  /* ── 2. Supabase session refresh ── */
   const env = clientEnv();
 
   let supabaseResponse = NextResponse.next({
@@ -51,19 +104,20 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
-  // Protected routes: redirect to login if not authenticated
-  if ((pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) && !user) {
+  /* ── 3. Protected route redirect ── */
+  if (
+    (cleanPath.startsWith("/dashboard") || cleanPath.startsWith("/admin")) &&
+    !user
+  ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = `/${pathLocale}/login`;
     return NextResponse.redirect(url);
   }
 
-  // Auth routes: redirect to dashboard if already authenticated
-  if ((pathname === "/login" || pathname === "/signup") && user) {
+  /* ── 4. Auth page redirect ── */
+  if ((cleanPath === "/login" || cleanPath === "/signup") && user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = `/${pathLocale}/dashboard`;
     return NextResponse.redirect(url);
   }
 

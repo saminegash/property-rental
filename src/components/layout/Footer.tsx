@@ -1,7 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
 
-export default function Footer() {
+interface FooterProps {
+  lang: string;
+  dict: {
+    tagline: string;
+    terms: string;
+    privacy: string;
+    contact: string;
+    allRightsReserved: string;
+  };
+}
+
+export default function Footer({ lang, dict }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -22,7 +33,7 @@ export default function Footer() {
                 MyEthioProperties
               </span>
               <span className="text-blue-200">
-                Ethiopia&apos;s trusted marketplace for properties and cars.
+                {dict.tagline}
               </span>
             </div>
           </div>
@@ -35,20 +46,20 @@ export default function Footer() {
 
           {/* Links */}
           <div className="flex gap-4 text-xs text-blue-200 sm:text-sm font-medium">
-            <Link href="/terms" className="hover:text-white">
-              Terms
+            <Link href={`/${lang}/terms`} className="hover:text-white">
+              {dict.terms}
             </Link>
-            <Link href="/privacy" className="hover:text-white">
-              Privacy
+            <Link href={`/${lang}/privacy`} className="hover:text-white">
+              {dict.privacy}
             </Link>
-            <Link href="/contact" className="hover:text-white">
-              Contact
+            <Link href={`/${lang}/contact`} className="hover:text-white">
+              {dict.contact}
             </Link>
           </div>
 
           {/* Copyright */}
           <p className="text-xs text-blue-200 sm:text-sm">
-            © {year} MyEthioProperties. All rights reserved.
+            © {year} MyEthioProperties. {dict.allRightsReserved}
           </p>
         </div>
       </div>
