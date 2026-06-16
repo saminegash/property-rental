@@ -32,7 +32,7 @@ export default async function HomePage({
   return (
     <>
       <HeroSection dict={dict.hero} lang={lang} />
-      <FeaturedListingsSection dict={dict.featured} lang={lang} />
+      <FeaturedListingsSection dict={dict.featured} cardLabels={{ ...dict.common, categories: dict.categories }} lang={lang} />
       <BrowseByCategorySection dict={dict.browseCategory} lang={lang} />
       <HowItWorksSection dict={dict.howItWorks} />
       <DualCTASection dict={dict.dualCta} lang={lang} />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
-import { submitRequest } from "@/app/(public)/actions";
+import { submitRequest } from "@/app/[lang]/(public)/actions";
 
 interface RequestFormProps {
   listingId: string;

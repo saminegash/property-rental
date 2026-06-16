@@ -48,6 +48,8 @@ export interface ListingsGridProps {
   limit?: number;
   /** Current locale. */
   lang?: string;
+  /** Labels for the listing cards. */
+  cardLabels?: import("@/components/listings/ListingCard").ListingCardLabels;
 }
 
 /**
@@ -73,6 +75,7 @@ export async function ListingsGrid({
   background = "slate",
   limit = 30,
   lang = "en",
+  cardLabels,
 }: ListingsGridProps) {
   const supabase = await createClient();
 
@@ -160,8 +163,10 @@ export async function ListingsGrid({
                   price={listing.price}
                   type={listing.listing_type}
                   propertyType={
-                    listing.property_type.charAt(0).toUpperCase() +
-                    listing.property_type.slice(1)
+                    cardLabels && cardLabels.categories
+                      ? cardLabels.categories[listing.property_type as keyof typeof cardLabels.categories] ||
+                        listing.property_type.charAt(0).toUpperCase() + listing.property_type.slice(1)
+                      : listing.property_type.charAt(0).toUpperCase() + listing.property_type.slice(1)
                   }
                   beds={details?.bedrooms || null}
                   baths={details?.bathrooms || null}
@@ -169,6 +174,7 @@ export async function ListingsGrid({
                   isVerified={verifiedOwnerIds.has(listing.owner_id)}
                   isFeatured={listing.is_featured}
                   href={`/${lang}/listings/${listing.id}`}
+                  labels={cardLabels}
                 />
               );
             })}

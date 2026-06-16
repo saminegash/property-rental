@@ -17,9 +17,11 @@ interface FeaturedDict {
  */
 export async function FeaturedListingsSection({
   dict,
+  cardLabels,
   lang,
 }: {
   dict: FeaturedDict;
+  cardLabels: any; // We'll type this better later, but it needs to match ListingCardLabels
   lang: string;
 }) {
   return (
@@ -35,6 +37,7 @@ export async function FeaturedListingsSection({
       background="slate"
       limit={30}
       lang={lang}
+      cardLabels={cardLabels}
     />
   );
 }
