@@ -6,16 +6,35 @@ const LOCATIONS = [
   "Kazanchis", "Adama", "Hawassa", "Bahir Dar",
 ] as const;
 
-const TOP_CATEGORIES = [
-  { label: "Apartments for Rent", href: "/rent?property_type=apartment" },
-  { label: "Houses for Sale", href: "/trade?property_type=house" },
-  { label: "Land for Sale", href: "/trade?property_type=land" },
-  { label: "Toyota Cars", href: "/rent?property_type=vehicle" },
-  { label: "SUVs", href: "/rent?property_type=vehicle" },
-  { label: "Office Spaces", href: "/rent?property_type=commercial" },
-] as const;
+interface PopularSearchedDict {
+  popularLocations: string;
+  exploreAll: string;
+  topSearched: string;
+  seeAll: string;
+  apartmentsForRent: string;
+  housesForSale: string;
+  landForSale: string;
+  toyotaCars: string;
+  suvs: string;
+  officeSpaces: string;
+}
 
-export default function PopularAndSearchedSection() {
+export default function PopularAndSearchedSection({
+  dict,
+  lang,
+}: {
+  dict: PopularSearchedDict;
+  lang: string;
+}) {
+  const TOP_CATEGORIES = [
+    { label: dict.apartmentsForRent, href: `/${lang}/rent?property_type=apartment` },
+    { label: dict.housesForSale, href: `/${lang}/trade?property_type=house` },
+    { label: dict.landForSale, href: `/${lang}/trade?property_type=land` },
+    { label: dict.toyotaCars, href: `/${lang}/rent?property_type=vehicle` },
+    { label: dict.suvs, href: `/${lang}/rent?property_type=vehicle` },
+    { label: dict.officeSpaces, href: `/${lang}/rent?property_type=commercial` },
+  ];
+
   return (
     <section className="bg-white py-10 lg:py-14">
       <div className="mx-auto px-4 sm:px-6">
@@ -25,14 +44,14 @@ export default function PopularAndSearchedSection() {
           <div>
             <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900 sm:text-lg">
               <MapPin className="h-4 w-4 text-blue-600" aria-hidden="true" />
-              Popular Locations
+              {dict.popularLocations}
             </h3>
 
             <div className="mt-4 flex flex-wrap gap-2">
               {LOCATIONS.map((loc) => (
                 <Link
                   key={loc}
-                  href={`/rent?location=${encodeURIComponent(loc)}`}
+                  href={`/${lang}/rent?location=${encodeURIComponent(loc)}`}
                   className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-700 shadow-sm hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-colors sm:text-sm"
                 >
                   {loc}
@@ -41,10 +60,10 @@ export default function PopularAndSearchedSection() {
             </div>
 
             <Link
-              href="/rent"
+              href={`/${lang}/rent`}
               className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:gap-2 transition-all sm:text-sm"
             >
-              Explore all locations
+              {dict.exploreAll}
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
@@ -53,7 +72,7 @@ export default function PopularAndSearchedSection() {
           <div>
             <h3 className="flex items-center gap-2 text-base font-semibold text-slate-900 sm:text-lg">
               <Search className="h-4 w-4 text-emerald-600" aria-hidden="true" />
-              Top Searched Categories
+              {dict.topSearched}
             </h3>
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -69,10 +88,10 @@ export default function PopularAndSearchedSection() {
             </div>
 
             <Link
-              href="/rent"
+              href={`/${lang}/rent`}
               className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:gap-2 transition-all sm:text-sm"
             >
-              See all categories
+              {dict.seeAll}
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>

@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { clientEnv } from "@/lib/env/client";
 
 /* ── Locale helpers ── */
-const LOCALES = ["en", "am"] as const;
+const LOCALES = ["en", "am", "om"] as const;
 type Locale = (typeof LOCALES)[number];
 const DEFAULT_LOCALE: Locale = "en";
 

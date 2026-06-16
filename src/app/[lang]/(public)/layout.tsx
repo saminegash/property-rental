@@ -19,7 +19,7 @@ export default async function PublicLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <AnnouncementBar />
+      <AnnouncementBar dict={dict.announcement} />
       <Header lang={lang} dict={dict.common} />
       <main className="flex-1">{children}</main>
       <Footer lang={lang} dict={dict.footer} />

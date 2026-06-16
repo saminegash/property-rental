@@ -1,41 +1,36 @@
-const STEPS = [
-  {
-    n: 1,
-    title: "Search or Browse",
-    desc: "Find properties or cars that match your needs",
-  },
-  {
-    n: 2,
-    title: "Send Inquiry",
-    desc: "Send a request or inquiry to the owner",
-  },
-  {
-    n: 3,
-    title: "Admin Reviews",
-    desc: "We review and verify the request & listing",
-  },
-  {
-    n: 4,
-    title: "Owner/Seller Contacted",
-    desc: "If verified, owner or seller will contact you",
-  },
-  {
-    n: 5,
-    title: "Visit & Complete Safely",
-    desc: "Visit, inspect, and complete the deal safely",
-  },
-] as const;
+interface HowItWorksDict {
+  title: string;
+  subtitle: string;
+  step1Title: string;
+  step1Desc: string;
+  step2Title: string;
+  step2Desc: string;
+  step3Title: string;
+  step3Desc: string;
+  step4Title: string;
+  step4Desc: string;
+  step5Title: string;
+  step5Desc: string;
+}
 
-export default function HowItWorksSection() {
+export default function HowItWorksSection({ dict }: { dict: HowItWorksDict }) {
+  const STEPS = [
+    { n: 1, title: dict.step1Title, desc: dict.step1Desc },
+    { n: 2, title: dict.step2Title, desc: dict.step2Desc },
+    { n: 3, title: dict.step3Title, desc: dict.step3Desc },
+    { n: 4, title: dict.step4Title, desc: dict.step4Desc },
+    { n: 5, title: dict.step5Title, desc: dict.step5Desc },
+  ];
+
   return (
     <section className="bg-slate-50 py-12 lg:py-16" id="how-it-works">
       <div className="mx-auto px-4 sm:px-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            How It Works
+            {dict.title}
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            Safe, simple, and transparent — from search to handover.
+            {dict.subtitle}
           </p>
         </div>
 

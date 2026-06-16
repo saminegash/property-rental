@@ -1,21 +1,28 @@
 import { ShieldCheck, BadgeCheck, Lock, Percent } from "lucide-react";
 import { COMMISSION_COPY } from "@/lib/commission";
 
-const ITEMS = [
-  { icon: ShieldCheck, label: "Admin Reviewed Listings" },
-  { icon: BadgeCheck, label: "Verified Owners & Sellers" },
-  { icon: Lock, label: "Safe & Transparent Process" },
-  {
-    icon: Percent,
-    label: `${COMMISSION_COPY.short} — Only After a Successful Deal`,
-  },
-] as const;
+interface AnnouncementDict {
+  adminReviewed: string;
+  verifiedOwners: string;
+  safeProcess: string;
+  commissionDeal: string;
+}
 
 /**
  * Thin trust bar that sits above the header.
  * Scrolling horizontally non-stop like an LED display.
  */
-export default function AnnouncementBar() {
+export default function AnnouncementBar({ dict }: { dict: AnnouncementDict }) {
+  const ITEMS = [
+    { icon: ShieldCheck, label: dict.adminReviewed },
+    { icon: BadgeCheck, label: dict.verifiedOwners },
+    { icon: Lock, label: dict.safeProcess },
+    {
+      icon: Percent,
+      label: `${COMMISSION_COPY.short} ${dict.commissionDeal}`,
+    },
+  ];
+
   // Repeat items to ensure there's always enough content to fill wide screens during the scroll
   const REPEATED_ITEMS = [...ITEMS, ...ITEMS, ...ITEMS, ...ITEMS];
 

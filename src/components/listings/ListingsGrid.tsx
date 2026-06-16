@@ -26,6 +26,16 @@ export interface ListingsGridProps {
   subtitle: string;
   /** "View All" link target. */
   viewAllHref: string;
+  /** "View All" link label. */
+  viewAllLabel?: string;
+  /** Empty state title. */
+  emptyTitle?: string;
+  /** Empty state description. */
+  emptyDesc?: string;
+  /** Empty state primary button label. */
+  emptyPrimaryLabel?: string;
+  /** Empty state secondary button label. */
+  emptySecondaryLabel?: string;
   /** Optional filter on `listings.property_type`. */
   propertyType?: PropertyType;
   /** Optional filter on `listings.listing_type`. */
@@ -36,6 +46,8 @@ export interface ListingsGridProps {
   background?: "white" | "slate";
   /** Max number of listings to fetch. */
   limit?: number;
+  /** Current locale. */
+  lang?: string;
 }
 
 /**
@@ -50,11 +62,17 @@ export async function ListingsGrid({
   title,
   subtitle,
   viewAllHref,
+  viewAllLabel = "View All",
+  emptyTitle = "No listings available right now",
+  emptyDesc = "We're onboarding verified owners. Check back soon.",
+  emptyPrimaryLabel = "Post a Listing",
+  emptySecondaryLabel = "Browse Marketplace",
   propertyType,
   listingType,
   anchorId,
   background = "slate",
   limit = 30,
+  lang = "en",
 }: ListingsGridProps) {
   const supabase = await createClient();
 
@@ -115,7 +133,7 @@ export async function ListingsGrid({
             href={viewAllHref}
             className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-blue-600 hover:gap-2 transition-all"
           >
-            View All <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            {viewAllLabel} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
 
@@ -150,7 +168,7 @@ export async function ListingsGrid({
                   area={details?.area_sqm || null}
                   isVerified={verifiedOwnerIds.has(listing.owner_id)}
                   isFeatured={listing.is_featured}
-                  href={`/listings/${listing.id}`}
+                  href={`/${lang}/listings/${listing.id}`}
                 />
               );
             })}
@@ -158,12 +176,12 @@ export async function ListingsGrid({
         ) : (
           <EmptyState
             icon={<Sparkles className="h-10 w-10 text-blue-600" />}
-            title="No listings available right now"
-            description="We're onboarding verified owners. Check back soon."
-            primaryHref="/dashboard/owner/listings/new"
-            primaryLabel="Post a Listing"
-            secondaryHref="/trade"
-            secondaryLabel="Browse Marketplace"
+            title={emptyTitle}
+            description={emptyDesc}
+            primaryHref={`/${lang}/dashboard/owner/listings/new`}
+            primaryLabel={emptyPrimaryLabel}
+            secondaryHref={`/${lang}/trade`}
+            secondaryLabel={emptySecondaryLabel}
           />
         )}
       </div>

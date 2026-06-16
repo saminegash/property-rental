@@ -2,7 +2,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { Home, Car, ArrowRight } from "lucide-react";
 
-export default function DualCTASection() {
+interface DualCtaDict {
+  propertyTitle: string;
+  propertySubtitle: string;
+  propertyButton: string;
+  propertyImageAlt: string;
+  carTitle: string;
+  carSubtitle: string;
+  carButton: string;
+  carImageAlt: string;
+}
+
+export default function DualCTASection({
+  dict,
+  lang,
+}: {
+  dict: DualCtaDict;
+  lang: string;
+}) {
   return (
     <section className="bg-white py-10 lg:py-12">
       <div className="mx-auto px-4 sm:px-6">
@@ -11,24 +28,24 @@ export default function DualCTASection() {
           <CtaCard
             tone="blue"
             icon={<Home className="h-5 w-5" />}
-            title="Own a property? List it safely"
-            subtitle="Reach genuine tenants and buyers. We review requests and connect you only with serious, verified people."
-            buttonLabel="List Your Property"
-            buttonHref="/dashboard/become-owner"
+            title={dict.propertyTitle}
+            subtitle={dict.propertySubtitle}
+            buttonLabel={dict.propertyButton}
+            buttonHref={`/${lang}/dashboard/become-owner`}
             image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&h=450&q=80"
-            imageAlt="Property listing illustration"
+            imageAlt={dict.propertyImageAlt}
           />
 
           {/* Car CTA */}
           <CtaCard
             tone="emerald"
             icon={<Car className="h-5 w-5" />}
-            title="Want to sell your car?"
-            subtitle="Get your car in front of thousands of serious buyers. We verify and support you every step."
-            buttonLabel="Sell Your Car"
-            buttonHref="/dashboard/become-owner?category=car"
+            title={dict.carTitle}
+            subtitle={dict.carSubtitle}
+            buttonLabel={dict.carButton}
+            buttonHref={`/${lang}/dashboard/become-owner?category=car`}
             image="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&h=450&q=80"
-            imageAlt="Car selling illustration"
+            imageAlt={dict.carImageAlt}
           />
         </div>
       </div>

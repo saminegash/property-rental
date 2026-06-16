@@ -8,14 +8,8 @@ import {
   Car,
   Search,
   MapPin,
-  BadgeCheck,
-  ShieldCheck,
-  FileCheck,
-  Percent,
   ChevronDown,
 } from "lucide-react";
-
-import { COMMISSION_COPY } from "@/lib/commission";
 
 type Tab = "rent" | "sale";
 
@@ -30,33 +24,44 @@ const POPULAR_LOCATIONS = [
   "Bahir Dar",
 ];
 
-const FLOATING_BADGES = [
-  {
-    icon: BadgeCheck,
-    title: "Verified Listings",
-    subtitle: "Real owners & sellers",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Admin Reviewed",
-    subtitle: "Every listing is checked",
-  },
-  {
-    icon: FileCheck,
-    title: "Transparent Process",
-    subtitle: "Clear steps, no surprises",
-  },
-  {
-    icon: Percent,
-    title: COMMISSION_COPY.badgeTitle,
-    subtitle: COMMISSION_COPY.badgeSubtitle,
-  },
-] as const;
+interface HeroDict {
+  title: string;
+  titleAccent: string;
+  titleSuffix: string;
+  subtitle: string;
+  subtitleLine2: string;
+  tabRent: string;
+  tabBuy: string;
+  locationLabel: string;
+  locationPlaceholder: string;
+  typeLabel: string;
+  allTypes: string;
+  typeApartment: string;
+  typeHouse: string;
+  typeVilla: string;
+  typeLand: string;
+  typeCommercial: string;
+  typeCondominium: string;
+  typeVehicle: string;
+  priceRangeLabel: string;
+  minPlaceholder: string;
+  maxPlaceholder: string;
+  searchRentals: string;
+  searchListings: string;
+  popular: string;
+  imageAlt: string;
+}
 
 /**
  * Hero section — unified marketplace.
  */
-export default function HeroSection() {
+export default function HeroSection({
+  dict,
+  lang,
+}: {
+  dict: HeroDict;
+  lang: string;
+}) {
   const [tab, setTab] = useState<Tab>("rent");
   const router = useRouter();
 
@@ -77,9 +82,9 @@ export default function HeroSection() {
     if (max) params.set("max_price", max);
 
     if (tab === "rent") {
-      router.push(`/rent?${params.toString()}`);
+      router.push(`/${lang}/rent?${params.toString()}`);
     } else {
-      router.push(`/trade?${params.toString()}`);
+      router.push(`/${lang}/trade?${params.toString()}`);
     }
   }
 
@@ -88,23 +93,33 @@ export default function HeroSection() {
   const inputClass =
     "w-full rounded-lg border border-slate-300 bg-white py-2.5 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20";
 
+  const PROPERTY_TYPES = [
+    { value: "apartment", label: dict.typeApartment },
+    { value: "house", label: dict.typeHouse },
+    { value: "villa", label: dict.typeVilla },
+    { value: "land", label: dict.typeLand },
+    { value: "commercial", label: dict.typeCommercial },
+    { value: "condominium", label: dict.typeCondominium },
+    { value: "vehicle", label: dict.typeVehicle },
+  ];
+
   return (
     <section className="hero-section">
       <div className="hero-section__container">
         {/* LEFT — Headline + search */}
         <div className="hero-section__left">
           <h1 className="hero-section__title">
-            Find trusted{" "}
+            {dict.title}{" "}
             <span className="hero-section__title-accent">
-              properties and cars
+              {dict.titleAccent}
             </span>
             <br />
-            across Ethiopia
+            {dict.titleSuffix}
           </h1>
           <p className="hero-section__subtitle">
-            Rent, buy, and list properties. Browse or sell cars.
+            {dict.subtitle}
             <br />
-            All in one trusted, admin-reviewed marketplace.
+            {dict.subtitleLine2}
           </p>
 
           {/* Search card */}
@@ -124,7 +139,7 @@ export default function HeroSection() {
                 }`}
               >
                 <HomeIcon className="h-4 w-4" aria-hidden="true" />
-                Rent
+                {dict.tabRent}
               </button>
               <button
                 role="tab"
@@ -135,14 +150,14 @@ export default function HeroSection() {
                 }`}
               >
                 <Car className="h-4 w-4" aria-hidden="true" />
-                Buy
+                {dict.tabBuy}
               </button>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="hero-section__form">
               {/* Row 1: Location */}
-              <Field label="Location">
+              <Field label={dict.locationLabel}>
                 <div className="hero-section__input-wrap">
                   <MapPin
                     className="hero-section__input-icon"
@@ -151,28 +166,20 @@ export default function HeroSection() {
                   <input
                     type="text"
                     name="location"
-                    placeholder="Addis Ababa, Bole, CMC..."
+                    placeholder={dict.locationPlaceholder}
                     className="hero-section__input hero-section__input--with-icon"
                   />
                 </div>
               </Field>
 
               {/* Property Type */}
-              <Field label="Type">
+              <Field label={dict.typeLabel}>
                 <div className="hero-section__select-wrap">
                   <select name="property_type" className={selectClass}>
-                    <option value="">All Types</option>
-                    {[
-                      "Apartment",
-                      "House",
-                      "Villa",
-                      "Land",
-                      "Commercial",
-                      "Condominium",
-                      "Vehicle",
-                    ].map((n) => (
-                      <option key={n} value={n.toLowerCase()}>
-                        {n}
+                    <option value="">{dict.allTypes}</option>
+                    {PROPERTY_TYPES.map((pt) => (
+                      <option key={pt.value} value={pt.value}>
+                        {pt.label}
                       </option>
                     ))}
                   </select>
@@ -184,12 +191,12 @@ export default function HeroSection() {
               </Field>
 
               {/* Price Range */}
-              <Field label="Price Range (ETB)">
+              <Field label={dict.priceRangeLabel}>
                 <div className="hero-section__price-row">
                   <input
                     type="number"
                     name="min_price"
-                    placeholder="Min"
+                    placeholder={dict.minPlaceholder}
                     className={inputClass}
                     min="0"
                   />
@@ -197,7 +204,7 @@ export default function HeroSection() {
                   <input
                     type="number"
                     name="max_price"
-                    placeholder="Max"
+                    placeholder={dict.maxPlaceholder}
                     className={inputClass}
                     min="0"
                   />
@@ -207,17 +214,17 @@ export default function HeroSection() {
               {/* Search button */}
               <button type="submit" className="hero-section__search-btn">
                 <Search className="h-4 w-4" aria-hidden="true" />
-                Search {tab === "rent" ? "Rentals" : "Listings"}
+                {tab === "rent" ? dict.searchRentals : dict.searchListings}
               </button>
             </form>
 
             {/* Popular locations */}
             <div className="hero-section__popular">
-              <span className="hero-section__popular-label">Popular:</span>
+              <span className="hero-section__popular-label">{dict.popular}</span>
               {POPULAR_LOCATIONS.map((loc) => (
                 <a
                   key={loc}
-                  href={`/${tab === "rent" ? "rent" : "trade"}?location=${encodeURIComponent(loc)}`}
+                  href={`/${lang}/${tab === "rent" ? "rent" : "trade"}?location=${encodeURIComponent(loc)}`}
                   className="hero-section__popular-link"
                 >
                   {loc}
@@ -234,7 +241,7 @@ export default function HeroSection() {
             <div className="hero-section__main-image">
               <Image
                 src="/luxury.jpg"
-                alt="Modern property in Ethiopia"
+                alt={dict.imageAlt}
                 fill
                 priority
                 className="hero-section__img"

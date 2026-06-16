@@ -1,6 +1,17 @@
 import Link from "next/link";
 import { formatCompactNumber } from "@/lib/format";
 
+export interface ListingCardLabels {
+  verified: string;
+  featured: string;
+  forRent: string;
+  forSale: string;
+  priceOnRequest: string;
+  perMonth: string;
+  beds: string;
+  baths: string;
+}
+
 export interface ListingCardProps {
   id: string;
   title: string;
@@ -15,7 +26,19 @@ export interface ListingCardProps {
   isVerified?: boolean;
   isFeatured?: boolean;
   href: string;
+  labels?: ListingCardLabels;
 }
+
+const DEFAULT_LABELS: ListingCardLabels = {
+  verified: "Verified",
+  featured: "Featured",
+  forRent: "For Rent",
+  forSale: "For Sale",
+  priceOnRequest: "Price on Request",
+  perMonth: "/month",
+  beds: "Beds",
+  baths: "Baths",
+};
 
 /**
  * Reusable listing card used across homepage, browse page, and related listings.
@@ -33,7 +56,10 @@ export function ListingCard({
   isVerified = false,
   isFeatured = false,
   href,
+  labels = DEFAULT_LABELS,
 }: ListingCardProps) {
+  const l = { ...DEFAULT_LABELS, ...labels };
+
   return (
     <div className="property-listing-card">
       {/* Image Area */}
@@ -41,7 +67,7 @@ export function ListingCard({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image}
-          alt={`${title} — property in ${location}`}
+          alt={`${title} — ${location}`}
           className="property-listing-card__img"
           loading="lazy"
         />
@@ -50,12 +76,12 @@ export function ListingCard({
         <div className="property-listing-card__badges">
           {isVerified && (
             <span className="property-listing-card__badge property-listing-card__badge--verified">
-              Verified
+              {l.verified}
             </span>
           )}
           {isFeatured && (
             <span className="property-listing-card__badge property-listing-card__badge--featured">
-              Featured
+              {l.featured}
             </span>
           )}
         </div>
@@ -65,7 +91,7 @@ export function ListingCard({
           className="property-listing-card__fav"
           role="button"
           tabIndex={0}
-          aria-label={`Save ${title} to favorites`}
+          aria-label={`Save ${title}`}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -74,7 +100,7 @@ export function ListingCard({
 
         {/* Status Badge — bottom-left */}
         <div className="property-listing-card__status-badge">
-          {propertyType} For {type === "rent" ? "Rent" : "Sale"}
+          {propertyType} {type === "rent" ? l.forRent : l.forSale}
         </div>
       </div>
 
@@ -95,12 +121,12 @@ export function ListingCard({
         {/* Price */}
         <div className="property-listing-card__price">
           {type === "sale" && (!price || price === 0) ? (
-            <span style={{ fontSize: "1.1rem" }}>Price on Request</span>
+            <span style={{ fontSize: "1.1rem" }}>{l.priceOnRequest}</span>
           ) : (
             <>
               {formatCompactNumber(price)} ETB
               {type === "rent" && (
-                <span className="property-listing-card__price-period">/month</span>
+                <span className="property-listing-card__price-period">{l.perMonth}</span>
               )}
             </>
           )}
@@ -115,7 +141,7 @@ export function ListingCard({
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                   <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
-                <span>{beds} Beds</span>
+                <span>{beds} {l.beds}</span>
               </div>
             )}
             {baths != null && (
@@ -128,7 +154,7 @@ export function ListingCard({
                   <path d="M8 2h8" />
                   <path d="M12 2v4" />
                 </svg>
-                <span>{baths} Baths</span>
+                <span>{baths} {l.baths}</span>
               </div>
             )}
             {area != null && (
@@ -146,7 +172,7 @@ export function ListingCard({
       </div>
 
       {/* Full-card link overlay */}
-      <Link href={href} className="property-listing-card__link" aria-label={`View details for ${title}`} />
+      <Link href={href} className="property-listing-card__link" aria-label={`${title}`} />
     </div>
   );
 }
