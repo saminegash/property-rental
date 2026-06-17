@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateProfile } from "@/app/dashboard/actions";
+import { updateProfile } from "@/app/[lang]/dashboard/actions";
 
 interface ProfileFormProps {
   initialData: {
