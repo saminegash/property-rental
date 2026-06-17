@@ -10,6 +10,7 @@ export interface ListingCardLabels {
   perMonth: string;
   beds: string;
   baths: string;
+  categories?: Record<string, string>;
 }
 
 export interface ListingCardProps {
